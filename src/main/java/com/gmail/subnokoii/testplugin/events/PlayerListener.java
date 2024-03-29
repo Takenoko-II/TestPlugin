@@ -1,11 +1,8 @@
 package com.gmail.subnokoii.testplugin.events;
 
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
-import com.gmail.subnokoii.testplugin.lib.vector.VectorBuilder;
 import com.gmail.subnokoii.testplugin.lib.vector.VectorDimensionSizeMismatchException;
 import com.gmail.subnokoii.testplugin.lib.vector.VectorUnexpectedDimensionSizeException;
-import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

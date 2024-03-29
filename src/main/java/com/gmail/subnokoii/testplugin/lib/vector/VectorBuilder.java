@@ -29,6 +29,11 @@ public class VectorBuilder {
         vectorDimensionSize = new VectorBuilderDimensionSize(3);
     }
 
+    public VectorBuilder(double[] componentsList) {
+        components = componentsList;
+        vectorDimensionSize = new VectorBuilderDimensionSize(components.length);
+    }
+
     public double getComponent(int index) {
         return components[index];
     }
@@ -87,6 +92,25 @@ public class VectorBuilder {
         return summaryOfMultiple;
     }
 
+    public VectorBuilder cross(VectorBuilder vectorBuilder) throws VectorUnexpectedDimensionSizeException {
+        if (!(vectorBuilder.vectorDimensionSize.getValue() == 3 && vectorDimensionSize.getValue() == 3)) {
+            throw new VectorUnexpectedDimensionSizeException();
+        }
+
+        final double x1 = components[0];
+        final double y1 = components[1];
+        final double z1 = components[2];
+        final double x2 = vectorBuilder.components[0];
+        final double y2 = vectorBuilder.components[1];
+        final double z2 = vectorBuilder.components[2];
+
+        return new VectorBuilder(
+                y1 * z2 - z1 * y2,
+                z1 * x2 - x1 * z2,
+                x1 * y2 - y1 * x2
+        );
+    }
+
     public double getLength() {
         try {
             return Math.sqrt(dot(this));
@@ -103,6 +127,27 @@ public class VectorBuilder {
         }
 
         return this;
+    }
+
+    public double getAngleBetween(VectorBuilder vectorBuilder) throws VectorDimensionSizeMismatchException {
+        if (!vectorDimensionSize.match(vectorBuilder)) {
+            throw new VectorDimensionSizeMismatchException();
+        }
+
+        double p = this.dot(vectorBuilder) / (getLength() * vectorBuilder.getLength());
+
+        return Math.acos(p) * 180 / Math.PI;
+    }
+
+    public VectorBuilder getRotation() throws VectorUnexpectedDimensionSizeException {
+        if (vectorDimensionSize.getValue() != 3) {
+            throw new VectorUnexpectedDimensionSizeException();
+        }
+
+        return new VectorBuilder(
+                -Math.asin(components[1] / getLength()) * 180d / Math.PI,
+                -Math.atan2(components[0] / getLength(), components[2]/ getLength()) * 180d / Math.PI
+        );
     }
 
     public VectorBuilder normalized() {
@@ -126,11 +171,7 @@ public class VectorBuilder {
             throw new VectorDimensionSizeMismatchException();
         }
 
-        for (int i = 0; i < components.length; i++) {
-            components[i] -= vectorBuilder.getComponent(i);
-        }
-
-        return this;
+        return copy().add(vectorBuilder.copy().inverted());
     }
 
     public VectorBuilder multiplyByScalar(double scalar) {
@@ -145,15 +186,67 @@ public class VectorBuilder {
         return multiplyByScalar(-1d);
     }
 
-    public VectorBuilder getRotation() throws VectorUnexpectedDimensionSizeException {
+    public VectorBuilder directionTo(VectorBuilder vectorBuilder) throws VectorDimensionSizeMismatchException {
+        if (!vectorDimensionSize.match(vectorBuilder)) {
+            throw new VectorDimensionSizeMismatchException();
+        }
+
+        return vectorBuilder.copy()
+                .subtract(this)
+                .normalized();
+    }
+
+    public double distanceWith(VectorBuilder vectorBuilder) throws VectorDimensionSizeMismatchException {
+        if (!vectorDimensionSize.match(vectorBuilder)) {
+            throw new VectorDimensionSizeMismatchException();
+        }
+
+        double summaryOfSquare = 0d;
+
+        for (int i = 0; i < components.length; i++) {
+            final double a = components[i];
+            final double b = vectorBuilder.getComponent(i);
+            summaryOfSquare += (a - b) * (a - b);
+        }
+
+        return Math.sqrt(summaryOfSquare);
+    }
+
+    public VectorBuilder projection(VectorBuilder vectorBuilder) throws VectorDimensionSizeMismatchException {
+        if (!vectorDimensionSize.match(vectorBuilder)) {
+            throw new VectorDimensionSizeMismatchException();
+        }
+
+        return vectorBuilder.copy().multiplyByScalar(
+                vectorBuilder.getLength() * getLength() / vectorBuilder.getLength() * vectorBuilder.getLength()
+        );
+    }
+
+    public VectorBuilder rejection(VectorBuilder vectorBuilder) throws VectorDimensionSizeMismatchException {
+        if (!vectorDimensionSize.match(vectorBuilder)) {
+            throw new VectorDimensionSizeMismatchException();
+        }
+
+        return subtract(projection(vectorBuilder));
+    }
+
+    public VectorBuilder copy() {
+        final VectorBuilder copied = new VectorBuilder(vectorDimensionSize.getValue());
+
+        try {
+            return copied.setAllComponents(components);
+        }
+        catch (VectorDimensionSizeMismatchException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public VectorLocalAxes getLocalAxes() throws VectorUnexpectedDimensionSizeException {
         if (vectorDimensionSize.getValue() != 3) {
             throw new VectorUnexpectedDimensionSizeException();
         }
 
-        return new VectorBuilder(
-                -Math.asin(components[1] / getLength()) * 180d / Math.PI,
-                -Math.atan2(components[0] / getLength(), components[2]/ getLength()) * 180d / Math.PI
-        );
+        return new VectorLocalAxes(this);
     }
 
     public Location toLocation(World world) throws VectorUnexpectedDimensionSizeException {
