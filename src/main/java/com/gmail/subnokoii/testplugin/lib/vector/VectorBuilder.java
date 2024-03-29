@@ -3,6 +3,8 @@ package com.gmail.subnokoii.testplugin.lib.vector;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.Arrays;
+
 public class VectorBuilder {
     private final double[] components;
 
@@ -30,7 +32,10 @@ public class VectorBuilder {
     }
 
     public VectorBuilder(double[] componentsList) {
-        components = componentsList;
+        double[] newArray = new double[componentsList.length];
+        System.arraycopy(componentsList, 0, newArray, 0, componentsList.length);
+
+        components = newArray;
         vectorDimensionSize = new VectorBuilderDimensionSize(components.length);
     }
 
@@ -67,7 +72,7 @@ public class VectorBuilder {
         }
 
         for (int i = 0; i < components.length; i++) {
-            if (components[i] != vectorBuilder.getComponent(i)) {
+            if (components[i] != vectorBuilder.components[i]) {
                 return false;
             }
         }
@@ -86,7 +91,7 @@ public class VectorBuilder {
 
         double summaryOfMultiple = 0d;
         for (int i = 0; i < components.length; i++) {
-            summaryOfMultiple += components[i] * vectorBuilder.getComponent(i);
+            summaryOfMultiple += components[i] * vectorBuilder.components[i];
         }
 
         return summaryOfMultiple;
@@ -139,17 +144,6 @@ public class VectorBuilder {
         return Math.acos(p) * 180 / Math.PI;
     }
 
-    public VectorBuilder getRotation() throws VectorUnexpectedDimensionSizeException {
-        if (vectorDimensionSize.getValue() != 3) {
-            throw new VectorUnexpectedDimensionSizeException();
-        }
-
-        return new VectorBuilder(
-                -Math.asin(components[1] / getLength()) * 180d / Math.PI,
-                -Math.atan2(components[0] / getLength(), components[2]/ getLength()) * 180d / Math.PI
-        );
-    }
-
     public VectorBuilder normalized() {
         return setLength(1d);
     }
@@ -160,7 +154,7 @@ public class VectorBuilder {
         }
 
         for (int i = 0; i < components.length; i++) {
-            components[i] += vectorBuilder.getComponent(i);
+            components[i] += vectorBuilder.components[i];
         }
 
         return this;
@@ -178,6 +172,12 @@ public class VectorBuilder {
         for (int i = 0; i < components.length; i++) {
             components[i] *= scalar;
         }
+
+        return this;
+    }
+
+    public VectorBuilder fill(double value) {
+        Arrays.fill(components, value);
 
         return this;
     }
@@ -231,14 +231,7 @@ public class VectorBuilder {
     }
 
     public VectorBuilder copy() {
-        final VectorBuilder copied = new VectorBuilder(vectorDimensionSize.getValue());
-
-        try {
-            return copied.setAllComponents(components);
-        }
-        catch (VectorDimensionSizeMismatchException e) {
-            throw new RuntimeException(e);
-        }
+        return new VectorBuilder(components);
     }
 
     public VectorLocalAxes getLocalAxes() throws VectorUnexpectedDimensionSizeException {
@@ -257,18 +250,33 @@ public class VectorBuilder {
         return new Location(world, components[0], components[1], components[2]);
     }
 
-    public static VectorBuilder getVector3FromRotation(VectorBuilder vectorBuilder) throws VectorUnexpectedDimensionSizeException {
-        if (vectorBuilder.vectorDimensionSize.getValue() != 2) {
+    public VectorBuilder getRotation2d() throws VectorUnexpectedDimensionSizeException {
+        if (vectorDimensionSize.getValue() != 3) {
             throw new VectorUnexpectedDimensionSizeException();
         }
 
-        final double x = vectorBuilder.components[0];
-        final double y = vectorBuilder.components[1];
+        return new VectorBuilder(
+                -Math.asin(components[1] / getLength()) * 180d / Math.PI,
+                -Math.atan2(components[0] / getLength(), components[2]/ getLength()) * 180d / Math.PI
+        );
+    }
+
+    public VectorBuilder getDirection3d() throws VectorUnexpectedDimensionSizeException {
+        if (vectorDimensionSize.getValue() != 2) {
+            throw new VectorUnexpectedDimensionSizeException();
+        }
+
+        final double x = components[0];
+        final double y = components[1];
 
         return new VectorBuilder(
                 -Math.sin(x * Math.PI / 180) * Math.cos(y * Math.PI / 180),
                 -Math.sin(y * Math.PI / 180),
                 Math.cos(x * Math.PI / 180) * Math.cos(y * Math.PI / 180)
         );
+    }
+
+    public static VectorBuilder zero(int dimensionSize) {
+        return new VectorBuilder(new double[dimensionSize]).fill(0d);
     }
 }

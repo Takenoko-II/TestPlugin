@@ -9,20 +9,16 @@ public final class TestPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
         getLogger().info("きどうしたぜいぇい");
 
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
         final PluginCommand foo = getCommand("foo");
-        if (foo != null) {
-            foo.setExecutor(new FooCommand());
-        }
+        if (foo != null) foo.setExecutor(new FooCommand());
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
         getLogger().info("ていししたぜいぇい");
     }
 }
