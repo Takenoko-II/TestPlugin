@@ -4,4 +4,3 @@ main: com.gmail.subnokoii.testplugin.TestPlugin
 api-version: '1.20'
 commands:
   foo:
-  map:

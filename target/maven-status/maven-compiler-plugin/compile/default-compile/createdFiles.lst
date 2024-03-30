@@ -2,8 +2,10 @@ com\gmail\subnokoii\testplugin\lib\vector\VectorUnexpectedDimensionSizeException
 com\gmail\subnokoii\testplugin\commands\FooCommand.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorDimensionSizeMismatchException.class
 com\gmail\subnokoii\testplugin\lib\scoreboard\ScoreboardUtilsObjective.class
+com\gmail\subnokoii\testplugin\events\TickListener.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorBuilderDimensionSize.class
 com\gmail\subnokoii\testplugin\lib\scoreboard\ScoreboardUtils.class
 com\gmail\subnokoii\testplugin\TestPlugin.class
 com\gmail\subnokoii\testplugin\events\PlayerListener.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorBuilder.class
+com\gmail\subnokoii\testplugin\lib\vector\VectorLocalAxes.class

@@ -3,6 +3,8 @@ package com.gmail.subnokoii.testplugin.events;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.vector.VectorDimensionSizeMismatchException;
 import com.gmail.subnokoii.testplugin.lib.vector.VectorUnexpectedDimensionSizeException;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,6 +12,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.server.ServerCommandEvent;
 
 import java.util.HashMap;
 import java.util.Map;
