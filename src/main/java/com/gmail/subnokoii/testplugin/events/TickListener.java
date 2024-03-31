@@ -12,15 +12,25 @@ public class TickListener extends BukkitRunnable {
     public void run() {
         final ScoreboardUtilsObjective objective = ScoreboardUtils.getObjective("plugin.scheduler.tick_listener");
 
+        final ScoreboardUtilsObjective objx = ScoreboardUtils.getObjective("plugin.api.knockback.x");
+        final ScoreboardUtilsObjective objy = ScoreboardUtils.getObjective("plugin.api.knockback.y");
+        final ScoreboardUtilsObjective objz = ScoreboardUtils.getObjective("plugin.api.knockback.z");
+
         for (Player player: Bukkit.getServer().getOnlinePlayers()) {
             if (objective.getScore(player) > 0) {
                 objective.setScore(player, 0);
 
-                final double x = ((double) objective.getScore("$x")) / 1000d;
-                final double y = ((double) objective.getScore("$y")) / 1000d;
-                final double z = ((double) objective.getScore("$z")) / 1000d;
+                final Vector velocity = player.getVelocity();
 
-                player.setVelocity(new Vector(x, y, z));
+                final double x = ((double) objx.getScore(player)) / 1000d;
+                final double y = ((double) objy.getScore(player)) / 1000d;
+                final double z = ((double) objz.getScore(player)) / 1000d;
+
+                objx.setScore(player, 0);
+                objy.setScore(player, 0);
+                objz.setScore(player, 0);
+
+                player.setVelocity(new Vector(x, y, z).add(velocity));
             }
         }
     }
