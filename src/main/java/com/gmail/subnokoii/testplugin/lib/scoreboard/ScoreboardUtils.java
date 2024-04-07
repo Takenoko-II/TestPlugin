@@ -11,6 +11,8 @@ public class ScoreboardUtils {
 
     private static final Scoreboard mainScoreboard = manager.getMainScoreboard();
 
+    private ScoreboardUtils() {}
+
     public static ScoreboardUtilsObjective getObjective(String name) {
         final Objective targetObjective = mainScoreboard.getObjective(name);
 

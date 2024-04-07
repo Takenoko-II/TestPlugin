@@ -23,6 +23,7 @@ com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_18_R1.cla
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_15.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_13.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_8.class
+com\gmail\subnokoii\testplugin\lib\itemstack\ItemStackBuilder.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_20_R2.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIClickEvent.class

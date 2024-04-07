@@ -4,9 +4,7 @@ import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIButtonBuilder;
-import net.kyori.adventure.text.*;
 import org.bukkit.*;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerListener implements Listener {
+
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
         final ItemStack itemStack = event.getItemDrop().getItemStack();
@@ -74,7 +73,7 @@ public class PlayerListener implements Listener {
                 .name("Game", Color.AQUA)
                 .lore("ゲームサーバーに移動", Color.GRAY)
                 .onClick(response -> {
-                    response.runCommand("server game");
+                    response.getPlayer().chat("/1d0a78b9-aa2e-4957-be57-5b745ea970b1;game");
                     response.getPlayer().sendMessage("サーバーへの接続を試行中...");
                     response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                     response.close();
@@ -86,7 +85,7 @@ public class PlayerListener implements Listener {
                 .lore("ロビーサーバーに移動", Color.GRAY)
                 .glint(true)
                 .onClick(response -> {
-                    response.runCommand("server lobby");
+                    response.getPlayer().chat("/1d0a78b9-aa2e-4957-be57-5b745ea970b1;lobby");
                     response.getPlayer().sendMessage("サーバーへの接続を試行中...");
                     response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                     response.close();
@@ -98,7 +97,7 @@ public class PlayerListener implements Listener {
                 .lore("開発サーバーに移動", Color.GRAY)
                 .glint(true)
                 .onClick(response -> {
-                    response.runCommand("server develop");
+                    response.getPlayer().chat("/1d0a78b9-aa2e-4957-be57-5b745ea970b1;development");
                     response.getPlayer().sendMessage("サーバーへの接続を試行中...");
                     response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                     response.close();
@@ -199,7 +198,7 @@ public class PlayerListener implements Listener {
     private static void onLeftClick(Player player) {
 
         ScoreboardUtils
-                .getObjective("plugin.events.player.left_click")
-                .addScore(player, 1);
+        .getObjective("plugin.events.player.left_click")
+        .addScore(player, 1);
     }
 }
