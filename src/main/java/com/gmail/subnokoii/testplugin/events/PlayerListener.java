@@ -2,8 +2,7 @@ package com.gmail.subnokoii.testplugin.events;
 
 import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
-import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
-import com.gmail.subnokoii.testplugin.lib.ui.ChestUIButtonBuilder;
+import com.gmail.subnokoii.testplugin.lib.ui.*;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -73,8 +72,7 @@ public class PlayerListener implements Listener {
                 .name("Game", Color.AQUA)
                 .lore("ゲームサーバーに移動", Color.GRAY)
                 .onClick(response -> {
-                    response.getPlayer().chat("/1d0a78b9-aa2e-4957-be57-5b745ea970b1;game");
-                    response.getPlayer().sendMessage("サーバーへの接続を試行中...");
+                    response.getPlayer().chat("$PluginMessageSender;TransferPlayer;game");
                     response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                     response.close();
                 });
@@ -85,21 +83,28 @@ public class PlayerListener implements Listener {
                 .lore("ロビーサーバーに移動", Color.GRAY)
                 .glint(true)
                 .onClick(response -> {
-                    response.getPlayer().chat("/1d0a78b9-aa2e-4957-be57-5b745ea970b1;lobby");
-                    response.getPlayer().sendMessage("サーバーへの接続を試行中...");
+                    response.getPlayer().chat("$PluginMessageSender;TransferPlayer;lobby");
                     response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                     response.close();
                 });
             })
             .set(5, builder -> {
-                return builder.type(Material.COMMAND_BLOCK)
+                if (player.isOp()) {
+                    return builder.type(Material.COMMAND_BLOCK)
+                    .name("Development", Color.ORANGE)
+                    .lore("開発サーバーに移動", Color.GRAY)
+                    .glint(true)
+                    .onClick(response -> {
+                        response.getPlayer().chat("$PluginMessageSender;TransferPlayer;develop");
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
+                        response.close();
+                    });
+                }
+                else return builder.type(Material.BARRIER)
                 .name("Development", Color.ORANGE)
-                .lore("開発サーバーに移動", Color.GRAY)
-                .glint(true)
+                .lore("権限がないため利用できません", Color.RED)
                 .onClick(response -> {
-                    response.getPlayer().chat("/1d0a78b9-aa2e-4957-be57-5b745ea970b1;development");
-                    response.getPlayer().sendMessage("サーバーへの接続を試行中...");
-                    response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
+                    response.playSound(Sound.BLOCK_NOTE_BLOCK_BASS, 10, 1);
                     response.close();
                 });
             })

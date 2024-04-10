@@ -1,14 +1,15 @@
 package com.gmail.subnokoii.testplugin;
 
-import com.gmail.subnokoii.testplugin.commands.FooCommand;
+import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.*;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEventListener;
 import com.google.common.io.*;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.command.UnknownCommandEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -36,6 +37,9 @@ public final class TestPlugin extends JavaPlugin implements Listener {
         final PluginCommand foo = getCommand("foo");
         if (foo != null) foo.setExecutor(new FooCommand());
 
+        final PluginCommand ui = getCommand("ui");
+        if (ui != null) ui.setExecutor(new UICommand());
+
         new TickListener().runTaskTimer(this, 0L, 1L);
     }
 
@@ -45,17 +49,25 @@ public final class TestPlugin extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onUnknownCommand(UnknownCommandEvent event) {
-        final String commandLine = event.getCommandLine();
+    public void onAsyncChatSend(AsyncChatEvent event) {
+        final Player player = event.getPlayer();
+        final String message = ((TextComponent) event.message()).content();
 
-        if (!(event.getSender() instanceof Player)) return;
+        if (!message.startsWith("$PluginMessageSender;")) return;
 
-        final Player player = (Player) event.getSender();
+        event.setCancelled(true);
 
-        if (!commandLine.startsWith("1d0a78b9-aa2e-4957-be57-5b745ea970b1;")) return;
+        if (message.split(";").length < 2) return;
 
-        final String serverName = commandLine.split(";")[1];
+        final String messageType = message.split(";")[1];
 
-        transferPlayer(player, serverName);
+        if (messageType.equals("TransferPlayer")) {
+            if (message.split(";").length < 3) return;
+
+            final String serverName = message.split(";")[2];
+
+            player.sendMessage(serverName + " サーバーへの接続を試行中...");
+            transferPlayer(player, serverName);
+        }
     }
 }

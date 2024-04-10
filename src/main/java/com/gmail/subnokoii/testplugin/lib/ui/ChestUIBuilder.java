@@ -76,7 +76,7 @@ public class ChestUIBuilder {
         return itemStacks;
     }
 
-    private static final List<ChestUIBuilder> builders = new ArrayList<ChestUIBuilder>();
+    private static final List<ChestUIBuilder> builders = new ArrayList<>();
 
     public static List<ChestUIBuilder> getBuilders() {
         return builders;
