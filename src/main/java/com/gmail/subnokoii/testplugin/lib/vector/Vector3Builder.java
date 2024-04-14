@@ -4,6 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
 
 public class Vector3Builder implements VectorBuilder {
     private final double[] components;
@@ -11,18 +13,18 @@ public class Vector3Builder implements VectorBuilder {
     private final VectorBuilderDimensionSize dimensionSize;
 
     public Vector3Builder() {
-        components = new double[3];
+        components = new double[]{0d, 0d, 0d};
         dimensionSize = new VectorBuilderDimensionSize(3);
     }
 
     public Vector3Builder(double x, double y, double z) {
-        components = new double[]{ x, y, z };
+        components = new double[]{x, y, z};
         dimensionSize = new VectorBuilderDimensionSize(3);
     }
 
-    public Vector3Builder(double[] allComponents) throws VectorUnexpectedDimensionSizeException {
+    public Vector3Builder(double[] allComponents) throws UnexpectedDimensionSizeException {
         if (allComponents.length != 3) {
-            throw new VectorUnexpectedDimensionSizeException();
+            throw new UnexpectedDimensionSizeException();
         }
 
         double[] newArray = new double[3];
@@ -40,9 +42,9 @@ public class Vector3Builder implements VectorBuilder {
         return components;
     }
 
-    public Vector3Builder setComponent(int index, double component) throws VectorDimensionSizeMismatchException {
+    public Vector3Builder setComponent(int index, double component) throws DimensionSizeMismatchException {
         if (index > 2) {
-            throw new VectorDimensionSizeMismatchException();
+            throw new DimensionSizeMismatchException();
         }
 
         components[index] = component;
@@ -50,9 +52,9 @@ public class Vector3Builder implements VectorBuilder {
         return this;
     }
 
-    public Vector3Builder setAllComponents(double[] allComponents) throws VectorDimensionSizeMismatchException {
+    public Vector3Builder setAllComponents(double[] allComponents) throws DimensionSizeMismatchException {
         if (allComponents.length != 3) {
-            throw new VectorDimensionSizeMismatchException();
+            throw new DimensionSizeMismatchException();
         }
 
         System.arraycopy(allComponents, 0, components, 0, allComponents.length);
@@ -213,5 +215,29 @@ public class Vector3Builder implements VectorBuilder {
             -Math.asin(components[1] / getLength()) * 180d / Math.PI,
             -Math.atan2(components[0] / getLength(), components[2]/ getLength()) * 180d / Math.PI
         );
+    }
+
+    public static Vector3Builder from(Vector<Double> vector) {
+        return new Vector3Builder(vector.get(0), vector.get(1), vector.get(2));
+    }
+
+    public static Vector3Builder from(Location location) {
+        return new Vector3Builder(location.x(), location.y(), location.z());
+    }
+
+    public static Vector3Builder from(double[] array) throws DimensionSizeMismatchException {
+        if (array.length != 3) {
+            throw new DimensionSizeMismatchException();
+        }
+
+        return new Vector3Builder(array[0], array[1], array[2]);
+    }
+
+    public static Vector3Builder from(List<Double> list) throws DimensionSizeMismatchException {
+        if (list.size() != 3) {
+            throw new DimensionSizeMismatchException();
+        }
+
+        return new Vector3Builder(list.get(0), list.get(1), list.get(2));
     }
 }

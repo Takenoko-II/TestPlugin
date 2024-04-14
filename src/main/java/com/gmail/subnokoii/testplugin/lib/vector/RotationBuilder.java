@@ -1,5 +1,7 @@
 package com.gmail.subnokoii.testplugin.lib.vector;
 
+import java.util.List;
+
 public class RotationBuilder implements VectorBuilder {
     private final double[] components;
 
@@ -15,9 +17,9 @@ public class RotationBuilder implements VectorBuilder {
         dimensionSize = new VectorBuilderDimensionSize(2);
     }
 
-    public RotationBuilder(double[] allComponents) throws VectorUnexpectedDimensionSizeException {
+    public RotationBuilder(double[] allComponents) throws UnexpectedDimensionSizeException {
         if (allComponents.length != 2) {
-            throw new VectorUnexpectedDimensionSizeException();
+            throw new UnexpectedDimensionSizeException();
         }
 
         double[] newArray = new double[2];
@@ -35,9 +37,9 @@ public class RotationBuilder implements VectorBuilder {
         return components;
     }
 
-    public RotationBuilder setComponent(int index, double component) throws VectorDimensionSizeMismatchException {
+    public RotationBuilder setComponent(int index, double component) throws DimensionSizeMismatchException {
         if (index > 1) {
-            throw new VectorDimensionSizeMismatchException();
+            throw new DimensionSizeMismatchException();
         }
 
         components[index] = component;
@@ -45,9 +47,9 @@ public class RotationBuilder implements VectorBuilder {
         return this;
     }
 
-    public RotationBuilder setAllComponents(double[] componentsList) throws VectorDimensionSizeMismatchException {
+    public RotationBuilder setAllComponents(double[] componentsList) throws DimensionSizeMismatchException {
         if (componentsList.length != 2) {
-            throw new VectorDimensionSizeMismatchException();
+            throw new DimensionSizeMismatchException();
         }
 
         System.arraycopy(componentsList, 0, components, 0, componentsList.length);
@@ -100,5 +102,21 @@ public class RotationBuilder implements VectorBuilder {
 
     public RotationBuilder copy() {
         return new RotationBuilder(components[0], components[1]);
+    }
+
+    public static RotationBuilder from(double[] array) throws DimensionSizeMismatchException {
+        if (array.length != 2) {
+            throw new DimensionSizeMismatchException();
+        }
+
+        return new RotationBuilder(array[0], array[1]);
+    }
+
+    public static RotationBuilder from(List<Double> list) throws DimensionSizeMismatchException {
+        if (list.size() != 2) {
+            throw new DimensionSizeMismatchException();
+        }
+
+        return new RotationBuilder(list.get(0), list.get(1));
     }
 }

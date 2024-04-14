@@ -5,9 +5,9 @@ public interface VectorBuilder {
 
     double[] getAllComponents();
 
-    VectorBuilder setComponent(int index, double component) throws VectorDimensionSizeMismatchException;
+    VectorBuilder setComponent(int index, double component) throws DimensionSizeMismatchException;
 
-    VectorBuilder setAllComponents(double[] allComponents) throws VectorDimensionSizeMismatchException;
+    VectorBuilder setAllComponents(double[] allComponents) throws DimensionSizeMismatchException;
 
     default boolean is(VectorBuilder vector) {
         if (this.getAllComponents().length != vector.getAllComponents().length) {
