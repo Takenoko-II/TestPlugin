@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
+import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -22,7 +23,7 @@ import java.util.function.UnaryOperator;
 public class ChestUIButtonBuilder {
     private final ItemStack itemStack;
 
-    private Consumer<ChestUIClickEvent> consumer = response -> {};
+    private Consumer<ChestUIClickEvent> listener = response -> {};
 
     public ChestUIButtonBuilder() {
         itemStack = new ItemStack(Material.AIR);
@@ -258,8 +259,8 @@ public class ChestUIButtonBuilder {
         return this;
     }
 
-    public ChestUIButtonBuilder onClick(Consumer<ChestUIClickEvent> consumer) {
-        this.consumer = consumer;
+    public ChestUIButtonBuilder onClick(Consumer<ChestUIClickEvent> listener) {
+        this.listener = listener;
 
         return this;
     }
@@ -268,7 +269,7 @@ public class ChestUIButtonBuilder {
         return itemStack;
     }
 
-    public Consumer<ChestUIClickEvent> getConsumer() {
-        return consumer;
+    public void click(Player clicker) {
+        listener.accept(new ChestUIClickEvent(clicker, this));
     }
 }

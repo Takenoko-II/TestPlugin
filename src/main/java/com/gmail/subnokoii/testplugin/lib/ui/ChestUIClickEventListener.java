@@ -6,29 +6,24 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-
 public class ChestUIClickEventListener implements Listener {
     @EventHandler
     public void on(InventoryClickEvent event) {
-        final ItemStack itemStack = event.getCurrentItem();
         final Player player = (Player) event.getWhoClicked();
+        final ItemStack itemStack = event.getCurrentItem();
 
-        final List<ChestUIBuilder> buildersList = ChestUIBuilder.getBuilders();
-
-        final ChestUIBuilder[] buildersArray = buildersList.toArray(new ChestUIBuilder[buildersList.size()]);
-
-        for (final ChestUIBuilder builder : buildersArray) {
-            if (!builder.getInventory().equals(event.getInventory())) continue;
-
-            for (final ChestUIButtonBuilder itemStackBuilder : builder.getItemStacks()) {
-                if (itemStackBuilder == null) continue;
-                if (!itemStackBuilder.getItemStack().equals(itemStack)) continue;
-
-                final ChestUIClickEvent clickEvent = new ChestUIClickEvent(player, itemStackBuilder);
-
-                itemStackBuilder.getConsumer().accept(clickEvent);
-                event.setCancelled(true);
+        for (final ChestUIBuilder ui : ChestUIBuilder.getAll()) {
+            if (ui.getInventory().equals(event.getClickedInventory())) {
+                for (final ChestUIButtonBuilder button : ui.getAllButtons()) {
+                    if (button == null) continue;
+                    if (button.getItemStack().equals(itemStack)) {
+                        button.click(player);
+                        ui.set(event.getSlot(), (ignored) -> button);
+                        event.setCancelled(true);
+                        break;
+                    }
+                }
+                break;
             }
         }
     }

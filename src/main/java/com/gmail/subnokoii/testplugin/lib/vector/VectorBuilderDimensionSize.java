@@ -11,7 +11,7 @@ public class VectorBuilderDimensionSize {
         return size;
     }
 
-    public boolean match(VectorBuilder vectorBuilder) {
-        return vectorBuilder.getAllComponents().length == size;
+    public boolean match(VectorBuilder vector) {
+        return vector.getAllComponents().length == size;
     }
 }

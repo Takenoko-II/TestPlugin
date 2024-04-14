@@ -15,13 +15,13 @@ import java.util.function.UnaryOperator;
 public class ChestUIBuilder {
     private final Inventory inventory;
 
-    private final ChestUIButtonBuilder[] itemStacks;
+    private final ChestUIButtonBuilder[] buttons;
 
     public ChestUIBuilder(String name, int line) {
         final Component component = Component.text(name);
 
         inventory = Bukkit.createInventory(null, line * 9, component);
-        itemStacks = new ChestUIButtonBuilder[line * 9];
+        buttons = new ChestUIButtonBuilder[line * 9];
 
         builders.add(this);
     }
@@ -30,7 +30,7 @@ public class ChestUIBuilder {
         final Component component = Component.text(name).decorate(decoration);
 
         inventory = Bukkit.createInventory(null, line * 9, component);
-        itemStacks = new ChestUIButtonBuilder[line * 9];
+        buttons = new ChestUIButtonBuilder[line * 9];
 
         builders.add(this);
     }
@@ -39,7 +39,7 @@ public class ChestUIBuilder {
         final Component component = Component.text(name).color(TextColor.color(color.asRGB()));
 
         inventory = Bukkit.createInventory(null, line * 9, component);
-        itemStacks = new ChestUIButtonBuilder[line * 9];
+        buttons = new ChestUIButtonBuilder[line * 9];
 
         builders.add(this);
     }
@@ -48,7 +48,7 @@ public class ChestUIBuilder {
         final Component component = Component.text(name).decorate(decoration).color(TextColor.color(color.asRGB()));
 
         inventory = Bukkit.createInventory(null, line * 9, component);
-        itemStacks = new ChestUIButtonBuilder[line * 9];
+        buttons = new ChestUIButtonBuilder[line * 9];
 
         builders.add(this);
     }
@@ -58,7 +58,7 @@ public class ChestUIBuilder {
 
         final ChestUIButtonBuilder result = builder.apply(itemStackBuilder);
 
-        itemStacks[index] = result;
+        buttons[index] = result;
         inventory.setItem(index, result.getItemStack());
 
         return this;
@@ -72,13 +72,13 @@ public class ChestUIBuilder {
         return inventory;
     }
 
-    public ChestUIButtonBuilder[] getItemStacks() {
-        return itemStacks;
+    public ChestUIButtonBuilder[] getAllButtons() {
+        return buttons;
     }
 
     private static final List<ChestUIBuilder> builders = new ArrayList<>();
 
-    public static List<ChestUIBuilder> getBuilders() {
-        return builders;
+    public static ChestUIBuilder[] getAll() {
+        return builders.toArray(new ChestUIBuilder[0]);
     }
 }

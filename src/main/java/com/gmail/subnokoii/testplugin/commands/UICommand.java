@@ -7,13 +7,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class UICommand implements CommandExecutor {
@@ -85,6 +83,8 @@ public class UICommand implements CommandExecutor {
                 .onClick(response -> {
                     final Location location = response.getPlayer().getLocation();
                     location.setWorld(Bukkit.createWorld(new WorldCreator("world")));
+
+                    response.getPlayer().teleport(location);
                 });
             })
             .set(2, builder -> {
@@ -94,6 +94,8 @@ public class UICommand implements CommandExecutor {
                 .onClick(response -> {
                     final Location location = response.getPlayer().getLocation();
                     location.setWorld(Bukkit.createWorld(new WorldCreator("world_nether")));
+
+                    response.getPlayer().teleport(location);
                 });
             })
             .set(3, builder -> {
@@ -103,6 +105,8 @@ public class UICommand implements CommandExecutor {
                 .onClick(response -> {
                     final Location location = response.getPlayer().getLocation();
                     location.setWorld(Bukkit.createWorld(new WorldCreator("world_the_end")));
+
+                    response.getPlayer().teleport(location);
                 });
             })
             .set(4, builder -> {
@@ -135,6 +139,7 @@ public class UICommand implements CommandExecutor {
         return mainBuilder.type(Material.POTION)
         .name("Effects")
         .lore("エフェクト効果を付与する", Color.GRAY)
+        .potion(PotionType.WATER)
         .onClick(mainResponse -> {
             final Player player = mainResponse.getPlayer();
 
@@ -148,25 +153,30 @@ public class UICommand implements CommandExecutor {
 
                     if (player.hasPotionEffect(nightVision)) {
                         player.removePotionEffect(nightVision);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 10f, 2f);
                     }
                     else {
                         final PotionEffect effect = new PotionEffect(nightVision, 2147483647, 0, true, false);
                         player.addPotionEffect(effect);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10f, 2f);
                     }
                 });
             })
             .set(1, builder -> {
                 return builder.type(Material.POTION)
                 .name("Saturation")
+                .potion(PotionType.UNCRAFTABLE)
                 .onClick(response -> {
                     final PotionEffectType saturation = PotionEffectType.SATURATION;
 
                     if (player.hasPotionEffect(saturation)) {
                         player.removePotionEffect(saturation);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 10f, 2f);
                     }
                     else {
                         final PotionEffect effect = new PotionEffect(saturation, 2147483647, 4, true, false);
                         player.addPotionEffect(effect);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10f, 2f);
                     }
                 });
             })
@@ -179,25 +189,30 @@ public class UICommand implements CommandExecutor {
 
                     if (player.hasPotionEffect(heal)) {
                         player.removePotionEffect(heal);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 10f, 2f);
                     }
                     else {
-                        final PotionEffect effect = new PotionEffect(heal, 2147483647, 127, true, false);
+                        final PotionEffect effect = new PotionEffect(heal, 2147483647, 28, true, false);
                         player.addPotionEffect(effect);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10f, 2f);
                     }
                 });
             })
             .set(3, builder -> {
                 return builder.type(Material.POTION)
                 .name("Resistance")
+                .potion(PotionType.UNCRAFTABLE)
                 .onClick(response -> {
                     final PotionEffectType resistance = PotionEffectType.DAMAGE_RESISTANCE;
 
                     if (player.hasPotionEffect(resistance)) {
                         player.removePotionEffect(resistance);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 10f, 2f);
                     }
                     else {
                         final PotionEffect effect = new PotionEffect(resistance, 2147483647, 4, true, false);
                         player.addPotionEffect(effect);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10f, 2f);
                     }
                 });
             })
@@ -210,10 +225,12 @@ public class UICommand implements CommandExecutor {
 
                     if (player.hasPotionEffect(breathing)) {
                         player.removePotionEffect(breathing);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 10f, 2f);
                     }
                     else {
                         final PotionEffect effect = new PotionEffect(breathing, 2147483647, 0, true, false);
                         player.addPotionEffect(effect);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10f, 2f);
                     }
                 });
             })
@@ -226,14 +243,46 @@ public class UICommand implements CommandExecutor {
 
                     if (player.hasPotionEffect(fireResistance)) {
                         player.removePotionEffect(fireResistance);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 10f, 2f);
                     }
                     else {
                         final PotionEffect effect = new PotionEffect(fireResistance, 2147483647, 0, true, false);
                         player.addPotionEffect(effect);
+                        response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10f, 2f);
                     }
                 });
             })
             .open(mainResponse.getPlayer());
+        });
+    })
+    .set(3, mainBuilder -> {
+        return mainBuilder.type(Material.CLOCK)
+        .name("Ticks")
+        .lore("ティックの管理", Color.GRAY)
+        .onClick(mainResponse -> {
+            final Player player = mainResponse.getPlayer();
+
+            final ServerTickManager manager = player.getServer().getServerTickManager();
+
+            new ChestUIBuilder("Ticks", 1)
+            .set(0, builder -> {
+                return builder.type(Material.ICE)
+                .name("Freeze/Unfreeze")
+                .glint(manager.isFrozen())
+                .onClick(response -> {
+                    if (manager.isFrozen()) {
+                        manager.setFrozen(false);
+                        response.playSound(Sound.ENTITY_WITHER_SPAWN, 10f, 2f);
+                        builder.glint(false);
+                    }
+                    else {
+                        manager.setFrozen(true);
+                        response.playSound(Sound.BLOCK_ANVIL_USE, 10f, 2f);
+                        builder.glint(true);
+                    }
+                });
+            })
+            .open(player);
         });
     });
 
