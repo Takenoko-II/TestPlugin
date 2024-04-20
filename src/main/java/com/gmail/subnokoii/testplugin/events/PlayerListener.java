@@ -36,6 +36,12 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         PlayerListener.lastBlockBreakTimestamp.put(event.getPlayer(), System.currentTimeMillis());
+
+        final int x = event.getBlock().getX();
+        final int y = event.getBlock().getY();
+        final int z = event.getBlock().getZ();
+
+        TestPlugin.log(event.getPlayer().getName() + " broke a " + event.getBlock().getType().name() + " at (" + x + ", " + y + ", " + z + ").");
     }
 
     @EventHandler
@@ -200,7 +206,12 @@ public class PlayerListener implements Listener {
         PlayerListener.isLeftClick.put(player, true);
         PlayerListener.lastBlockBreakTimestamp.put(player, 0L);
 
-        TestPlugin.log(player.getName() + " joined PaperMC Server");
+        TestPlugin.log(player.getName() + " joined the server.");
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event) {
+        TestPlugin.log(event.getPlayer().getName() + " left.");
     }
 
     private static final Map<Player, Boolean> isLeftClick = new HashMap<Player, Boolean>();

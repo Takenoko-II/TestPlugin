@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
@@ -54,12 +55,23 @@ public class ChestUIBuilder {
     }
 
     public ChestUIBuilder set(int index, UnaryOperator<ChestUIButtonBuilder> builder) {
-        final ChestUIButtonBuilder itemStackBuilder = new ChestUIButtonBuilder();
+        final ChestUIButtonBuilder button = builder.apply(new ChestUIButtonBuilder());
 
-        final ChestUIButtonBuilder result = builder.apply(itemStackBuilder);
+        buttons[index] = button;
+        inventory.setItem(index, button.getItemStack());
 
-        buttons[index] = result;
-        inventory.setItem(index, result.getItemStack());
+        return this;
+    }
+
+    public ChestUIBuilder add(UnaryOperator<ChestUIButtonBuilder> builder) {
+        final ChestUIButtonBuilder button = builder.apply(new ChestUIButtonBuilder());
+
+        final int index = Arrays.asList(buttons).indexOf(null);
+
+        if (index == -1) return this;
+
+        buttons[index] = button;
+        inventory.setItem(index, button.getItemStack());
 
         return this;
     }

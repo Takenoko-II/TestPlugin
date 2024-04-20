@@ -8,7 +8,6 @@ import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class TextFileUtils {
@@ -76,7 +75,7 @@ public class TextFileUtils {
         }
 
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss.SSS");
+        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
         write(logPath.toString(), "[" + formatter.format(timestamp) + "] " + text);
     }
