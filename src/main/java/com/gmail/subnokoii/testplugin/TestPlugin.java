@@ -2,44 +2,34 @@ package com.gmail.subnokoii.testplugin;
 
 import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.*;
+import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEventListener;
 import com.google.common.io.*;
-import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.text.TextComponent;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class TestPlugin extends JavaPlugin implements Listener {
-    private void transferPlayer(Player player, String serverName) {
-        final ByteArrayDataOutput output = ByteStreams.newDataOutput();
-        output.writeUTF("Connect");
-        output.writeUTF(serverName);
-        final byte[] data = output.toByteArray();
+import java.util.Objects;
 
-        player.sendPluginMessage(this, "BungeeCord", data);
-    }
+public final class TestPlugin extends JavaPlugin {
+    private static TestPlugin plugin;
 
     @Override
     public void onEnable() {
         getLogger().info("きどうしたぜいぇい");
 
-        final PluginManager pluginManager = getServer().getPluginManager();
+        final PluginManager manager = getServer().getPluginManager();
 
-        pluginManager.registerEvents(this, this);
-        pluginManager.registerEvents(new PlayerListener(), this);
-        pluginManager.registerEvents(new ChestUIClickEventListener(), this);
+        manager.registerEvents(new PlayerListener(), this);
+        manager.registerEvents(new ChestUIClickEventListener(), this);
+        new TickListener().runTaskTimer(this, 0L, 1L);
+
+        Objects.requireNonNull(getCommand("foo")).setExecutor(new FooCommand());
+        Objects.requireNonNull(getCommand("ui")).setExecutor(new UICommand());
+
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-        final PluginCommand foo = getCommand("foo");
-        if (foo != null) foo.setExecutor(new FooCommand());
-
-        final PluginCommand ui = getCommand("ui");
-        if (ui != null) ui.setExecutor(new UICommand());
-
-        new TickListener().runTaskTimer(this, 0L, 1L);
+        plugin = this;
     }
 
     @Override
@@ -47,26 +37,21 @@ public final class TestPlugin extends JavaPlugin implements Listener {
         getLogger().info("ていししたぜいぇい");
     }
 
-    @EventHandler
-    public void onAsyncChatSend(AsyncChatEvent event) {
-        final Player player = event.getPlayer();
-        final String message = ((TextComponent) event.message()).content();
+    public static TestPlugin get() {
+        return plugin;
+    }
 
-        if (!message.startsWith("$PluginMessageSender;")) return;
+    public static void transfer(Player player, String serverName) {
+        final ByteArrayDataOutput output = ByteStreams.newDataOutput();
+        output.writeUTF("Connect");
+        output.writeUTF(serverName);
+        final byte[] data = output.toByteArray();
 
-        event.setCancelled(true);
+        player.sendPluginMessage(plugin, "BungeeCord", data);
+    }
 
-        if (message.split(";").length < 2) return;
-
-        final String messageType = message.split(";")[1];
-
-        if (messageType.equals("TransferPlayer")) {
-            if (message.split(";").length < 3) return;
-
-            final String serverName = message.split(";")[2];
-
-            player.sendMessage(serverName + " サーバーへの接続を試行中...");
-            transferPlayer(player, serverName);
-        }
+    public static void log(String message) {
+        plugin.getLogger().info(message);
+        TextFileUtils.log(message);
     }
 }

@@ -5,7 +5,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class TextFileUtils {
@@ -60,7 +63,7 @@ public class TextFileUtils {
     }
 
     public static void log(String text) {
-        final Path logPath = Path.of("plugins/TestPlugin-Logs.txt");
+        final Path logPath = Path.of("plugins/TestPlugin-1.0-SNAPSHOT.log");
 
         if (!Files.exists(logPath.getParent())) {
             try { Files.createDirectory(logPath.getParent()); }
@@ -72,8 +75,9 @@ public class TextFileUtils {
             catch (IOException e) { throw new RuntimeException(); }
         }
 
-        final String timestamp = Long.toString(System.currentTimeMillis());
+        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss.SSS");
 
-        write(logPath.toString(), "[" + timestamp + "] " + text);
+        write(logPath.toString(), "[" + formatter.format(timestamp) + "] " + text);
     }
 }

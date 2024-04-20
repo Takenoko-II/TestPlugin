@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.events;
 
+import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
@@ -73,7 +74,8 @@ public class PlayerListener implements Listener {
                 .name("Game", Color.AQUA)
                 .lore("ゲームサーバーに移動", Color.GRAY)
                 .onClick(response -> {
-                    response.getPlayer().chat("$PluginMessageSender;TransferPlayer;game");
+                    TestPlugin.transfer(player, "game");
+                    player.sendMessage("gameサーバーへの接続を試行中...");
                     response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                     response.close();
                 });
@@ -84,7 +86,8 @@ public class PlayerListener implements Listener {
                 .lore("ロビーサーバーに移動", Color.GRAY)
                 .glint(true)
                 .onClick(response -> {
-                    response.getPlayer().chat("$PluginMessageSender;TransferPlayer;lobby");
+                    TestPlugin.transfer(player, "lobby");
+                    player.sendMessage("lobbyサーバーへの接続を試行中...");
                     response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                     response.close();
                 });
@@ -96,7 +99,8 @@ public class PlayerListener implements Listener {
                     .lore("開発サーバーに移動", Color.GRAY)
                     .glint(true)
                     .onClick(response -> {
-                        response.getPlayer().chat("$PluginMessageSender;TransferPlayer;develop");
+                        TestPlugin.transfer(player, "develop");
+                        player.sendMessage("developサーバーへの接続を試行中...");
                         response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                         response.close();
                     });
@@ -195,6 +199,8 @@ public class PlayerListener implements Listener {
 
         PlayerListener.isLeftClick.put(player, true);
         PlayerListener.lastBlockBreakTimestamp.put(player, 0L);
+
+        TestPlugin.log(player.getName() + " joined PaperMC Server");
     }
 
     private static final Map<Player, Boolean> isLeftClick = new HashMap<Player, Boolean>();
@@ -202,7 +208,6 @@ public class PlayerListener implements Listener {
     private static final Map<Player, Long> lastBlockBreakTimestamp = new HashMap<Player, Long>();
 
     private static void onLeftClick(Player player) {
-
         ScoreboardUtils
         .getObjective("plugin.events.player.left_click")
         .addScore(player, 1);
