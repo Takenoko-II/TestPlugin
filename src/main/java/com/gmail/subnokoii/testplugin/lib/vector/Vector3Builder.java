@@ -210,6 +210,15 @@ public class Vector3Builder implements VectorBuilder {
         return new Location(world, components[0], components[1], components[2]);
     }
 
+    public Vector<Double> toVector() {
+        final Vector<Double> vec = new Vector<>();
+        vec.add(components[0]);
+        vec.add(components[1]);
+        vec.add(components[2]);
+
+        return vec;
+    }
+
     public RotationBuilder getRotation2d() {
         return new RotationBuilder(
             -Math.asin(components[1] / getLength()) * 180d / Math.PI,

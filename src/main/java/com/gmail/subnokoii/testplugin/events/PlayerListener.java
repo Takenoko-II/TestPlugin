@@ -1,9 +1,11 @@
 package com.gmail.subnokoii.testplugin.events;
 
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.ui.*;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerListener implements Listener {
-
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
         final ItemStack itemStack = event.getItemDrop().getItemStack();
@@ -169,12 +170,12 @@ public class PlayerListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
 
-        final ItemStack itemStack = new ChestUIButtonBuilder()
-        .type(Material.COMPASS)
-        .name("Server Selector", Color.WHITE)
-        .lore("click to open", Color.GRAY)
-        .glint(true)
-        .getItemStack();
+        final ItemStack itemStack = new ItemStackBuilder(Material.COMPASS)
+        .name("Server Selector")
+        .lore("Right Click to Open", Color.GRAY)
+        .enchantment(Enchantment.ARROW_INFINITE, 1)
+        .hideFlag(ItemFlag.HIDE_ENCHANTS)
+        .get();
 
         final String json = "{\"locked\": true, \"on_right_click\": {\"type\": \"open_ui\", \"content\":\"server_selector\" }}";
 
