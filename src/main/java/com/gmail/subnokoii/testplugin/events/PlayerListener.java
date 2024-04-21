@@ -204,6 +204,11 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onDimensionChange(PlayerPortalEvent event) {
+        TestPlugin.log(event.getPlayer().getName() + "entered " + event.getTo().getWorld().getName());
+    }
+
+    @EventHandler
     public void onLeave(PlayerQuitEvent event) {
         TestPlugin.log(event.getPlayer().getName() + " left.");
     }

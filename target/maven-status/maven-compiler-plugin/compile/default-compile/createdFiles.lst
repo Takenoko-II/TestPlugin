@@ -1,5 +1,6 @@
 com\gmail\subnokoii\testplugin\commands\FooCommand.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_18_R2.class
+com\gmail\subnokoii\testplugin\commands\LogCommand.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$ConstructorTarget.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$MinecraftVersion.class
 com\gmail\subnokoii\testplugin\lib\vector\UnexpectedDimensionSizeException.class
@@ -24,6 +25,7 @@ com\gmail\subnokoii\testplugin\lib\other\NBTEditor$Type.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_18_R1.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_15.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_13.class
+com\gmail\subnokoii\testplugin\commands\LobbyCommand.class
 com\gmail\subnokoii\testplugin\commands\UICommand.class
 com\gmail\subnokoii\testplugin\lib\vector\RotationBuilder.class
 com\gmail\subnokoii\testplugin\lib\file\TextFileUtils.class

@@ -3,12 +3,18 @@
 
 ## Usage
 
+[これ](target/TestPlugin-1.0-SNAPSHOT.jar)をpluginsフォルダにぶち込むと使えるよ
+
 ### Scoreboard Objectives
 - `plugin.events.player.left_click`
 <br>プレイヤーが左クリックを行うと1増加する。</br>
 
 - `plugin.scheduler.tick_listener`
 <br>1以上の値をプレイヤーに持たせると、1tick後にプラグインの処理が起動する。</br>
+
+### Entity Tags
+- `plugin.permission.cannot_use_lobby`
+<br>このタグを持ったプレイヤーは/lobbyコマンドで自身を移動させることができなくなる。</br>
 
 ### Item Tags
 #### `plugin`
@@ -59,8 +65,47 @@
     ```
 
 ### Commands
-#### `/foo` -> foo!
-#### `/ui` -> なんかUIを開きます
+#### /foo
+構文:
+```mcfunction
+/foo
+```
+foo!
+
+#### /ui
+構文:
+```mcfunction
+/ui
+```
+なんかUIを開きます
+
+#### /lobby
+構文:
+```mcfunction
+# 実行者を転送
+/lobby
+
+# 指定のプレイヤーを転送(OP必須)
+/lobby <player>
+```
+プレイヤーをロビーに転送します
+
+### /log
+構文:
+```mcfunction
+# ログファイルの内容を表示
+/log read
+
+# ログファイルの指定の行を表示
+/log read <int>
+
+# ログファイルに書き込み
+/log write <string>
+
+# ログファイルの内容を削除
+/log clear
+```
+ログファイルを管理します。
 
 ### Events
 #### PlayerJoinEvent

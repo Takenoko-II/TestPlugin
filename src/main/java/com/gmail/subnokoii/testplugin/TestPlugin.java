@@ -28,8 +28,21 @@ public final class TestPlugin extends JavaPlugin {
 
         TestPlugin.log("イベントリスナーの登録が完了しました");
 
-        Objects.requireNonNull(getCommand("foo")).setExecutor(new FooCommand());
-        Objects.requireNonNull(getCommand("ui")).setExecutor(new UICommand());
+        final FooCommand foo = new FooCommand();
+        Objects.requireNonNull(getCommand("foo")).setExecutor(foo);
+        Objects.requireNonNull(getCommand("foo")).setTabCompleter(foo);
+
+        final LogCommand log = new LogCommand();
+        Objects.requireNonNull(getCommand("log")).setExecutor(log);
+        Objects.requireNonNull(getCommand("log")).setTabCompleter(log);
+
+        final UICommand ui = new UICommand();
+        Objects.requireNonNull(getCommand("ui")).setExecutor(ui);
+        Objects.requireNonNull(getCommand("ui")).setTabCompleter(ui);
+
+        final LobbyCommand lobby = new LobbyCommand();
+        Objects.requireNonNull(getCommand("lobby")).setExecutor(lobby);
+        Objects.requireNonNull(getCommand("lobby")).setTabCompleter(lobby);
 
         TestPlugin.log("testplugin:*コマンドを登録しました");
 

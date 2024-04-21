@@ -21,7 +21,7 @@ public class TextFileUtils {
     }
 
     public static void overwrite(String path, List<String> texts) {
-        try { Files.write(Path.of(path), texts, StandardCharsets.UTF_8, StandardOpenOption.WRITE); }
+        try { Files.write(Path.of(path), texts, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING); }
         catch (IOException e) { throw new RuntimeException(e); }
     }
 
@@ -58,7 +58,7 @@ public class TextFileUtils {
     }
 
     public static void erase(String path) {
-        overwrite(path, new ArrayList<>());
+        overwrite(path, List.of());
     }
 
     public static void log(String text) {

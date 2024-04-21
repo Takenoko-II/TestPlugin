@@ -6,15 +6,18 @@ import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Consumer;
 
-public class UICommand implements CommandExecutor {
+public class UICommand implements CommandExecutor, TabCompleter {
     private final Consumer<ChestUIClickEvent> giveClickedItem = response -> {
         response.getPlayer().getInventory().addItem(response.getClicked().getItemStack());
     };
@@ -299,5 +302,10 @@ public class UICommand implements CommandExecutor {
         main.open(player);
 
         return true;
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+        return List.of();
     }
 }
