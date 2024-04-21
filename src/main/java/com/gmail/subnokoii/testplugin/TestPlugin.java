@@ -16,7 +16,9 @@ public final class TestPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getLogger().info("きどうしたぜいぇい");
+        plugin = this;
+
+        TestPlugin.log("TestPluginが起動しました");
 
         final PluginManager manager = getServer().getPluginManager();
 
@@ -24,17 +26,21 @@ public final class TestPlugin extends JavaPlugin {
         manager.registerEvents(new ChestUIClickEventListener(), this);
         new TickListener().runTaskTimer(this, 0L, 1L);
 
+        TestPlugin.log("イベントリスナーの登録が完了しました");
+
         Objects.requireNonNull(getCommand("foo")).setExecutor(new FooCommand());
         Objects.requireNonNull(getCommand("ui")).setExecutor(new UICommand());
 
+        TestPlugin.log("testplugin:*コマンドを登録しました");
+
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-        plugin = this;
+        TestPlugin.log("BungeeCordチャンネルにTestPluginを登録しました");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("ていししたぜいぇい");
+        TestPlugin.log("TestPluginが停止しました");
     }
 
     public static TestPlugin get() {
@@ -48,6 +54,8 @@ public final class TestPlugin extends JavaPlugin {
         final byte[] data = output.toByteArray();
 
         player.sendPluginMessage(plugin, "BungeeCord", data);
+
+        TestPlugin.log("BungeeCordチャンネルにプラグインメッセージが送信されました: [\"Connect\", \"" + serverName + "\"]");
     }
 
     public static void log(String message) {

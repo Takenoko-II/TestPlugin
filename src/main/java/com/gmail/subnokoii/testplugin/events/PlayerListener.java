@@ -36,12 +36,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         PlayerListener.lastBlockBreakTimestamp.put(event.getPlayer(), System.currentTimeMillis());
-
-        final int x = event.getBlock().getX();
-        final int y = event.getBlock().getY();
-        final int z = event.getBlock().getZ();
-
-        TestPlugin.log(event.getPlayer().getName() + " broke a " + event.getBlock().getType().name() + " at (" + x + ", " + y + ", " + z + ").");
     }
 
     @EventHandler

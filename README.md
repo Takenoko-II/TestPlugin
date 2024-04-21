@@ -66,44 +66,78 @@
 #### PlayerJoinEvent
 - `Server Selector`をgive
 
-## Internal Libraries
-### Classes
-#### scoreboard
-- `ScoreboardUtils`
-<br>スコアボードの直感的な操作を可能とする。</br>
-<br></br>
+## Internal
+### Plugin
+#### TestPlugin
+プラグインのメインクラス。
+- `static void log(String message)`
+- `static void transfer(Player player, String serverName)`
+- `static TestPlugin get()`
 
-- `ScoreboardUtilsObjective`
-<br>`ScoreboardUtils`におけるオブジェクトの表現として使用される。</br>
+### Libraries
+#### ScoreboardUtils
+スコアボードの直感的な操作を可能とする。
+- `static ScoreboardUtilsObjective getObjective(String name)`
+- `static ScoreboardUtilsObjective[] getAllObjectives()`
+- `static void removeObjective(String name)`
 
-#### vector
-- `Vector3Builder`
-<br>三次元ベクトルの容易な計算を可能とする。</br>
-<br></br>
+#### ScoreboardUtilsObjective
+`ScoreboardUtils`におけるオブジェクトの表現として使用される。
+- `int getScore(Entity entity)`
+- `int getScore(String name)`
+- `void setScore(Entity entity, int value)`
+- `void setScore(String name, int value)`
+- `void addScore(Entity entity, int value)`
+- `void addScore(String name, int value)`
+- `String getName()`
+- `DisplaySlot getDisplaySlot()`
+- `void setDisplaySlot(DisplaySlot displaySlot)`
 
-- `RotationBuilder`
-<br>二次元回転の容易な計算を可能とする。</br>
+#### Vector3Builder
+三次元ベクトルの容易な計算を可能とする。
+- `...`
 
-#### itemstack
-- `ItemStackBuilder`
-<br>アイテムの直感的な作成を可能とする。</br>
+#### RotationBuilder
+二次元回転の容易な計算を可能とする。
+- `...`
 
-#### ui
-- `ChestUIBuilder`
-<br>チェスト型UIの直感的な作成を可能とする。</br>
-<br></br>
+#### `ItemStackBuilder
+アイテムの直感的な作成を可能とする。
+- `...`
 
-- `ChestUIButtonBuilder`
-<br>`ChestUIBuilder`におけるボタンの作成を行う。</br>
-<br></br>
+#### ChestUIBuilder
+チェスト型UIの直感的な作成を可能とする。
+- `new ChestUIBuilder(String name, int line)`
+- `new ChestUIBuilder(String name, TextDecoration decoration, int line)`
+- `new ChestUIBuilder(String name, Color color, int line)`
+- `new ChestUIBuilder(String name, TextDecoration decoration, Color color, int line)`
+- `ChestUIBuilder set(int index, UnaryOperator<ChestUIBuilder> builder)`
+- `ChestUIBuilder add(UnaryOperator<ChestUIBuilder> builder)`
+- `void open(Player player)`
+- `Inventory getInventory()`
+- `ChestUIButtonBuilder[] getAllButtons()`
+- `static ChestUIBuilder[] getAll()`
 
-- `ChestUIClickEvent`
-<br>`ChestUIButtonBuilder#onClick()`の引数として渡されるクラス。</br>
-<br></br>
+#### ChestUIButtonBuilder
+`ChestUIBuilder`におけるボタンの作成を行う。
+- `...`
 
-- `ChestUIClickEventListener`
-<br>UIの操作を監視する。</br>
+#### ChestUIClickEvent
+ChestUIButtonBuilder#onClick()`の引数として渡されるクラス。
+- `Player getPlayer()`
+- `void playSound(Sound sound, volume float, pitch float)`
+- `void close()`
+- `ChestUIButtonBuilder getClicked()`
+- `void runCommand()`
 
-#### file
-- `TextFileUtils`
-<br>テキストファイルの直感的な操作を可能とする。
+#### TextFileUtils
+テキストファイルの直感的な操作を可能とする。
+- `static List<String> read(String path)`
+- `static List<String> read(String path, int line)`
+- `static void overwrite(String path, List<String> texts)`
+- `static void overwrite(String path, String text, int line)`
+- `static void write(String path, String text)`
+- `static void write(String path, String text, int line)`
+- `static void erase(String path, int line)`
+- `static void erase(String path)`
+- `static void log(String text)`
