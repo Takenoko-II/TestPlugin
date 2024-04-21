@@ -95,15 +95,15 @@
 
 #### Vector3Builder
 三次元ベクトルの容易な計算を可能とする。
-- `...`
+- [`...`](src/main/java/com/gmail/subnokoii/testplugin/lib/vector/Vector3Builder.java)
 
 #### RotationBuilder
 二次元回転の容易な計算を可能とする。
-- `...`
+- [`...`](src/main/java/com/gmail/subnokoii/testplugin/lib/vector/RotationBuilder.java)
 
-#### `ItemStackBuilder
+#### ItemStackBuilder
 アイテムの直感的な作成を可能とする。
-- `...`
+- [`...`](src/main/java/com/gmail/subnokoii/testplugin/lib/itemstack/ItemStackBuilder.java)
 
 #### ChestUIBuilder
 チェスト型UIの直感的な作成を可能とする。
@@ -120,10 +120,10 @@
 
 #### ChestUIButtonBuilder
 `ChestUIBuilder`におけるボタンの作成を行う。
-- `...`
+- [`...`](src/main/java/com/gmail/subnokoii/testplugin/lib/ui/ChestUIButtonBuilder.java)
 
 #### ChestUIClickEvent
-ChestUIButtonBuilder#onClick()`の引数として渡されるクラス。
+`ChestUIButtonBuilder#onClick()`の引数として渡されるクラス。
 - `Player getPlayer()`
 - `void playSound(Sound sound, volume float, pitch float)`
 - `void close()`
