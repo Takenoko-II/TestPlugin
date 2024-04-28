@@ -5,19 +5,21 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class TextFileUtils {
     public static List<String> read(String path) {
         try { return Files.readAllLines(Path.of(path), StandardCharsets.UTF_8); }
-        catch (IOException e) { throw new RuntimeException(e); }
+        catch (IOException e) { return null; }
     }
 
     public static String read(String path, int line) {
-        return read(path).get(line - 1);
+        final List<String> texts = read(path);
+
+        if (texts == null) return null;
+
+        return texts.get(line - 1);
     }
 
     public static void overwrite(String path, List<String> texts) {
@@ -28,6 +30,8 @@ public class TextFileUtils {
     public static void overwrite(String path, String text, int line) {
         final List<String> texts = read(path);
 
+        if (texts == null) return;
+
         texts.set(line, text);
 
         overwrite(path, texts);
@@ -35,6 +39,8 @@ public class TextFileUtils {
 
     public static void write(String path, String text) {
         final List<String> texts = read(path);
+
+        if (texts == null) return;
 
         texts.add(text);
 
@@ -44,6 +50,8 @@ public class TextFileUtils {
     public static void write(String path, String text, int line) {
         final List<String> texts = read(path);
 
+        if (texts == null) return;
+
         texts.add(line, text);
 
         overwrite(path, texts);
@@ -51,6 +59,8 @@ public class TextFileUtils {
 
     public static void erase(String path, int line) {
         final List<String> texts = read(path);
+
+        if (texts == null) return;
 
         texts.remove(line);
 
@@ -61,22 +71,21 @@ public class TextFileUtils {
         overwrite(path, List.of());
     }
 
-    public static void log(String text) {
-        final Path logPath = Path.of("plugins/TestPlugin-1.0-SNAPSHOT.log");
-
-        if (!Files.exists(logPath.getParent())) {
-            try { Files.createDirectory(logPath.getParent()); }
-            catch (IOException e) { throw new RuntimeException(e); }
+    public static void delete(String path) {
+        try {
+            Files.delete(Path.of(path));
         }
-
-        if (!Files.exists(logPath)) {
-            try { Files.createFile(logPath); }
-            catch (IOException e) { throw new RuntimeException(); }
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-
-        write(logPath.toString(), "[" + formatter.format(timestamp) + "] " + text);
+    public static java.util.stream.Stream<String> getAll(String path) {
+        try {
+            return Files.list(Path.of(path)).map(Path::toString);
+        }
+        catch (IOException e) {
+            return Stream.of();
+        }
     }
 }

@@ -1,9 +1,9 @@
 package com.gmail.subnokoii.testplugin.lib.vector;
 
-public class VectorBuilderDimensionSize {
+public class VectorDimensionSize {
     private final int size;
 
-    public VectorBuilderDimensionSize(int dimensionSize) {
+    public VectorDimensionSize(int dimensionSize) {
         size = dimensionSize;
     }
 

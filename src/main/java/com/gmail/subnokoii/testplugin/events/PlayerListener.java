@@ -1,10 +1,13 @@
 package com.gmail.subnokoii.testplugin.events;
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.ui.*;
+import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
+import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -15,6 +18,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
+import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -173,19 +177,9 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-
-        final ItemStack itemStack = new ItemStackBuilder(Material.COMPASS)
-        .name("Server Selector")
-        .lore("Right Click to Open", Color.GRAY)
-        .enchantment(Enchantment.ARROW_INFINITE, 1)
-        .hideFlag(ItemFlag.HIDE_ENCHANTS)
-        .get();
-
-        final String json = "{\"locked\": true, \"on_right_click\": {\"type\": \"open_ui\", \"content\":\"server_selector\" }}";
-
-        final ItemStack serverSelector = NBTEditor.set(itemStack, NBTEditor.NBTCompound.fromJson(json), "plugin");
-
         final PlayerInventory inventory = player.getInventory();
+
+        final ItemStack serverSelector = TestPlugin.getServerSelector();
 
         if (!inventory.contains(serverSelector)) {
             inventory.addItem(serverSelector);
@@ -200,17 +194,17 @@ public class PlayerListener implements Listener {
         PlayerListener.isLeftClick.put(player, true);
         PlayerListener.lastBlockBreakTimestamp.put(player, 0L);
 
-        TestPlugin.log(player.getName() + " joined the server.");
+        TestPlugin.log("Plugin", player.getName() + " joined the server.");
     }
 
     @EventHandler
     public void onDimensionChange(PlayerPortalEvent event) {
-        TestPlugin.log(event.getPlayer().getName() + "entered " + event.getTo().getWorld().getName());
+        TestPlugin.log("Plugin", event.getPlayer().getName() + "entered " + event.getTo().getWorld().getName());
     }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
-        TestPlugin.log(event.getPlayer().getName() + " left.");
+        TestPlugin.log("Plugin", event.getPlayer().getName() + " left.");
     }
 
     private static final Map<Player, Boolean> isLeftClick = new HashMap<Player, Boolean>();

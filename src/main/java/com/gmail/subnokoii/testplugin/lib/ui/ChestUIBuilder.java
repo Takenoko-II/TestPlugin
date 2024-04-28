@@ -54,8 +54,8 @@ public class ChestUIBuilder {
         builders.add(this);
     }
 
-    public ChestUIBuilder set(int index, UnaryOperator<ChestUIButtonBuilder> builder) {
-        final ChestUIButtonBuilder button = builder.apply(new ChestUIButtonBuilder());
+    public ChestUIBuilder set(int index, UnaryOperator<ChestUIButtonBuilder> modifier) {
+        final ChestUIButtonBuilder button = modifier.apply(new ChestUIButtonBuilder());
 
         buttons[index] = button;
         inventory.setItem(index, button.getItemStack());

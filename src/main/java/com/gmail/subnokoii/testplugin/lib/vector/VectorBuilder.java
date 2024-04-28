@@ -19,7 +19,7 @@ public interface VectorBuilder {
         && this.getComponent(2) == vector.getComponent(2);
     }
 
-    VectorBuilderDimensionSize getDimensionSize();
+    VectorDimensionSize getDimensionSize();
 
     VectorBuilder copy();
 }

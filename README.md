@@ -68,14 +68,14 @@
 #### /foo
 構文:
 ```mcfunction
-/foo
+foo
 ```
 foo!
 
 #### /ui
 構文:
 ```mcfunction
-/ui
+ui
 ```
 なんかUIを開きます
 
@@ -83,27 +83,42 @@ foo!
 構文:
 ```mcfunction
 # 実行者を転送
-/lobby
+lobby
 
 # 指定のプレイヤーを転送(OP必須)
-/lobby <player>
+lobby <player>
 ```
 プレイヤーをロビーに転送します
 
 ### /log
 構文:
 ```mcfunction
-# ログファイルの内容を表示
-/log read
+# サーバーのログファイルの内容を全て表示
+log server read
 
-# ログファイルの指定の行を表示
-/log read <int>
+# プラグイン固有のログファイルの内容を全て表示
+log plugin read
 
-# ログファイルに書き込み
-/log write <string>
+# サーバーのログファイルの指定の行を表示
+log server read <int>
 
-# ログファイルの内容を削除
-/log clear
+# プラグイン固有のログファイルの指定の行を表示
+log plugin read <int>
+
+# サーバーのログファイルに書き込み
+log server write <string>
+
+# プラグイン固有のログファイルに書き込み
+log plugin write <string>
+
+# サーバーのログファイルの内容を削除
+log server clear latest
+
+# サーバーの過去のログファイルのアーカイブを全て削除
+log server clear archive
+
+# プラグイン固有のログファイルの内容を削除
+log plugin clear
 ```
 ログファイルを管理します。
 
@@ -185,4 +200,4 @@ foo!
 - `static void write(String path, String text, int line)`
 - `static void erase(String path, int line)`
 - `static void erase(String path)`
-- `static void log(String text)`
+- `static void log(String target, String text)`

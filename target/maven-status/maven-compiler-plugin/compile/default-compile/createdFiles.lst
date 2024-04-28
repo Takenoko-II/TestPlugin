@@ -1,6 +1,4 @@
-com\gmail\subnokoii\testplugin\commands\FooCommand.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_18_R2.class
-com\gmail\subnokoii\testplugin\commands\LogCommand.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$ConstructorTarget.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$MinecraftVersion.class
 com\gmail\subnokoii\testplugin\lib\vector\UnexpectedDimensionSizeException.class
@@ -9,6 +7,7 @@ com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_19_R1.cla
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_9.class
 com\gmail\subnokoii\testplugin\lib\scoreboard\ScoreboardUtils.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIButtonBuilder.class
+com\gmail\subnokoii\testplugin\lib\vector\VectorDimensionSize.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIBuilder.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_11.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$NBTCompound.class
@@ -21,12 +20,12 @@ com\gmail\subnokoii\testplugin\lib\vector\DimensionSizeMismatchException.class
 com\gmail\subnokoii\testplugin\events\PlayerListener.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$MethodId.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorBuilder.class
+com\gmail\subnokoii\testplugin\commands\Lobby.class
+com\gmail\subnokoii\testplugin\commands\Log.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$Type.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_18_R1.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_15.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_13.class
-com\gmail\subnokoii\testplugin\commands\LobbyCommand.class
-com\gmail\subnokoii\testplugin\commands\UICommand.class
 com\gmail\subnokoii\testplugin\lib\vector\RotationBuilder.class
 com\gmail\subnokoii\testplugin\lib\file\TextFileUtils.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_8.class
@@ -41,6 +40,6 @@ com\gmail\subnokoii\testplugin\events\TickListener.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_19_R2.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_17.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_20_R1.class
-com\gmail\subnokoii\testplugin\lib\vector\VectorBuilderDimensionSize.class
 com\gmail\subnokoii\testplugin\lib\vector\Vector3Builder.class
+com\gmail\subnokoii\testplugin\commands\Foo.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ClassId.class

@@ -4,6 +4,5 @@ main: com.gmail.subnokoii.testplugin.TestPlugin
 api-version: '1.20'
 commands:
   foo:
-  ui:
-  log:
   lobby:
+  log:

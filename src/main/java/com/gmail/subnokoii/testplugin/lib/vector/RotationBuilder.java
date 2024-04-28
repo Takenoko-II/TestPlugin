@@ -1,20 +1,21 @@
 package com.gmail.subnokoii.testplugin.lib.vector;
 
 import java.util.List;
+import java.util.Vector;
 
 public class RotationBuilder implements VectorBuilder {
     private final double[] components;
 
-    private final VectorBuilderDimensionSize dimensionSize;
+    private final VectorDimensionSize dimensionSize;
 
     public RotationBuilder() {
         components = new double[3];
-        dimensionSize = new VectorBuilderDimensionSize(2);
+        dimensionSize = new VectorDimensionSize(2);
     }
 
     public RotationBuilder(double x, double y) {
         components = new double[]{ x, y };
-        dimensionSize = new VectorBuilderDimensionSize(2);
+        dimensionSize = new VectorDimensionSize(2);
     }
 
     public RotationBuilder(double[] allComponents) throws UnexpectedDimensionSizeException {
@@ -26,7 +27,7 @@ public class RotationBuilder implements VectorBuilder {
         System.arraycopy(allComponents, 0, newArray, 0, allComponents.length);
 
         components = newArray;
-        dimensionSize = new VectorBuilderDimensionSize(3);
+        dimensionSize = new VectorDimensionSize(3);
     }
 
     public double getComponent(int index) {
@@ -73,7 +74,7 @@ public class RotationBuilder implements VectorBuilder {
         components[1] = value;
     }
 
-    public VectorBuilderDimensionSize getDimensionSize() {
+    public VectorDimensionSize getDimensionSize() {
         return dimensionSize;
     }
 
@@ -102,6 +103,14 @@ public class RotationBuilder implements VectorBuilder {
 
     public RotationBuilder copy() {
         return new RotationBuilder(components[0], components[1]);
+    }
+
+    public static RotationBuilder from(Vector<Double> vector) throws DimensionSizeMismatchException {
+        if (vector.size() != 2) {
+            throw new DimensionSizeMismatchException();
+        }
+
+        return new RotationBuilder(vector.get(0), vector.get(1));
     }
 
     public static RotationBuilder from(double[] array) throws DimensionSizeMismatchException {
