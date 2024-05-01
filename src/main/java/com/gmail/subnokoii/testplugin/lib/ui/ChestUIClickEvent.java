@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
+import com.gmail.subnokoii.testplugin.TestPlugin;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -29,7 +30,7 @@ public class ChestUIClickEvent {
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
 
-    public void runCommand(String command) {
-        player.getServer().dispatchCommand(player, command);
+    public boolean runCommand(String command) {
+        return TestPlugin.runCommand(player, command);
     }
 }

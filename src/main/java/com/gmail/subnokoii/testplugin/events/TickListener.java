@@ -15,6 +15,8 @@ import java.util.Objects;
 public class TickListener extends BukkitRunnable {
     @Override
     public void run() {
+        if (Bukkit.getServer().getServerTickManager().isFrozen()) return;
+
         final ScoreboardUtilsObjective objective = ScoreboardUtils.getObjective("plugin.scheduler.tick_listener");
 
         final ScoreboardUtilsObjective objX = ScoreboardUtils.getObjective("plugin.api.knockback.x");

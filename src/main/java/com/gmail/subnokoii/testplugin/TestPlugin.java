@@ -7,9 +7,13 @@ import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEventListener;
 import com.google.common.io.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.CommandException;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -130,5 +134,14 @@ public final class TestPlugin extends JavaPlugin {
         final String json = "{\"locked\": true, \"on_right_click\": {\"type\": \"open_ui\", \"content\":\"server_selector\" }}";
 
         return NBTEditor.set(itemStack, NBTEditor.NBTCompound.fromJson(json), "plugin");
+    }
+
+    public static boolean runCommand(Entity entity, String command) {
+        try {
+            return entity.getServer().dispatchCommand(Bukkit.getConsoleSender(), String.format("execute as %s at @s run %s", entity.getUniqueId(), command));
+        }
+        catch (CommandException e) {
+            return false;
+        }
     }
 }

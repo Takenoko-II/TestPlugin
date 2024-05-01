@@ -7,10 +7,13 @@ import com.gmail.subnokoii.testplugin.lib.ui.*;
 import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,6 +23,9 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.structure.StructureManager;
 
 import java.util.HashMap;
@@ -132,7 +138,7 @@ public class PlayerListener implements Listener {
 
                 switch (type) {
                     case "run_command":
-                        player.getServer().dispatchCommand(player, content);
+                        TestPlugin.runCommand(player, content);
                         break;
                     case "open_ui":
                         if (content.equals("server_selector")) ui.open(player);
@@ -201,8 +207,26 @@ public class PlayerListener implements Listener {
 
                         break;
                     }
-                    case "structure_manager": {
-                        final StructureManager manager = player.getServer().getStructureManager();
+                    case "tick_progress_canceler": {
+                        event.setCancelled(true);
+
+                        final ServerTickManager manager = player.getServer().getServerTickManager();
+                        final boolean isFrozen = manager.isFrozen();
+
+                        if (isFrozen) {
+                            manager.setFrozen(false);
+                            player.getServer().getOnlinePlayers().forEach(p -> {
+                                p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 10.0f, 2.0f);
+                                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 127, false, false));
+                            });
+                        }
+                        else {
+                            manager.setFrozen(true);
+                            player.getServer().getOnlinePlayers().forEach(p -> {
+                                p.playSound(p.getLocation(), Sound.BLOCK_GLASS_BREAK, 10.0f, 0.8f);
+                                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 127, false, false));
+                            });
+                        }
                         break;
                     }
                 }
@@ -295,7 +319,7 @@ public class PlayerListener implements Listener {
         if (type == null || content == null) return;
 
         if (type.equals("run_command")) {
-            player.getServer().dispatchCommand(player, content);
+            TestPlugin.runCommand(player, content);
         }
     }
 }

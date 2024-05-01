@@ -7,22 +7,30 @@
 
 ### Scoreboard Objectives
 - `plugin.events.player.left_click`
-<br>プレイヤーが左クリックを行うと1増加する。</br>
+<br>プレイヤーが左クリックを行うと1増加する。
 
 - `plugin.scheduler.tick_listener`
-<br>1以上の値をプレイヤーに持たせると、1tick後にプラグインの処理が起動する。</br>
+<br>1以上の値をプレイヤーに持たせると、1tick後にプラグインの処理が起動する。
 
 ### Entity Tags
 - `plugin.permission.cannot_use_lobby`
-<br>このタグを持ったプレイヤーは/lobbyコマンドで自身を移動させることができなくなる。</br>
+<br>このタグを持ったプレイヤーは/lobbyコマンドで自身を移動させることができなくなる。
 
 ### Item Tags
 #### `plugin`
 - `locked`: `boolean`
-<br>trueの場合、クリエイティブモードのときを除きアイテムはそのスロットから移動できなくなる。</br>
+<br>trueの場合、クリエイティブモードのときを除きアイテムはそのスロットから移動できなくなる。
 
 - `on_right_click`: `compound`
-<br>アイテムを手に持って右クリックしたときに実行する処理を登録する。</br>
+<br>アイテムを手に持って右クリックしたときに実行する処理を登録する。
+    ```
+    {
+        type: string,
+        content: string
+    }
+    ```
+- `on_left_click`: `compound`
+  <br>アイテムを手に持って左クリックしたときに実行する処理を登録する。
     ```
     {
         type: string,
@@ -32,7 +40,8 @@
 
 #### `weapon`
 - `on_left_click`: `compound`
-<br>アイテムを手に持って左クリックしたときに実行する処理を登録する。</br>
+<br>アイテムを手に持って左クリックしたときに表示するカスタムパーティクルと再生する音を登録する。
+<br>代替手段(plugin.on_left_click)があるため削除を検討中
     ```
     {
         particle: string,
@@ -47,7 +56,7 @@
 ### Functions
 #### `...systems/plugin/`
 - `api/knockback/specific`
-<br>渡された三次元ベクトルを使用して実行者を吹き飛ばす。</br>
+<br>渡された三次元ベクトルを使用して実行者を吹き飛ばす。
     ```
     {
         x: double,
@@ -57,7 +66,7 @@
     ```
 
 - `api/knockback/rotation`
-<br>渡された力の分だけ実行方向に実行者を吹き飛ばす。</br>
+<br>渡された力の分だけ実行方向に実行者を吹き飛ばす。
     ```
     {
         strength: double
@@ -66,21 +75,16 @@
 
 ### Commands
 #### /foo
-構文:
+foo!
+<br>構文:
 ```mcfunction
 foo
 ```
-foo!
 
-#### /ui
-構文:
-```mcfunction
-ui
-```
-なんかUIを開きます
 
 #### /lobby
-構文:
+プレイヤーをロビーに転送します
+<br>構文:
 ```mcfunction
 # 実行者を転送
 lobby
@@ -88,10 +92,10 @@ lobby
 # 指定のプレイヤーを転送(OP必須)
 lobby <player>
 ```
-プレイヤーをロビーに転送します
 
-### /log
-構文:
+#### /log
+ログファイルを管理します
+<br>構文:
 ```mcfunction
 # サーバーのログファイルの内容を全て表示
 log server read
@@ -120,7 +124,24 @@ log server clear archive
 # プラグイン固有のログファイルの内容を削除
 log plugin clear
 ```
-ログファイルを管理します。
+
+#### /test
+いろいろできます
+<br>構文:
+```mcfunction
+# サーバーセレクターの入手
+test get_server_selector
+
+# サーバー・プラグイン関連の情報の取得(OP必須)
+test get_info <infomation_id>
+```
+
+#### /tools
+プラグイン製のツールを入手するためのUIを開きます(OP必須)
+<br>構文:
+```mcfunction
+tools
+```
 
 ### Events
 #### PlayerJoinEvent

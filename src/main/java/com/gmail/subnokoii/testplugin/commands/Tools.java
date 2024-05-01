@@ -41,6 +41,15 @@ public class Tools implements CommandExecutor, TabCompleter {
             .onClick(event -> {
                 event.getPlayer().getInventory().addItem(button.getItemStack().clone());
             });
+        })
+        .add(button -> {
+            return button.type(Material.CLOCK)
+            .name("Tick Progress Canceler", Color.fromRGB(0xFFF928))
+            .glint(true)
+            .modify(meta -> NBTEditor.set(button.getItemStack(), "tick_progress_canceler", "plugin", "custom_item_tag").getItemMeta())
+            .onClick(event -> {
+                event.getPlayer().getInventory().addItem(button.getItemStack().clone());
+            });
         });
 
         tools.open((Player) sender);
