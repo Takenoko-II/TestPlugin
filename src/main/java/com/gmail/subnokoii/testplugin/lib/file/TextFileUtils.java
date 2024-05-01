@@ -80,6 +80,15 @@ public class TextFileUtils {
         }
     }
 
+    public static long getSize(String path) {
+        try {
+            return Files.size(Path.of(path));
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static java.util.stream.Stream<String> getAll(String path) {
         try {
             return Files.list(Path.of(path)).map(Path::toString);

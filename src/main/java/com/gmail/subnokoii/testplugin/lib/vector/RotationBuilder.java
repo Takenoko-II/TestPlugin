@@ -1,5 +1,7 @@
 package com.gmail.subnokoii.testplugin.lib.vector;
 
+import org.bukkit.Location;
+
 import java.util.List;
 import java.util.Vector;
 
@@ -83,7 +85,7 @@ public class RotationBuilder implements VectorBuilder {
         final double pitch = components[1];
 
         final double x = -Math.sin(yaw * Math.PI / 180) * Math.cos(pitch * Math.PI / 180);
-        final double y = Math.sin(pitch * Math.PI / 180);
+        final double y = -Math.sin(pitch * Math.PI / 180);
         final double z = Math.cos(yaw * Math.PI / 180) * Math.cos(pitch * Math.PI / 180);
 
         return new Vector3Builder(x, y, z);
@@ -111,6 +113,10 @@ public class RotationBuilder implements VectorBuilder {
         }
 
         return new RotationBuilder(vector.get(0), vector.get(1));
+    }
+
+    public static RotationBuilder from(Location location) {
+        return new RotationBuilder(location.getYaw(), location.getPitch());
     }
 
     public static RotationBuilder from(double[] array) throws DimensionSizeMismatchException {

@@ -29,38 +29,46 @@ public final class TestPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // 準備
-            plugin = this;
+        plugin = this;
 
-            TestPlugin.log("Plugin", "TestPluginが起動しました");
+        TestPlugin.log("Plugin", "TestPluginが起動しました");
 
-            final PluginManager manager = getServer().getPluginManager();
+        final PluginManager manager = getServer().getPluginManager();
 
         // イベントリスナー登録
-            manager.registerEvents(new PlayerListener(), this);
-            manager.registerEvents(new ChestUIClickEventListener(), this);
-            new TickListener().runTaskTimer(this, 0L, 1L);
+        manager.registerEvents(new PlayerListener(), this);
+        manager.registerEvents(new ChestUIClickEventListener(), this);
+        new TickListener().runTaskTimer(this, 0L, 1L);
 
-            TestPlugin.log("Plugin", "イベントリスナーの登録が完了しました");
+        TestPlugin.log("Plugin", "イベントリスナーの登録が完了しました");
 
         // コマンド登録
-            final Foo foo = new Foo();
-            Objects.requireNonNull(getCommand("foo")).setExecutor(foo);
-            Objects.requireNonNull(getCommand("foo")).setTabCompleter(foo);
+        final Foo foo = new Foo();
+        Objects.requireNonNull(getCommand("foo")).setExecutor(foo);
+        Objects.requireNonNull(getCommand("foo")).setTabCompleter(foo);
 
-            final Log log = new Log();
-            Objects.requireNonNull(getCommand("log")).setExecutor(log);
-            Objects.requireNonNull(getCommand("log")).setTabCompleter(log);
+        final Log log = new Log();
+        Objects.requireNonNull(getCommand("log")).setExecutor(log);
+        Objects.requireNonNull(getCommand("log")).setTabCompleter(log);
 
-            final Lobby lobby = new Lobby();
-            Objects.requireNonNull(getCommand("lobby")).setExecutor(lobby);
-            Objects.requireNonNull(getCommand("lobby")).setTabCompleter(lobby);
+        final Lobby lobby = new Lobby();
+        Objects.requireNonNull(getCommand("lobby")).setExecutor(lobby);
+        Objects.requireNonNull(getCommand("lobby")).setTabCompleter(lobby);
 
-            TestPlugin.log("Plugin", "testplugin:*コマンドを登録しました");
+        final Tools tools = new Tools();
+        Objects.requireNonNull(getCommand("tools")).setExecutor(tools);
+        Objects.requireNonNull(getCommand("tools")).setTabCompleter(tools);
+
+        final Test test = new Test();
+        Objects.requireNonNull(getCommand("test")).setExecutor(test);
+        Objects.requireNonNull(getCommand("test")).setTabCompleter(test);
+
+        TestPlugin.log("Plugin", "testplugin:*コマンドを登録しました");
 
         // BungeeCordに接続
-            getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-            TestPlugin.log("Plugin", "BungeeCordチャンネルにTestPluginを登録しました");
+        TestPlugin.log("Plugin", "BungeeCordチャンネルにTestPluginを登録しました");
     }
 
     @Override
@@ -84,26 +92,30 @@ public final class TestPlugin extends JavaPlugin {
     }
 
     public static void log(String target, String message) {
-        if (target.equals("Server")) {
-            plugin.getLogger().info(message);
-        }
-        else if (target.equals("Plugin")) {
-            final Path logPath = Path.of("plugins/TestPlugin-1.0-SNAPSHOT.log");
-
-            if (!java.nio.file.Files.exists(logPath.getParent())) {
-                try { java.nio.file.Files.createDirectory(logPath.getParent()); }
-                catch (IOException e) { throw new RuntimeException(e); }
+        switch (target) {
+            case "Server": {
+                plugin.getLogger().info(message);
+                break;
             }
+            case "Plugin": {
+                final Path logPath = Path.of("plugins/TestPlugin-1.0-SNAPSHOT.log");
 
-            if (!java.nio.file.Files.exists(logPath)) {
-                try { Files.createFile(logPath); }
-                catch (IOException e) { throw new RuntimeException(); }
+                if (!java.nio.file.Files.exists(logPath.getParent())) {
+                    try { java.nio.file.Files.createDirectory(logPath.getParent()); }
+                    catch (IOException e) { throw new RuntimeException(e); }
+                }
+
+                if (!java.nio.file.Files.exists(logPath)) {
+                    try { Files.createFile(logPath); }
+                    catch (IOException e) { throw new RuntimeException(); }
+                }
+
+                final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+
+                TextFileUtils.write(logPath.toString(), "[" + formatter.format(timestamp) + "] " + message);
+                break;
             }
-
-            final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-
-            TextFileUtils.write(logPath.toString(), "[" + formatter.format(timestamp) + "] " + message);
         }
     }
 

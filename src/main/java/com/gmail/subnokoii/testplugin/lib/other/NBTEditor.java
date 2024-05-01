@@ -728,7 +728,8 @@ public final class NBTEditor {
             Object tileEntity = getMethod( MethodId.getTileEntity ).invoke( nmsWorld, blockPosition );
 
             if ( tileEntity == null ) {
-                throw new IllegalArgumentException( block + " is not a tile entity!" );
+                // edited
+                return null;
             }
             
             Object tag;

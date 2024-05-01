@@ -6,3 +6,5 @@ commands:
   foo:
   lobby:
   log:
+  tools:
+  test:

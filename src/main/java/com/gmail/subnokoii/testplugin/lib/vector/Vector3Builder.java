@@ -230,8 +230,8 @@ public class Vector3Builder implements VectorBuilder {
         return new Vector3LocalAxes(this);
     }
 
-    public Location toLocation(World world) {
-        return new Location(world, components[0], components[1], components[2]);
+    public Location mergeWithLocation(Location location) {
+        return new Location(location.getWorld(), components[0], components[1], components[2], location.getYaw(), location.getPitch());
     }
 
     public Vector<Double> toVector() {
