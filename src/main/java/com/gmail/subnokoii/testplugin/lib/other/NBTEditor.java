@@ -1167,6 +1167,25 @@ public final class NBTEditor {
         return object;
     }
 
+    public static < T > T set( T object, Object value, String[] keys ) {
+        if ( object instanceof ItemStack ) {
+            return ( T ) setItemTag( ( ItemStack ) object, value, keys );
+        } else if ( object instanceof Entity ) {
+            setEntityTag( ( Entity ) object, value, keys );
+        } else if ( object instanceof Block ) {
+            setBlockTag( ( Block ) object, value, keys );
+        } else if ( object instanceof NBTCompound ) {
+            try {
+                setTag( ( ( NBTCompound ) object ).tag, value, keys );
+            } catch ( InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {
+                e.printStackTrace();
+            }
+        } else {
+            throw new IllegalArgumentException( "Object provided must be of type ItemStack, Entity, Block, or NBTCompound!" );
+        }
+        return object;
+    }
+
     /**
      * Load an NBTCompound from a String.
      * 

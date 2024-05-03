@@ -7,13 +7,11 @@ import com.gmail.subnokoii.testplugin.lib.ui.*;
 import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.command.CommandException;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,13 +21,12 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.structure.StructureManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class PlayerListener implements Listener {
     @EventHandler
@@ -236,10 +233,25 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onEntityAttacked(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player && event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
-            PlayerListener.onLeftClick((Player) event.getDamager());
+        final Entity entity = event.getDamager();
+        final EntityDamageEvent.DamageCause cause = event.getCause();
+
+        final long timestamp = Objects.requireNonNullElse(lastAttackedTime.get(event.getEntity()), 0L);
+
+        lastAttackedTime.put(event.getEntity(), System.currentTimeMillis());
+
+        if (System.currentTimeMillis() - timestamp < 50) {
+            return;
+        }
+
+        TestPlugin.log("Server", String.valueOf(System.currentTimeMillis() - timestamp));
+
+        if (entity instanceof Player && cause.equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) && !event.getDamageSource().isIndirect()) {
+            PlayerListener.onLeftClick((Player) entity);
         }
     }
+
+    private final Map<Entity, Long> lastAttackedTime = new HashMap<>();
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
@@ -316,10 +328,58 @@ public class PlayerListener implements Listener {
         final String type = NBTEditor.getString(itemStack, "plugin", "on_left_click", "type");
         final String content = NBTEditor.getString(itemStack, "plugin", "on_left_click", "content");
 
-        if (type == null || content == null) return;
+        if (type != null && content != null) {
+            if (type.equals("run_command")) {
+                TestPlugin.runCommand(player, content);
+            }
+        }
 
-        if (type.equals("run_command")) {
-            TestPlugin.runCommand(player, content);
+        final String tag = NBTEditor.getString(itemStack, "plugin", "custom_item_tag");
+
+        if (tag != null) {
+            switch (tag) {
+                case "instant_shoot_bow": {
+                    final Integer count = shootableCountByLeftClick.get(player);
+
+                    if (count == null) break;
+                    if (count <= 0) {
+                        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 5f, 1f);
+                        break;
+                    }
+
+                    shootableCountByLeftClick.put(player, count - 1);
+
+                    final Vector3Builder vector = RotationBuilder.from(player.getLocation())
+                    .getDirection3d();
+
+                    final Arrow arrow = player.getWorld().spawnArrow(player.getEyeLocation(), vector.toBukkitVector(), 1.6f, 12f);
+                    arrow.setCritical(true);
+                    arrow.setDamage(4d);
+                    arrow.setLifetimeTicks(1200);
+                    arrow.setShooter(player);
+                    arrow.setHasLeftShooter(false);
+
+                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 5f, 1f);
+                    break;
+                }
+            }
         }
     }
+
+    @EventHandler
+    public void onShot(EntityShootBowEvent event) {
+        final Entity entity = event.getEntity();
+        final Entity projectile = event.getProjectile();
+
+        if (entity instanceof Player && projectile instanceof Arrow) {
+            final Player player = (Player) entity;
+            final Arrow arrow = (Arrow) projectile;
+
+            if (!arrow.isCritical()) return;
+
+            shootableCountByLeftClick.put(player, 3);
+        }
+    }
+
+    static private final Map<Player, Integer> shootableCountByLeftClick = new HashMap<>();
 }

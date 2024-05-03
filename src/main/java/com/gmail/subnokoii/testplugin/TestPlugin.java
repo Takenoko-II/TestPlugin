@@ -9,7 +9,7 @@ import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEventListener;
 import com.google.common.io.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.Location;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.command.CommandException;
 import org.bukkit.enchantments.Enchantment;
@@ -40,9 +40,13 @@ public final class TestPlugin extends JavaPlugin {
         final PluginManager manager = getServer().getPluginManager();
 
         // イベントリスナー登録
+        final EntityListener entityListener = new EntityListener();
+
         manager.registerEvents(new PlayerListener(), this);
+        manager.registerEvents(entityListener, this);
         manager.registerEvents(new ChestUIClickEventListener(), this);
         new TickListener().runTaskTimer(this, 0L, 1L);
+        entityListener.runTaskTimer(this, 0L, 1L);
 
         TestPlugin.log("Plugin", "イベントリスナーの登録が完了しました");
 
@@ -138,7 +142,13 @@ public final class TestPlugin extends JavaPlugin {
 
     public static boolean runCommand(Entity entity, String command) {
         try {
-            return entity.getServer().dispatchCommand(Bukkit.getConsoleSender(), String.format("execute as %s at @s run %s", entity.getUniqueId(), command));
+            final Boolean sendCommandFeedback = Objects.requireNonNullElse(entity.getWorld().getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK), true);
+
+            entity.getWorld().setGameRule(GameRule.SEND_COMMAND_FEEDBACK, false);
+            final boolean result = entity.getServer().dispatchCommand(Bukkit.getConsoleSender(), String.format("execute as %s at @s run %s", entity.getUniqueId(), command));
+            entity.getWorld().setGameRule(GameRule.SEND_COMMAND_FEEDBACK, sendCommandFeedback);
+
+            return result;
         }
         catch (CommandException e) {
             return false;

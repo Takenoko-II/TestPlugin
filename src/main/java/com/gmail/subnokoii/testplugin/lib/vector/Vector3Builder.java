@@ -2,6 +2,8 @@ package com.gmail.subnokoii.testplugin.lib.vector;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 import java.util.List;
 import java.util.Vector;
@@ -284,5 +286,18 @@ public class Vector3Builder implements VectorBuilder {
         }
 
         return new Vector3Builder(list.get(0), list.get(1), list.get(2));
+    }
+
+    public static Vector3Builder from(Block block, BlockFace blockFace) {
+        return Vector3Builder.from(block.getLocation())
+        .add(new Vector3Builder(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ()));
+    }
+
+    public static Vector3Builder min(Vector3Builder a, Vector3Builder b) {
+        return a.copy().calculate(b, Math::min);
+    }
+
+    public static Vector3Builder max(Vector3Builder a, Vector3Builder b) {
+        return a.copy().calculate(b, Math::max);
     }
 }

@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.itemstack;
 
+import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.format.*;
 import org.bukkit.*;
@@ -17,7 +18,7 @@ import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 public class ItemStackBuilder {
-    private final ItemStack itemStack;
+    private ItemStack itemStack;
 
     private void modifyItemMeta(UnaryOperator<ItemMeta> builder) {
         final ItemMeta itemMeta = builder.apply(itemStack.getItemMeta());
@@ -410,6 +411,12 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder modify(UnaryOperator<ItemMeta> operator) {
         modifyItemMeta(operator);
+
+        return this;
+    }
+
+    public ItemStackBuilder nbt(String path, Object value) {
+        itemStack = NBTEditor.set(itemStack, value, path.split("\\."));
 
         return this;
     }
