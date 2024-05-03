@@ -29,14 +29,19 @@
         content: string
     }
     ```
+
 - `on_left_click`: `compound`
-  <br>アイテムを手に持って左クリックしたときに実行する処理を登録する。
+<br>アイテムを手に持って左クリックしたときに実行する処理を登録する。
     ```
     {
         type: string,
         content: string
     }
     ```
+
+- `custom_item_tag`: `string`
+<br>プラグイン製のアイテムであることを明示するタグ。
+<br>決まった文字列を入力すると、このアイテムを持ってなんらかの動作をした際にプラグインの処理が起動する。
 
 #### `weapon`
 - `on_left_click`: `compound`
@@ -134,6 +139,9 @@ test get_server_selector
 
 # サーバー・プラグイン関連の情報の取得(OP必須)
 test get_info <infomation_id>
+
+# 試験的なアイテムの入手用(OP必須)
+test get_experimental_item <item_type_id>
 ```
 
 #### /tools
@@ -154,6 +162,7 @@ tools
 - `static void log(String message)`
 - `static void transfer(Player player, String serverName)`
 - `static TestPlugin get()`
+- `static boolean runCommand(Entity entity, String command)`
 
 ### Libraries
 #### ScoreboardUtils
@@ -209,7 +218,7 @@ tools
 - `void playSound(Sound sound, volume float, pitch float)`
 - `void close()`
 - `ChestUIButtonBuilder getClicked()`
-- `void runCommand()`
+- `boolean runCommand()`
 
 #### TextFileUtils
 テキストファイルの直感的な操作を可能とする。
@@ -222,3 +231,4 @@ tools
 - `static void erase(String path, int line)`
 - `static void erase(String path)`
 - `static void log(String target, String text)`
+- `static void delete(String path)`
