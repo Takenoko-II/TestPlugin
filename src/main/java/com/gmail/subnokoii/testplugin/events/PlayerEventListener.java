@@ -18,6 +18,7 @@ import org.bukkit.inventory.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class PlayerEventListener implements Listener {
     private static PlayerEventListener instance;
@@ -105,9 +106,8 @@ public class PlayerEventListener implements Listener {
         if (tag != null) {
             switch (tag) {
                 case "instant_shoot_bow": {
-                    final Integer count = shootableCountByLeftClick.get(player);
+                    final int count = Objects.requireNonNullElse(shootableCountByLeftClick.get(player), 0);
 
-                    if (count == null) break;
                     if (count <= 0) {
                         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 5f, 1f);
                         break;
