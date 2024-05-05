@@ -17,7 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class EntityListener extends BukkitRunnable implements Listener {
+public class EntityEventListener extends BukkitRunnable implements Listener {
+    private static EntityEventListener instance;
+
+    public static EntityEventListener get() {
+        if (instance == null) instance = new EntityEventListener();
+
+        return instance;
+    }
+
     @Override
     public void run() {
         final World world = Bukkit.getServer().getWorld("world");

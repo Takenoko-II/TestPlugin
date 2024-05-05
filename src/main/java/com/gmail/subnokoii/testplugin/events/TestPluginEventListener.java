@@ -22,12 +22,12 @@ import org.bukkit.potion.PotionEffectType;
 public class TestPluginEventListener {
     public static void init() {
         TestPlugin.events().onLeftClick(event -> {
-            PlayerListener.get().onLeftClick(event);
+            PlayerEventListener.get().onLeftClick(event);
 
             final ItemStack itemStack = event.getItemStack();
 
             ScoreboardUtils
-            .getObjective("plugin.events.player.left_click")
+            .getOrCreateObjective("plugin.events.player.left_click")
             .addScore(event.getPlayer(), 1);
 
             final String type = NBTEditor.getString(itemStack, "plugin", "on_left_click", "type");

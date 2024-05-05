@@ -6,14 +6,10 @@ import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
-import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
-import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEventListener;
+import com.gmail.subnokoii.testplugin.lib.ui.*;
 import com.google.common.io.*;
 import org.bukkit.*;
-import org.bukkit.command.CommandException;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -42,15 +38,12 @@ public final class TestPlugin extends JavaPlugin {
         final PluginManager manager = getServer().getPluginManager();
 
         // イベントリスナー登録
-        final EntityListener entityListener = new EntityListener();
-
-        manager.registerEvents(entityListener, this);
-        manager.registerEvents(PlayerListener.get(), this);
+        manager.registerEvents(EntityEventListener.get(), this);
+        manager.registerEvents(PlayerEventListener.get(), this);
         manager.registerEvents(new ChestUIClickEventListener(), this);
-
         TestPluginEventListener.init();
-        entityListener.runTaskTimer(this, 0L, 1L);
-        new TickListener().runTaskTimer(this, 0L, 1L);
+        EntityEventListener.get().runTaskTimer(this, 0L, 1L);
+        new TickEventListener().runTaskTimer(this, 0L, 1L);
 
         TestPlugin.log("Plugin", "イベントリスナーの登録が完了しました");
 

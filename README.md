@@ -1,85 +1,83 @@
 # TestPlugin
 ぷらぐいーん
 
-## Usage
-
 [これ](target/TestPlugin-1.0-SNAPSHOT.jar)をpluginsフォルダにぶち込むと使えるよ
 
-### Scoreboard Objectives
+## Scoreboard Objectives
 - `plugin.events.player.left_click`
 <br>プレイヤーが左クリックを行うと1増加する。
 
 - `plugin.scheduler.tick_listener`
 <br>1以上の値をプレイヤーに持たせると、1tick後にプラグインの処理が起動する。
 
-### Entity Tags
+## Entity Tags
 - `plugin.permission.cannot_use_lobby`
 <br>このタグを持ったプレイヤーは/lobbyコマンドで自身を移動させることができなくなる。
 
-### Item Tags
-#### `plugin`
-- `locked`: `boolean`
-<br>trueの場合、クリエイティブモードのときを除きアイテムはそのスロットから移動できなくなる。
+## Item Tags
+### `plugin`
+#### `locked`: `boolean`
+trueの場合、クリエイティブモードのときを除きアイテムはそのスロットから移動できなくなる。
 
-- `on_right_click`: `compound`
-<br>アイテムを手に持って右クリックしたときに実行する処理を登録する。
-    ```
-    {
-        type: string,
-        content: string
-    }
-    ```
+#### `on_right_click`: `compound`
+アイテムを手に持って右クリックしたときに実行する処理を登録する。
+```
+{
+    type: string,
+    content: string
+}
+```
 
-- `on_left_click`: `compound`
-<br>アイテムを手に持って左クリックしたときに実行する処理を登録する。
-    ```
-    {
-        type: string,
-        content: string
-    }
-    ```
+#### `on_left_click`: `compound`
+アイテムを手に持って左クリックしたときに実行する処理を登録する。
+```
+{
+    type: string,
+    content: string
+}
+```
 
-- `custom_item_tag`: `string`
-<br>プラグイン製のアイテムであることを明示するタグ。
+#### `custom_item_tag`: `string`
+プラグイン製のアイテムであることを明示するタグ。
 <br>決まった文字列を入力すると、このアイテムを持ってなんらかの動作をした際にプラグインの処理が起動する。
 
-#### `weapon`
-- `on_left_click`: `compound`
-<br>アイテムを手に持って左クリックしたときに表示するカスタムパーティクルと再生する音を登録する。
+### `weapon`
+#### `on_left_click`: `compound`
+アイテムを手に持って左クリックしたときに表示するカスタムパーティクルと再生する音を登録する。
 <br>代替手段(plugin.on_left_click)があるため削除を検討中
-    ```
-    {
-        particle: string,
-        sound: {
-            id: string,
-            volume?: float,
-            pitch?: float
-        }
+```
+{
+    particle: string,
+    sound: {
+        id: string,
+        volume?: float,
+        pitch?: float
     }
-    ```
+}
+```
 
-### Functions
-#### `...systems/plugin/`
-- `api/knockback/specific`
-<br>渡された三次元ベクトルを使用して実行者を吹き飛ばす。
-    ```
-    {
-        x: double,
-        y: double,
-        z: double
-    }
-    ```
+## Data Pack Functions
+### `...systems/plugin/`
+#### `api/knockback/specific`
+渡された三次元ベクトルを使用して実行者を吹き飛ばす。
+```
+{
+    x: double,
+    y: double,
+    z: double
+}
+```
 
-- `api/knockback/rotation`
-<br>渡された力の分だけ実行方向に実行者を吹き飛ばす。
-    ```
-    {
-        strength: double
-    }
-    ```
+#### `api/knockback/rotation`
+渡された力の分だけ実行方向に実行者を吹き飛ばす。
+```
+{
+    strength: double
+}
+```
 
-### Commands
-#### /foo
+## Commands
+### /foo
 foo!
 <br>構文:
 ```mcfunction
@@ -87,7 +85,7 @@ foo
 ```
 
 
-#### /lobby
+### /lobby
 プレイヤーをロビーに転送します
 <br>構文:
 ```mcfunction
@@ -98,7 +96,7 @@ lobby
 lobby <player>
 ```
 
-#### /log
+### /log
 ログファイルを管理します
 <br>構文:
 ```mcfunction
@@ -130,7 +128,7 @@ log server clear archive
 log plugin clear
 ```
 
-#### /test
+### /test
 いろいろできます
 <br>構文:
 ```mcfunction
@@ -144,14 +142,14 @@ test get_info <infomation_id>
 test get_experimental_item <item_type_id>
 ```
 
-#### /tools
+### /tools
 プラグイン製のツールを入手するためのUIを開きます(OP必須)
 <br>構文:
 ```mcfunction
 tools
 ```
 
-## Internal
+## Internal Functions
 ### Plugin
 #### TestPlugin
 プラグインのメインクラス。
@@ -175,12 +173,17 @@ public static <T extends CommandExecutor & TabCompleter> void setCommandManager(
 ### Libraries
 #### ScoreboardUtils
 スコアボードの直感的な操作を可能とする。
+
 ```java
-static ScoreboardUtilsObjective getObjective(String name);
+public static ScoreboardUtilsObjective getOrCreateObjective(String name);
+public static ScoreboardUtilsObjective getOrCreateObjective(String name, Criteria criteria);
 
-static ScoreboardUtilsObjective[] getAllObjectives();
+public static ScoreboardUtilsObjective createObjective(String name);
+public static ScoreboardUtilsObjective createObjective(String name, Criteria criteria);
 
-static void removeObjective(String name);
+public static ScoreboardUtilsObjective[] getAllObjectives();
+
+public static void removeObjective(String name);
 ```
 
 #### ScoreboardUtilsObjective
@@ -195,7 +198,12 @@ public void setScore(String name, int value);
 public void addScore(Entity entity, int value);
 public void addScore(String name, int value);
 
+public void resetScore(Entity entity);
+public void resetScore(String name);
+
 public String getName();
+
+public void setName();
 
 public DisplaySlot getDisplaySlot();
 

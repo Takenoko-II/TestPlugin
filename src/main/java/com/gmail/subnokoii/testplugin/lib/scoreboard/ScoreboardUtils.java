@@ -13,7 +13,7 @@ public class ScoreboardUtils {
 
     private ScoreboardUtils() {}
 
-    public static ScoreboardUtilsObjective getObjective(String name) {
+    public static ScoreboardUtilsObjective getOrCreateObjective(String name) {
         final Objective targetObjective = mainScoreboard.getObjective(name);
 
         if (targetObjective == null) {
@@ -22,6 +22,27 @@ public class ScoreboardUtils {
         }
 
         return new ScoreboardUtilsObjective(targetObjective);
+    }
+
+    public static ScoreboardUtilsObjective getOrCreateObjective(String name, Criteria criteria) {
+        final Objective targetObjective = mainScoreboard.getObjective(name);
+
+        if (targetObjective == null) {
+            final Objective newObjective = mainScoreboard.registerNewObjective(name, criteria, Component.text(name));
+            return new ScoreboardUtilsObjective(newObjective);
+        }
+
+        return new ScoreboardUtilsObjective(targetObjective);
+    }
+
+    public static ScoreboardUtilsObjective createObjective(String name) {
+        final Objective newObjective = mainScoreboard.registerNewObjective(name, Criteria.DUMMY, Component.text(name));
+        return new ScoreboardUtilsObjective(newObjective);
+    }
+
+    public static ScoreboardUtilsObjective createObjective(String name, Criteria criteria) {
+        final Objective newObjective = mainScoreboard.registerNewObjective(name, criteria, Component.text(name));
+        return new ScoreboardUtilsObjective(newObjective);
     }
 
     public static ScoreboardUtilsObjective[] getAllObjectives() {

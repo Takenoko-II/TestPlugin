@@ -23,6 +23,7 @@ com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_19_R2.cla
 com\gmail\subnokoii\testplugin\lib\event\TestPluginEvent$EventRegisterer.class
 com\gmail\subnokoii\testplugin\commands\Foo.class
 com\gmail\subnokoii\testplugin\commands\Test.class
+com\gmail\subnokoii\testplugin\lib\other\ScheduleUtils$3.class
 com\gmail\subnokoii\testplugin\events\TestPluginEventListener.class
 com\gmail\subnokoii\testplugin\lib\event\data\CustomItemUseEvent.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$ConstructorTarget.class

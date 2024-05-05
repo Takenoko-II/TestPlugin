@@ -19,11 +19,11 @@ import org.bukkit.inventory.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerListener implements Listener {
-    private static PlayerListener instance;
+public class PlayerEventListener implements Listener {
+    private static PlayerEventListener instance;
 
-    public static PlayerListener get() {
-        if (instance == null) instance = new PlayerListener();
+    public static PlayerEventListener get() {
+        if (instance == null) instance = new PlayerEventListener();
 
         return instance;
     }

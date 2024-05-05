@@ -12,16 +12,16 @@ import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
-public class TickListener extends BukkitRunnable {
+public class TickEventListener extends BukkitRunnable {
     @Override
     public void run() {
         if (Bukkit.getServer().getServerTickManager().isFrozen()) return;
 
-        final ScoreboardUtilsObjective objective = ScoreboardUtils.getObjective("plugin.scheduler.tick_listener");
+        final ScoreboardUtilsObjective objective = ScoreboardUtils.getOrCreateObjective("plugin.scheduler.tick_listener");
 
-        final ScoreboardUtilsObjective objX = ScoreboardUtils.getObjective("plugin.api.knockback.x");
-        final ScoreboardUtilsObjective objY = ScoreboardUtils.getObjective("plugin.api.knockback.y");
-        final ScoreboardUtilsObjective objZ = ScoreboardUtils.getObjective("plugin.api.knockback.z");
+        final ScoreboardUtilsObjective objX = ScoreboardUtils.getOrCreateObjective("plugin.api.knockback.x");
+        final ScoreboardUtilsObjective objY = ScoreboardUtils.getOrCreateObjective("plugin.api.knockback.y");
+        final ScoreboardUtilsObjective objZ = ScoreboardUtils.getOrCreateObjective("plugin.api.knockback.z");
 
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             if (objective.getScore(player) > 0) {
