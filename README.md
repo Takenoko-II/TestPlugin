@@ -151,37 +151,56 @@ test get_experimental_item <item_type_id>
 tools
 ```
 
-### Events
-#### PlayerJoinEvent
-- `Server Selector`をgive
-
 ## Internal
 ### Plugin
 #### TestPlugin
 プラグインのメインクラス。
-- `static void log(String message)`
-- `static void transfer(Player player, String serverName)`
-- `static TestPlugin get()`
-- `static boolean runCommand(Entity entity, String command)`
+
+```java
+public static void transfer(Player player, String serverName);
+
+public static void log(String target, String... messages);
+
+public static ItemStack getServerSelector();
+  
+public static void openServerSelector(Player player);
+  
+public static boolean runCommand(Entity entity, String command);
+  
+public static TestPluginEvent.EventRegister events();
+  
+public static <T extends CommandExecutor & TabCompleter> void setCommandManager(String name, T manager);
+```
 
 ### Libraries
 #### ScoreboardUtils
 スコアボードの直感的な操作を可能とする。
-- `static ScoreboardUtilsObjective getObjective(String name)`
-- `static ScoreboardUtilsObjective[] getAllObjectives()`
-- `static void removeObjective(String name)`
+```java
+static ScoreboardUtilsObjective getObjective(String name);
+
+static ScoreboardUtilsObjective[] getAllObjectives();
+
+static void removeObjective(String name);
+```
 
 #### ScoreboardUtilsObjective
 `ScoreboardUtils`におけるオブジェクトの表現として使用される。
-- `int getScore(Entity entity)`
-- `int getScore(String name)`
-- `void setScore(Entity entity, int value)`
-- `void setScore(String name, int value)`
-- `void addScore(Entity entity, int value)`
-- `void addScore(String name, int value)`
-- `String getName()`
-- `DisplaySlot getDisplaySlot()`
-- `void setDisplaySlot(DisplaySlot displaySlot)`
+```java
+public int getScore(Entity entity);
+public int getScore(String name);
+
+public void setScore(Entity entity, int value);
+public void setScore(String name, int value);
+
+public void addScore(Entity entity, int value);
+public void addScore(String name, int value);
+
+public String getName();
+
+public DisplaySlot getDisplaySlot();
+
+public void setDisplaySlot(DisplaySlot displaySlot);
+```
 
 #### Vector3Builder
 三次元ベクトルの容易な計算を可能とする。
@@ -197,16 +216,25 @@ tools
 
 #### ChestUIBuilder
 チェスト型UIの直感的な作成を可能とする。
-- `new ChestUIBuilder(String name, int line)`
-- `new ChestUIBuilder(String name, TextDecoration decoration, int line)`
-- `new ChestUIBuilder(String name, Color color, int line)`
-- `new ChestUIBuilder(String name, TextDecoration decoration, Color color, int line)`
-- `ChestUIBuilder set(int index, UnaryOperator<ChestUIBuilder> builder)`
-- `ChestUIBuilder add(UnaryOperator<ChestUIBuilder> builder)`
-- `void open(Player player)`
-- `Inventory getInventory()`
-- `ChestUIButtonBuilder[] getAllButtons()`
-- `static ChestUIBuilder[] getAll()`
+```java
+public ChestUIBuilder(String name, int line);
+public ChestUIBuilder(String name, TextDecoration decoration, int line);
+public ChestUIBuilder(String name, Color color, int line);
+public ChestUIBuilder(String name, TextDecoration decoration, Color color, int line);
+
+public ChestUIBuilder set(int index, UnaryOperator<ChestUIBuilder> builder);
+
+public ChestUIBuilder add(UnaryOperator<ChestUIBuilder> builder);
+
+public void open(Player player);
+
+public Inventory getInventory();
+
+public ChestUIButtonBuilder[] getAllButtons();
+
+public static ChestUIBuilder[] getAll();
+```
+
 
 #### ChestUIButtonBuilder
 `ChestUIBuilder`におけるボタンの作成を行う。
@@ -214,21 +242,57 @@ tools
 
 #### ChestUIClickEvent
 `ChestUIButtonBuilder#onClick()`の引数として渡されるクラス。
-- `Player getPlayer()`
-- `void playSound(Sound sound, volume float, pitch float)`
-- `void close()`
-- `ChestUIButtonBuilder getClicked()`
-- `boolean runCommand()`
+```java
+public Player getPlayer();
+
+public void playSound(Sound sound, float volume, float pitch);
+
+public void close();
+
+public ChestUIButtonBuilder getClicked();
+
+public boolean runCommand();
+```
+
 
 #### TextFileUtils
 テキストファイルの直感的な操作を可能とする。
-- `static List<String> read(String path)`
-- `static List<String> read(String path, int line)`
-- `static void overwrite(String path, List<String> texts)`
-- `static void overwrite(String path, String text, int line)`
-- `static void write(String path, String text)`
-- `static void write(String path, String text, int line)`
-- `static void erase(String path, int line)`
-- `static void erase(String path)`
-- `static void log(String target, String text)`
-- `static void delete(String path)`
+```java
+public static List<String> read(String path);
+public static List<String> read(String path, int line);
+
+public static void overwrite(String path, List<String> texts);
+public static void overwrite(String path, String text, int line);
+
+public static void write(String path, String text);
+public static void write(String path, String text, int line);
+
+public static void erase(String path, int line);
+public static void erase(String path);
+
+public static void log(String target, String text);
+
+public static void delete(String path);
+```
+
+#### ScheduleUtils
+処理に遅延をかけるための関数を集めたユーティリティクラス。
+- [`...`](src/main/java/com/gmail/subnokoii/testplugin/lib/other/ScheduleUtils.java)
+
+#### TestPluginEvent
+このプラグイン独自のイベントシステムを管理するためのクラス。
+- [`...`](src/main/java/com/gmail/subnokoii/testplugin/lib/event/TestPluginEvent.java)
+
+#### EventRegisterer
+このプラグイン独自のイベントにイベントリスナーを登録することができる。
+```java
+public void onLeftClick(Consumer<PlayerClickEvent> listener);
+
+public void onRightClick(Consumer<PlayerClickEvent> listener);
+
+public void onCustomItemUse(Consumer<CustomItemUseEvent> listener);
+
+public void onTick(Consumer<TickEvent> listener);
+
+public void onEnable(Runnable listener);
+```

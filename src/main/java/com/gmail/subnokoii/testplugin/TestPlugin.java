@@ -2,16 +2,18 @@ package com.gmail.subnokoii.testplugin;
 
 import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.*;
+import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
+import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEventListener;
 import com.google.common.io.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.GameRule;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -42,34 +44,22 @@ public final class TestPlugin extends JavaPlugin {
         // イベントリスナー登録
         final EntityListener entityListener = new EntityListener();
 
-        manager.registerEvents(new PlayerListener(), this);
         manager.registerEvents(entityListener, this);
+        manager.registerEvents(PlayerListener.get(), this);
         manager.registerEvents(new ChestUIClickEventListener(), this);
-        new TickListener().runTaskTimer(this, 0L, 1L);
+
+        TestPluginEventListener.init();
         entityListener.runTaskTimer(this, 0L, 1L);
+        new TickListener().runTaskTimer(this, 0L, 1L);
 
         TestPlugin.log("Plugin", "イベントリスナーの登録が完了しました");
 
         // コマンド登録
-        final Foo foo = new Foo();
-        Objects.requireNonNull(getCommand("foo")).setExecutor(foo);
-        Objects.requireNonNull(getCommand("foo")).setTabCompleter(foo);
-
-        final Log log = new Log();
-        Objects.requireNonNull(getCommand("log")).setExecutor(log);
-        Objects.requireNonNull(getCommand("log")).setTabCompleter(log);
-
-        final Lobby lobby = new Lobby();
-        Objects.requireNonNull(getCommand("lobby")).setExecutor(lobby);
-        Objects.requireNonNull(getCommand("lobby")).setTabCompleter(lobby);
-
-        final Tools tools = new Tools();
-        Objects.requireNonNull(getCommand("tools")).setExecutor(tools);
-        Objects.requireNonNull(getCommand("tools")).setTabCompleter(tools);
-
-        final Test test = new Test();
-        Objects.requireNonNull(getCommand("test")).setExecutor(test);
-        Objects.requireNonNull(getCommand("test")).setTabCompleter(test);
+        setCommandManager("foo", new Foo());
+        setCommandManager("log", new Log());
+        setCommandManager("lobby", new Lobby());
+        setCommandManager("tools", new Tools());
+        setCommandManager("test", new Test());
 
         TestPlugin.log("Plugin", "testplugin:*コマンドを登録しました");
 
@@ -77,6 +67,8 @@ public final class TestPlugin extends JavaPlugin {
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
         TestPlugin.log("Plugin", "BungeeCordチャンネルにTestPluginを登録しました");
+
+        TestPluginEvent.init();
     }
 
     @Override
@@ -99,13 +91,15 @@ public final class TestPlugin extends JavaPlugin {
         TestPlugin.log("Plugin", player.getName() + "からBungeeCordチャンネルにプラグインメッセージが送信されました: [\"Connect\", \"" + serverName + "\"]");
     }
 
-    public static void log(String target, String message) {
-        switch (target) {
-            case "Server": {
-                plugin.getLogger().info(message);
+    public static void log(String target, String... messages) {
+        final String text = String.join(", ", messages);
+
+        switch (target.toLowerCase()) {
+            case "server": {
+                plugin.getLogger().info(text);
                 break;
             }
-            case "Plugin": {
+            case "plugin": {
                 final Path logPath = Path.of("plugins/TestPlugin-1.0-SNAPSHOT.log");
 
                 if (!java.nio.file.Files.exists(logPath.getParent())) {
@@ -121,7 +115,7 @@ public final class TestPlugin extends JavaPlugin {
                 final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
-                TextFileUtils.write(logPath.toString(), "[" + formatter.format(timestamp) + "] " + message);
+                TextFileUtils.write(logPath.toString(), "[" + formatter.format(timestamp) + "] " + text);
                 break;
             }
         }
@@ -129,15 +123,76 @@ public final class TestPlugin extends JavaPlugin {
 
     public static ItemStack getServerSelector() {
         final ItemStack itemStack = new ItemStackBuilder(Material.COMPASS)
-        .name("Server Selector")
+        .name("Server Selector", Color.fromRGB(0x00FF55))
         .lore("Right Click to Open", Color.GRAY)
         .enchantment(Enchantment.ARROW_INFINITE, 1)
         .hideFlag(ItemFlag.HIDE_ENCHANTS)
         .get();
 
-        final String json = "{\"locked\": true, \"on_right_click\": {\"type\": \"open_ui\", \"content\":\"server_selector\" }}";
+        final String json = "{\"locked\": true, \"custom_item_tag\": \"server_selector\"}";
 
         return NBTEditor.set(itemStack, NBTEditor.NBTCompound.fromJson(json), "plugin");
+    }
+
+    public static void openServerSelector(Player player) {
+        new ChestUIBuilder("Battle of Apostolos", 1)
+        .set(1, builder -> {
+            return builder.type(Material.NETHER_STAR)
+            .name("Game", Color.AQUA)
+            .lore("ゲームサーバーに移動", Color.GRAY)
+            .onClick(response -> {
+                TestPlugin.transfer(player, "game");
+                player.sendMessage("gameサーバーへの接続を試行中...");
+                response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
+                response.close();
+            });
+        })
+        .set(3, builder -> {
+            return builder.type(Material.PAPER)
+            .name("Lobby", Color.WHITE)
+            .lore("ロビーサーバーに移動", Color.GRAY)
+            .glint(true)
+            .onClick(response -> {
+                TestPlugin.transfer(player, "lobby");
+                player.sendMessage("lobbyサーバーへの接続を試行中...");
+                response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
+                response.close();
+            });
+        })
+        .set(5, builder -> {
+            if (player.isOp()) {
+                return builder.type(Material.COMMAND_BLOCK)
+                .name("Development", Color.ORANGE)
+                .lore("開発サーバーに移動", Color.GRAY)
+                .glint(true)
+                .onClick(response -> {
+                    TestPlugin.transfer(player, "develop");
+                    player.sendMessage("developサーバーへの接続を試行中...");
+                    response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
+                    response.close();
+                });
+            }
+            else return builder.type(Material.BARRIER)
+            .name("Development", Color.ORANGE)
+            .lore("権限がないため利用できません", Color.RED)
+            .onClick(response -> {
+                response.playSound(Sound.BLOCK_NOTE_BLOCK_BASS, 10, 1);
+                response.close();
+            });
+        })
+        .set(7, builder -> {
+            return builder.type(Material.RED_BED)
+            .name("Respawn", Color.RED)
+            .lore("ワールドのスポーンポイントに戻る", Color.GRAY)
+            .onClick(response -> {
+                final Location spawnPoint = player.getWorld().getSpawnLocation();
+                player.teleport(spawnPoint);
+                player.sendMessage("スポーンポイントに戻ります...");
+                response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
+                response.close();
+            });
+        })
+        .open(player);
     }
 
     public static boolean runCommand(Entity entity, String command) {
@@ -153,5 +208,18 @@ public final class TestPlugin extends JavaPlugin {
         catch (CommandException e) {
             return false;
         }
+    }
+
+    public static TestPluginEvent.EventRegisterer events() {
+        return TestPluginEvent.EventRegisterer.get();
+    }
+
+    public static <T extends CommandExecutor & TabCompleter> void setCommandManager(String name, T manager) {
+        final PluginCommand command = plugin.getCommand(name);
+
+        if (command == null) return;
+
+        command.setExecutor(manager);
+        command.setTabCompleter(manager);
     }
 }
