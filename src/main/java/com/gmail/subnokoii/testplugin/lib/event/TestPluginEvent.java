@@ -4,7 +4,6 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.event.data.CustomItemUseEvent;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
-import com.gmail.subnokoii.testplugin.lib.event.data.TickEvent;
 import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.other.ScheduleUtils;
 import org.bukkit.Bukkit;
@@ -17,7 +16,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -25,16 +23,19 @@ import java.util.function.Consumer;
 public class TestPluginEvent implements Listener {
     private static TestPluginEvent instance;
 
-    private static TestPluginEvent get() {
+    public static TestPluginEvent get() {
         if (instance == null) {
-            instance = new TestPluginEvent();
+            throw new RuntimeException("init()が実行されるよりも前にインスタンスを取得することはできません");
         }
 
         return instance;
     }
 
     public static void init() {
-        get().onEnable();
+        if (instance == null) {
+            instance = new TestPluginEvent();
+            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.get());
+        }
     }
 
     public static final class EventRegisterer {
@@ -50,14 +51,6 @@ public class TestPluginEvent implements Listener {
             TestPluginEvent.get().customItemUseEventListeners.add(listener);
         }
 
-        public void onTick(Consumer<TickEvent> listener) {
-            TestPluginEvent.get().tickEventListeners.add(listener);
-        }
-
-        public void onEnable(Runnable listener) {
-            TestPluginEvent.get().pluginEnableEventListeners.add(listener);
-        }
-
         private EventRegisterer() {}
 
         private static EventRegisterer registerer;
@@ -67,25 +60,6 @@ public class TestPluginEvent implements Listener {
 
             return registerer;
         }
-    }
-
-    public void onEnable() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (Bukkit.getServer().getServerTickManager().isFrozen()) return;
-                tickEventListeners.forEach(listener -> {
-                    listener.accept(new TickEvent());
-                });
-            }
-        }
-        .runTaskTimer(TestPlugin.get(), 0L, 1L);
-
-        Bukkit.getServer()
-        .getPluginManager()
-        .registerEvents(this, TestPlugin.get());
-
-        pluginEnableEventListeners.forEach(Runnable::run);
     }
 
     @EventHandler
@@ -183,10 +157,6 @@ public class TestPluginEvent implements Listener {
     private final Set<Consumer<PlayerClickEvent>> playerLeftClickEventListeners = new HashSet<>();
 
     private final Set<Consumer<PlayerClickEvent>> playerRightClickEventListeners = new HashSet<>();
-
-    private final Set<Consumer<TickEvent>> tickEventListeners = new HashSet<>();
-
-    private final Set<Runnable> pluginEnableEventListeners = new HashSet<>();
 
     private final Set<Consumer<CustomItemUseEvent>> customItemUseEventListeners = new HashSet<>();
 

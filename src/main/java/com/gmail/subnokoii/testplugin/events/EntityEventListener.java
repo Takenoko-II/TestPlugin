@@ -21,10 +21,22 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
     private static EntityEventListener instance;
 
     public static EntityEventListener get() {
-        if (instance == null) instance = new EntityEventListener();
+        if (instance == null) {
+            throw new RuntimeException("init()が実行されるよりも前にインスタンスを取得することはできません");
+        }
 
         return instance;
     }
+
+    public static void init() {
+        if (instance == null) {
+            instance = new EntityEventListener();
+            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.get());
+            instance.runTaskTimer(TestPlugin.get(), 0L, 1L);
+        }
+    }
+
+    private EntityEventListener() {}
 
     @Override
     public void run() {

@@ -6,6 +6,7 @@ com\gmail\subnokoii\testplugin\lib\scoreboard\ScoreboardUtils.class
 com\gmail\subnokoii\testplugin\lib\other\ScheduleUtils.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIButtonBuilder.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIBuilder.class
+com\gmail\subnokoii\testplugin\BungeeCordManager.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$NBTCompound.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_16.class
 com\gmail\subnokoii\testplugin\lib\vector\Vector3LocalAxes.class
@@ -25,11 +26,9 @@ com\gmail\subnokoii\testplugin\commands\Foo.class
 com\gmail\subnokoii\testplugin\events\TickEventListener.class
 com\gmail\subnokoii\testplugin\commands\Test.class
 com\gmail\subnokoii\testplugin\lib\other\ScheduleUtils$3.class
-com\gmail\subnokoii\testplugin\events\TestPluginEventListener.class
 com\gmail\subnokoii\testplugin\lib\event\data\CustomItemUseEvent.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$ConstructorTarget.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$MinecraftVersion.class
-com\gmail\subnokoii\testplugin\lib\event\data\TickEvent.class
 com\gmail\subnokoii\testplugin\lib\vector\UnexpectedDimensionSizeException.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_9.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorDimensionSize.class
@@ -46,7 +45,6 @@ com\gmail\subnokoii\testplugin\commands\Lobby.class
 com\gmail\subnokoii\testplugin\events\EntityEventListener.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_13.class
 com\gmail\subnokoii\testplugin\lib\event\data\PlayerClickEvent.class
-com\gmail\subnokoii\testplugin\lib\event\TestPluginEvent$1.class
 com\gmail\subnokoii\testplugin\lib\file\TextFileUtils.class
 com\gmail\subnokoii\testplugin\lib\other\NBTEditor$ReflectionTarget$v1_8.class
 com\gmail\subnokoii\testplugin\lib\itemstack\ItemStackBuilder.class

@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.commands;
 
+import com.gmail.subnokoii.testplugin.BungeeCordManager;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
@@ -113,7 +114,7 @@ public class Test implements CommandExecutor, TabCompleter {
 
                 final Player player = (Player) sender;
 
-                final ItemStack serverSelector = TestPlugin.getServerSelector();
+                final ItemStack serverSelector = BungeeCordManager.getServerSelector();
 
                 if (player.getInventory().contains(serverSelector)) {
                     player.sendMessage(Component.text("あなたは既に所持しています").color(TextColor.color(252, 64, 72)));

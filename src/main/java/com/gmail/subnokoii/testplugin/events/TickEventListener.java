@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.events;
 
+import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.*;
 import org.bukkit.*;
@@ -13,6 +14,25 @@ import org.bukkit.util.Vector;
 import java.util.Objects;
 
 public class TickEventListener extends BukkitRunnable {
+    private static TickEventListener instance;
+
+    public static TickEventListener get() {
+        if (instance == null) {
+            throw new RuntimeException("init()が実行されるよりも前にインスタンスを取得することはできません");
+        }
+
+        return instance;
+    }
+
+    public static void init() {
+        if (instance == null) {
+            instance = new TickEventListener();
+            instance.runTaskTimer(TestPlugin.get(), 0L, 1L);
+        }
+    }
+
+    private TickEventListener() {}
+
     @Override
     public void run() {
         if (Bukkit.getServer().getServerTickManager().isFrozen()) return;
