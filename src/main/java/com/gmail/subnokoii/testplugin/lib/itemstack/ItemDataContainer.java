@@ -78,8 +78,6 @@ public class ItemDataContainer {
     }
 
     private PersistentDataContainer setContainer(List<String> keys, PersistentDataContainer container, Object value) {
-        TestPlugin.log("Server", keys.toString());
-
         final NamespacedKey key = new NamespacedKey(TestPlugin.get(), keys.get(0));
         keys.remove(0);
 
