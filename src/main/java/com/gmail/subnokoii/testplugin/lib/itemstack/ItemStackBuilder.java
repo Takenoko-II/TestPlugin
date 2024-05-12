@@ -1,6 +1,5 @@
 package com.gmail.subnokoii.testplugin.lib.itemstack;
 
-import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.format.*;
 import org.bukkit.*;
@@ -60,6 +59,15 @@ public class ItemStackBuilder {
 
     public ItemStackBuilder count(int count) {
         itemStack.setAmount(count);
+
+        return this;
+    }
+
+    public ItemStackBuilder maxCount(int count) {
+        modifyItemMeta(meta -> {
+            meta.setMaxStackSize(count);
+            return meta;
+        });
 
         return this;
     }
@@ -415,8 +423,8 @@ public class ItemStackBuilder {
         return this;
     }
 
-    public ItemStackBuilder nbt(String path, Object value) {
-        itemStack = NBTEditor.set(itemStack, value, path.split("\\."));
+    public ItemStackBuilder dataContainer(String key, Object value) {
+        itemStack = new ItemDataContainer(itemStack).set(key, value);
 
         return this;
     }

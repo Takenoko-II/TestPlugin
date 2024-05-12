@@ -1,11 +1,11 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -14,16 +14,26 @@ import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 public class ChestUIButtonBuilder {
-    private final ItemStack itemStack;
+    private ItemStack itemStack;
 
     private Consumer<ChestUIClickEvent> listener = response -> {};
 
     public ChestUIButtonBuilder() {
-        itemStack = new ItemStack(Material.AIR);
+        itemStack = new ItemDataContainer(new ItemStack(Material.IRON_BARS)).set("id", UUID.randomUUID().toString());
+    }
+
+    public boolean matchId(ItemStack itemStack) {
+        final String id = new ItemDataContainer(itemStack).getString("id");
+        final String thisId = new ItemDataContainer(getItemStack()).getString("id");
+
+        if (id == null) return false;
+
+        return id.equals(thisId);
     }
 
     public ChestUIButtonBuilder type(Material material) {
@@ -152,14 +162,7 @@ public class ChestUIButtonBuilder {
     public ChestUIButtonBuilder glint(boolean flag) {
         final ItemMeta meta = itemStack.getItemMeta();
 
-        if (flag) {
-            meta.addEnchant(Enchantment.ARROW_INFINITE, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-        else {
-            meta.removeEnchantments();
-            meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
+        meta.setEnchantmentGlintOverride(flag);
 
         itemStack.setItemMeta(meta);
 
@@ -252,6 +255,12 @@ public class ChestUIButtonBuilder {
     public ChestUIButtonBuilder modify(UnaryOperator<ItemMeta> operator) {
         final ItemMeta meta = itemStack.getItemMeta();
         itemStack.setItemMeta(operator.apply(meta));
+
+        return this;
+    }
+
+    public ChestUIButtonBuilder dataContainer(String key, Object value) {
+        itemStack = new ItemDataContainer(itemStack).set(key, value);
 
         return this;
     }

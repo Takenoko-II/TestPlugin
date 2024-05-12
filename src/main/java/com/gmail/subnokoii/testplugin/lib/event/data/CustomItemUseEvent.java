@@ -1,12 +1,16 @@
 package com.gmail.subnokoii.testplugin.lib.event.data;
 
-import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class CustomItemUseEvent {
-    private final PlayerInteractEvent event;
+    private PlayerInteractEvent playerInteractEvent;
+
+    private EntityDamageByEntityEvent entityDamageByEntityEvent;
 
     private final Player player;
 
@@ -17,13 +21,31 @@ public class CustomItemUseEvent {
     private final boolean isLeftClick;
 
     public CustomItemUseEvent(PlayerInteractEvent event, boolean isLeftClick) {
-        this.event = event;
+        playerInteractEvent = event;
         player = event.getPlayer();
         itemStack = event.getItem();
-        tag = NBTEditor.getString(itemStack, "plugin", "custom_item_tag");
+        tag = new ItemDataContainer(itemStack).getString("custom_item_tag");
         this.isLeftClick = isLeftClick;
 
-        if (itemStack == null || tag == null) {
+        if (event.getItem() == null || tag == null) {
+            throw new RuntimeException();
+        }
+    }
+
+    public CustomItemUseEvent(EntityDamageByEntityEvent event) {
+        entityDamageByEntityEvent = event;
+        final Entity damagingEntity = event.getDamager();
+
+        if (!(damagingEntity instanceof Player)) {
+            throw new RuntimeException();
+        }
+
+        player = (Player) damagingEntity;
+        itemStack = player.getEquipment().getItemInMainHand();
+        tag = new ItemDataContainer(itemStack).getString("custom_item_tag");
+        isLeftClick = true;
+
+        if (tag == null) {
             throw new RuntimeException();
         }
     }
@@ -49,6 +71,14 @@ public class CustomItemUseEvent {
     }
 
     public void cancel() {
-        event.setCancelled(true);
+        if (entityDamageByEntityEvent != null) {
+            entityDamageByEntityEvent.setCancelled(true);
+        }
+        else if (playerInteractEvent != null) {
+            playerInteractEvent.setCancelled(true);
+        }
+        else {
+            throw new RuntimeException();
+        }
     }
 }

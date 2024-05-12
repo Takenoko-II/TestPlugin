@@ -58,13 +58,22 @@
           <id>sonatype</id>
           <url>https://oss.sonatype.org/content/groups/public/</url>
       </repository>
+      <repository>
+          <id>sonatype-oss-snapshots1</id>
+          <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+      </repository>
   </repositories>
 
   <dependencies>
       <dependency>
+          <groupId>net.kyori</groupId>
+          <artifactId>adventure-api</artifactId>
+          <version>4.16.0</version>
+      </dependency>
+      <dependency>
           <groupId>io.papermc.paper</groupId>
           <artifactId>paper-api</artifactId>
-          <version>1.20.4-R0.1-SNAPSHOT</version>
+          <version>1.20.6-R0.1-SNAPSHOT</version>
           <scope>provided</scope>
       </dependency>
   </dependencies>

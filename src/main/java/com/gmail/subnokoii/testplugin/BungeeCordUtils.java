@@ -1,7 +1,6 @@
 package com.gmail.subnokoii.testplugin;
 
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
-import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -14,20 +13,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-public class BungeeCordManager {
-    private BungeeCordManager() {}
+public class BungeeCordUtils {
+    private BungeeCordUtils() {}
 
     public static ItemStack getServerSelector() {
-        final ItemStack itemStack = new ItemStackBuilder(Material.COMPASS)
+        return new ItemStackBuilder(Material.COMPASS)
         .name("Server Selector", Color.fromRGB(0x00FF55))
         .lore("Right Click to Open", Color.GRAY)
-        .enchantment(Enchantment.ARROW_INFINITE, 1)
+        .enchantment(Enchantment.INFINITY, 1)
         .hideFlag(ItemFlag.HIDE_ENCHANTS)
+        .dataContainer("locked", true)
+        .dataContainer("custom_item_tag", "server_selector")
         .get();
-
-        final String json = "{\"locked\": true, \"custom_item_tag\": \"server_selector\"}";
-
-        return NBTEditor.set(itemStack, NBTEditor.NBTCompound.fromJson(json), "plugin");
     }
 
     public static void openServerSelector(Player player) {

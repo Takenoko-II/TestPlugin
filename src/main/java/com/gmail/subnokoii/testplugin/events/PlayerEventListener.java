@@ -1,14 +1,13 @@
 package com.gmail.subnokoii.testplugin.events;
 
-import com.gmail.subnokoii.testplugin.BungeeCordManager;
+import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
-import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainer;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -56,11 +55,11 @@ public class PlayerEventListener implements Listener {
             final ItemStack itemStack = event.getItemStack();
 
             ScoreboardUtils
-            .getOrCreateObjective("plugin.events.player.left_click")
+            .getOrCreateObjective("plugin_api.on_left_click")
             .addScore(event.getPlayer(), 1);
 
-            final String type = NBTEditor.getString(itemStack, "plugin", "on_left_click", "type");
-            final String content = NBTEditor.getString(itemStack, "plugin", "on_left_click", "content");
+            final String type = new ItemDataContainer(itemStack).getString("on_left_click.type");
+            final String content = new ItemDataContainer(itemStack).getString("on_left_click.content");
 
             if (type != null && content != null) {
                 if (type.equals("run_command")) {
@@ -75,8 +74,8 @@ public class PlayerEventListener implements Listener {
 
             if (itemStack == null) return;
 
-            final String type = NBTEditor.getString(itemStack, "plugin", "on_right_click", "type");
-            final String content = NBTEditor.getString(itemStack, "plugin", "on_right_click", "content");
+            final String type = new ItemDataContainer(itemStack).getString("on_right_click.type");
+            final String content = new ItemDataContainer(itemStack).getString("on_right_click.content");
 
             if (type != null && content != null) {
                 switch (type) {
@@ -121,29 +120,16 @@ public class PlayerEventListener implements Listener {
 
                     if (entity != null) {
                         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 10.0f, 2.0f);
-                        player.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, entity.getLocation(), 40, 0.6d, 0.6d, 0.6d);
+                        player.getWorld().spawnParticle(Particle.ENCHANT, entity.getLocation(), 40, 0.6d, 0.6d, 0.6d);
 
-                        final NBTEditor.NBTCompound nbt = NBTEditor.getNBTCompound(entity);
-
-                        if (nbt == null) {
-                            throw new RuntimeException("NBT持ってないエンティティなんておるわけないやろ！");
-                        }
-
-                        player.sendMessage(Component.text(entity.getType().name() + "は以下のNBTを持っています:\n" + nbt.toJson()));
+                        player.sendMessage(Component.text(entity.getType().name() + "は以下のNBTを持っています:\n" + entity.getAsString()));
 
                     }
                     else if (block != null) {
                         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_OFF, 10.0f, 2.0f);
-                        player.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, block.getLocation(), 40, 0.6d, 0.6d, 0.6d);
+                        player.getWorld().spawnParticle(Particle.ENCHANT, block.getLocation(), 40, 0.6d, 0.6d, 0.6d);
 
-                        final NBTEditor.NBTCompound nbt = NBTEditor.getNBTCompound(block);
-
-                        if (nbt == null) {
-                            player.sendMessage(Component.text("そのブロックはNBTを持っていません").color(TextColor.color(252, 64, 72)));
-                            break;
-                        }
-
-                        player.sendMessage(Component.text(block.getType().name() + "は以下のNBTを持っています:\n" + nbt.toJson()));
+                        player.sendMessage(Component.text(block.getType().name() + "は以下のデータを持っています:\n" + block.getBlockData().getAsString()));
                     }
 
                     break;
@@ -172,7 +158,7 @@ public class PlayerEventListener implements Listener {
                 }
                 case "server_selector": {
                     event.cancel();
-                    BungeeCordManager.openServerSelector(player);
+                    BungeeCordUtils.openServerSelector(player);
                 }
             }
         });
@@ -183,7 +169,9 @@ public class PlayerEventListener implements Listener {
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
         final ItemStack itemStack = event.getItemDrop().getItemStack();
-        final boolean locked = NBTEditor.getBoolean(itemStack, "plugin", "locked");
+        final Boolean locked = new ItemDataContainer(itemStack).getBoolean("locked");
+
+        if (locked == null) return;
 
         if (locked && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
@@ -199,7 +187,10 @@ public class PlayerEventListener implements Listener {
         final ItemStack itemStack = event.getCurrentItem();
         if (itemStack == null) return;
 
-        final boolean locked = NBTEditor.getBoolean(itemStack, "plugin", "locked");
+        final Boolean locked = new ItemDataContainer(itemStack).getBoolean("locked");
+
+        if (locked == null) return;
+
         if (locked && !player.getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
         }
@@ -210,15 +201,15 @@ public class PlayerEventListener implements Listener {
         final ItemStack mainHandItem = event.getMainHandItem();
         final ItemStack offhandItem = event.getOffHandItem();
 
-        final boolean mainHandLocked = NBTEditor.getBoolean(mainHandItem, "plugin", "locked");
-        final boolean offHandLocked = NBTEditor.getBoolean(offhandItem, "plugin", "locked");
+        final Boolean mainHandLocked = new ItemDataContainer(mainHandItem).getBoolean("locked");
+        final Boolean offHandLocked = new ItemDataContainer(offhandItem).getBoolean("locked");
 
-        if (mainHandLocked && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+        if (Objects.equals(mainHandLocked, true) && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
             return;
         }
 
-        if (offHandLocked && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
+        if (Objects.equals(offHandLocked, true) && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
         }
     }
@@ -228,7 +219,7 @@ public class PlayerEventListener implements Listener {
         final Player player = event.getPlayer();
         final PlayerInventory inventory = player.getInventory();
 
-        final ItemStack serverSelector = BungeeCordManager.getServerSelector();
+        final ItemStack serverSelector = BungeeCordUtils.getServerSelector();
 
         if (!inventory.contains(serverSelector)) {
             inventory.addItem(serverSelector);
@@ -252,7 +243,7 @@ public class PlayerEventListener implements Listener {
         final Player player = event.getPlayer();
         final ItemStack itemStack = event.getItemStack();
 
-        final String tag = NBTEditor.getString(itemStack, "plugin", "custom_item_tag");
+        final String tag = new ItemDataContainer(itemStack).getString("custom_item_tag");
 
         if (tag != null) {
             switch (tag) {

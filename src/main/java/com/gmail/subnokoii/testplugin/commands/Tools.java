@@ -1,6 +1,5 @@
 package com.gmail.subnokoii.testplugin.commands;
 
-import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -28,7 +27,7 @@ public class Tools implements CommandExecutor, TabCompleter {
         .add(button -> {
             return button.type(Material.ENDER_EYE)
             .name("Quick Teleporter", Color.fromRGB(0xA200FF))
-            .modify(meta -> NBTEditor.set(button.getItemStack(), "quick_teleporter", "plugin", "custom_item_tag").getItemMeta())
+            .dataContainer("custom_item_tag", "quick_teleporter")
             .onClick(event -> {
                 event.getPlayer().getInventory().addItem(button.getItemStack().clone());
             });
@@ -37,16 +36,17 @@ public class Tools implements CommandExecutor, TabCompleter {
             return button.type(Material.LINGERING_POTION)
             .name("Data Getter", Color.fromRGB(0x2FFF90))
             .potionColor(Color.fromRGB(0x2FFF90))
-            .modify(meta -> NBTEditor.set(button.getItemStack(), "data_getter", "plugin", "custom_item_tag").getItemMeta())
+            .dataContainer("custom_item_tag", "data_getter")
             .onClick(event -> {
                 event.getPlayer().getInventory().addItem(button.getItemStack().clone());
             });
+            // これクリックしたとき保存されているものがtick progress cancelerになってる
         })
         .add(button -> {
             return button.type(Material.CLOCK)
             .name("Tick Progress Canceler", Color.fromRGB(0xFFF928))
             .glint(true)
-            .modify(meta -> NBTEditor.set(button.getItemStack(), "tick_progress_canceler", "plugin", "custom_item_tag").getItemMeta())
+            .dataContainer("custom_item_tag", "tick_progress_canceler")
             .onClick(event -> {
                 event.getPlayer().getInventory().addItem(button.getItemStack().clone());
             });

@@ -1,6 +1,6 @@
 package com.gmail.subnokoii.testplugin.commands;
 
-import com.gmail.subnokoii.testplugin.BungeeCordManager;
+import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
@@ -17,13 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class Test implements CommandExecutor, TabCompleter {
@@ -114,7 +108,7 @@ public class Test implements CommandExecutor, TabCompleter {
 
                 final Player player = (Player) sender;
 
-                final ItemStack serverSelector = BungeeCordManager.getServerSelector();
+                final ItemStack serverSelector = BungeeCordUtils.getServerSelector();
 
                 if (player.getInventory().contains(serverSelector)) {
                     player.sendMessage(Component.text("あなたは既に所持しています").color(TextColor.color(252, 64, 72)));
@@ -142,14 +136,20 @@ public class Test implements CommandExecutor, TabCompleter {
                             itemStackBuilder
                             .type(Material.FISHING_ROD)
                             .name("Grappling Hook", Color.ORANGE)
-                            .nbt("plugin.custom_item_tag", "grappling_hook");
+                            .dataContainer("custom_item_tag", "grappling_hook");
                             break;
                         }
                         case "instant_shoot_bow": {
                             itemStackBuilder
                             .type(Material.BOW)
                             .name("Instant Shoot Bow", Color.ORANGE)
-                            .nbt("plugin.custom_item_tag", "instant_shoot_bow");
+                            .dataContainer("custom_item_tag", "instant_shoot_bow");
+                            break;
+                        }
+                        case "foo": {
+                            itemStackBuilder
+                            .type(Material.APPLE)
+                            .dataContainer("a.b.c.d", "value");
                             break;
                         }
                         default: {

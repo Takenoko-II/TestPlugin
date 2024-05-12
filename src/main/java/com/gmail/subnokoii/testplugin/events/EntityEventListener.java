@@ -2,22 +2,26 @@ package com.gmail.subnokoii.testplugin.events;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.gmail.subnokoii.testplugin.TestPlugin;
-import com.gmail.subnokoii.testplugin.lib.other.NBTEditor;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainer;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import org.bukkit.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class EntityEventListener extends BukkitRunnable implements Listener {
     private static EntityEventListener instance;
@@ -128,6 +132,52 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
         }
     }
 
+    @EventHandler
+    public void onTeleport(EntityTeleportEvent event) {
+        final Entity entity = event.getEntity();
+
+        if (!entity.getType().equals(EntityType.MARKER)) return;
+
+        final Set<String> tags = entity.getScoreboardTags();
+
+        tags.forEach(tag -> {
+            if (tag.startsWith("testplugin:")) {
+                final String message = tag.split("testplugin:", 2)[1];
+
+                final Entity[] entities = entity.getWorld()
+                .getEntities()
+                .stream()
+                .filter(e -> e.getScoreboardTags().contains("plugin_api.target"))
+                .toArray(Entity[]::new);
+
+                onDataPackMessage(entities, message.split("\\s+"));
+            }
+        });
+    }
+
+    private void onDataPackMessage(Entity[] targets, String[] message) {
+        if (message.length >= 1) {
+            switch (message[0]) {
+                case "knockback": {
+                    if (message.length != 4) return;
+
+                    try {
+                        final double x = Double.parseDouble(message[1]);
+                        final double y = Double.parseDouble(message[2]);
+                        final double z = Double.parseDouble(message[3]);
+
+                        for (final Entity target : targets) {
+                            target.setVelocity(target.getVelocity().add(new Vector(x, y, z)));
+                        }
+                    }
+                    catch (IllegalArgumentException ignored) {}
+
+                    break;
+                }
+            }
+        }
+    }
+
     private final Map<Player, Boolean> grapplingHookExists = new HashMap<>();
 
     private final Map<Player, Vector3Builder> grapplingHookLocation = new HashMap<>();
@@ -135,7 +185,9 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
     private boolean isGrapplingHook(ItemStack itemStack) {
         if (itemStack == null) return false;
 
-        final String tag = NBTEditor.getString(itemStack, "plugin", "custom_item_tag");
+        itemStack.getItemMeta().getAsString();
+
+        final String tag = new ItemDataContainer(itemStack).getString("custom_item_tag");
         return itemStack.getType().equals(Material.FISHING_ROD) && Objects.equals(tag, "grappling_hook");
     }
 }

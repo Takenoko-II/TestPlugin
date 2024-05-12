@@ -1,6 +1,6 @@
 package com.gmail.subnokoii.testplugin.commands;
 
-import com.gmail.subnokoii.testplugin.BungeeCordManager;
+import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.Command;
@@ -19,12 +19,12 @@ public class Lobby implements CommandExecutor, TabCompleter {
         if (args.length == 0) {
             if (!(commandSender instanceof Player)) return false;
 
-            if (((Player) commandSender).getScoreboardTags().contains("plugin.permission.cannot_use_lobby")) {
+            if (((Player) commandSender).getScoreboardTags().contains("plugin_api.no_lobby_command")) {
                 commandSender.sendMessage(Component.text("権限がありません").color(TextColor.color(252, 64, 72)));
                 return false;
             }
 
-            BungeeCordManager.transfer((Player) commandSender, "lobby");
+            BungeeCordUtils.transfer((Player) commandSender, "lobby");
         }
         else {
             if (!commandSender.isOp()) {
@@ -39,7 +39,7 @@ public class Lobby implements CommandExecutor, TabCompleter {
                 return false;
             }
 
-            BungeeCordManager.transfer(player, "lobby");
+            BungeeCordUtils.transfer(player, "lobby");
         }
 
         commandSender.sendMessage("lobbyサーバーへの接続を試行中...");
