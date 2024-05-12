@@ -1,6 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainer;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainerAccessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -24,12 +24,12 @@ public class ChestUIButtonBuilder {
     private Consumer<ChestUIClickEvent> listener = response -> {};
 
     public ChestUIButtonBuilder() {
-        itemStack = new ItemDataContainer(new ItemStack(Material.IRON_BARS)).set("id", UUID.randomUUID().toString());
+        itemStack = new ItemDataContainerAccessor(new ItemStack(Material.IRON_BARS)).set("id", UUID.randomUUID().toString());
     }
 
     public boolean matchId(ItemStack itemStack) {
-        final String id = new ItemDataContainer(itemStack).getString("id");
-        final String thisId = new ItemDataContainer(getItemStack()).getString("id");
+        final String id = new ItemDataContainerAccessor(itemStack).getString("id");
+        final String thisId = new ItemDataContainerAccessor(getItemStack()).getString("id");
 
         if (id == null) return false;
 
@@ -260,7 +260,7 @@ public class ChestUIButtonBuilder {
     }
 
     public ChestUIButtonBuilder dataContainer(String key, Object value) {
-        itemStack = new ItemDataContainer(itemStack).set(key, value);
+        itemStack = new ItemDataContainerAccessor(itemStack).set(key, value);
 
         return this;
     }

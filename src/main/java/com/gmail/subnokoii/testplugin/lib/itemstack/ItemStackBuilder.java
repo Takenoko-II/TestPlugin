@@ -424,7 +424,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder dataContainer(String key, Object value) {
-        itemStack = new ItemDataContainer(itemStack).set(key, value);
+        itemStack = new ItemDataContainerAccessor(itemStack).set(key, value);
 
         return this;
     }

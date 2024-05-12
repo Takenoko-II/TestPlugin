@@ -9,15 +9,16 @@ com\gmail\subnokoii\testplugin\lib\ui\ChestUIButtonBuilder.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorDimensionSize.class
 com\gmail\subnokoii\testplugin\lib\event\TestPluginEvent.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIBuilder.class
+com\gmail\subnokoii\testplugin\lib\other\DataContainerAccessor.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIClickEventListener.class
 com\gmail\subnokoii\testplugin\events\PlayerEventListener.class
 com\gmail\subnokoii\testplugin\lib\vector\Vector3LocalAxes.class
 com\gmail\subnokoii\testplugin\TestPlugin.class
 com\gmail\subnokoii\testplugin\lib\vector\DimensionSizeMismatchException.class
-com\gmail\subnokoii\testplugin\lib\itemstack\ItemDataContainer.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorBuilder.class
 com\gmail\subnokoii\testplugin\commands\Lobby.class
 com\gmail\subnokoii\testplugin\commands\Log.class
+com\gmail\subnokoii\testplugin\lib\itemstack\ItemDataContainerAccessor.class
 com\gmail\subnokoii\testplugin\events\EntityEventListener.class
 com\gmail\subnokoii\testplugin\lib\event\data\PlayerClickEvent.class
 com\gmail\subnokoii\testplugin\lib\vector\RotationBuilder.class

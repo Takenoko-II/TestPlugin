@@ -1,10 +1,9 @@
-package com.gmail.subnokoii.testplugin.lib.itemstack;
+package com.gmail.subnokoii.testplugin.lib.other;
 
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
@@ -13,24 +12,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ItemDataContainer {
-    private final ItemStack itemStack;
+public final class DataContainerAccessor {
+    private final PersistentDataContainer container;
 
-    public ItemDataContainer(ItemStack itemStack) {
-        if (itemStack == null) {
-            throw new RuntimeException();
-        }
-
-        this.itemStack = itemStack;
+    public DataContainerAccessor(PersistentDataContainer container) {
+        this.container = container;
     }
 
-    private @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
+    public @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
         final String[] keys = path.split("\\.");
-        final ItemMeta meta = itemStack.getItemMeta();
 
-        if (meta == null) return null;
-
-        PersistentDataContainer container = meta.getPersistentDataContainer();
+        PersistentDataContainer container = this.container;
 
         for (int i = 0; i < keys.length; i++) {
             final NamespacedKey namespacedKey = new NamespacedKey(TestPlugin.get(), keys[i]);
@@ -60,24 +52,19 @@ public class ItemDataContainer {
         return null;
     }
 
-    public ItemStack set(String path, Object value) {
+    public PersistentDataContainer set(String path, Object value) {
         final List<String> keys = new ArrayList<>(Arrays.asList(path.split("\\.")));
-        final ItemMeta meta = itemStack.getItemMeta();
 
-        if (meta == null) return itemStack;
+        loop(keys, this.container, value);
 
-        setContainer(keys, meta.getPersistentDataContainer(), value);
-
-        itemStack.setItemMeta(meta);
-
-        return itemStack;
+        return this.container;
     }
 
-    private PersistentDataContainer createNew() {
+    private PersistentDataContainer createNewContainer() {
         return new ItemStack(Material.APPLE).getItemMeta().getPersistentDataContainer();
     }
 
-    private PersistentDataContainer setContainer(List<String> keys, PersistentDataContainer container, Object value) {
+    private PersistentDataContainer loop(List<String> keys, PersistentDataContainer container, Object value) {
         final NamespacedKey key = new NamespacedKey(TestPlugin.get(), keys.get(0));
         keys.remove(0);
 
@@ -88,10 +75,10 @@ public class ItemDataContainer {
             catch (IllegalArgumentException ignored) {}
 
             if (subContainer == null) {
-                subContainer = createNew();
+                subContainer = createNewContainer();
             }
 
-            container.set(key, PersistentDataType.TAG_CONTAINER, setContainer(keys, subContainer, value));
+            container.set(key, PersistentDataType.TAG_CONTAINER, loop(keys, subContainer, value));
 
             return container;
         }
@@ -121,7 +108,7 @@ public class ItemDataContainer {
                 container.set(key, PersistentDataType.SHORT, (Short) value);
             }
             else {
-                throw new RuntimeException();
+                throw new RuntimeException("この型の値はDataContainerAccessorでは扱えません");
             }
 
             return container;
@@ -148,37 +135,5 @@ public class ItemDataContainer {
         }
 
         return false;
-    }
-
-    public @Nullable String getString(String path) {
-        return get(path, PersistentDataType.STRING);
-    }
-
-    public @Nullable Boolean getBoolean(String path) {
-        return get(path, PersistentDataType.BOOLEAN);
-    }
-
-    public @Nullable Integer getInteger(String path) {
-        return get(path, PersistentDataType.INTEGER);
-    }
-
-    public @Nullable Float getFloat(String path) {
-        return get(path, PersistentDataType.FLOAT);
-    }
-
-    public @Nullable Double getDouble(String path) {
-        return get(path, PersistentDataType.DOUBLE);
-    }
-
-    public @Nullable Byte getByte(String path) {
-        return get(path, PersistentDataType.BYTE);
-    }
-
-    public @Nullable Long getLong(String path) {
-        return get(path, PersistentDataType.LONG);
-    }
-
-    public @Nullable Short getShort(String path) {
-        return get(path, PersistentDataType.SHORT);
     }
 }

@@ -1,15 +1,13 @@
 package com.gmail.subnokoii.testplugin.events;
 
 import com.gmail.subnokoii.testplugin.TestPlugin;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainer;
-import com.gmail.subnokoii.testplugin.lib.scoreboard.*;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainerAccessor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
@@ -41,8 +39,8 @@ public class TickEventListener extends BukkitRunnable {
             final ItemStack itemStackInMainHand = player.getEquipment().getItemInMainHand();
             final ItemStack itemStackInOffHand = player.getEquipment().getItemInOffHand();
 
-            final String tagInMainHand = new ItemDataContainer(itemStackInMainHand).getString("custom_item_tag");
-            final String tagInOffHand = new ItemDataContainer(itemStackInOffHand).getString("custom_item_tag");
+            final String tagInMainHand = new ItemDataContainerAccessor(itemStackInMainHand).getString("custom_item_tag");
+            final String tagInOffHand = new ItemDataContainerAccessor(itemStackInOffHand).getString("custom_item_tag");
 
             if (Objects.equals(tagInMainHand, "data_getter") || Objects.equals(tagInOffHand, "data_getter")) {
                 final Entity entity = player.getTargetEntity(16);

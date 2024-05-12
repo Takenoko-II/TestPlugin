@@ -2,14 +2,12 @@ package com.gmail.subnokoii.testplugin.events;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.gmail.subnokoii.testplugin.TestPlugin;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainer;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainerAccessor;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import org.bukkit.*;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -17,11 +15,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class EntityEventListener extends BukkitRunnable implements Listener {
     private static EntityEventListener instance;
@@ -185,9 +179,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
     private boolean isGrapplingHook(ItemStack itemStack) {
         if (itemStack == null) return false;
 
-        itemStack.getItemMeta().getAsString();
-
-        final String tag = new ItemDataContainer(itemStack).getString("custom_item_tag");
+        final String tag = new ItemDataContainerAccessor(itemStack).getString("custom_item_tag");
         return itemStack.getType().equals(Material.FISHING_ROD) && Objects.equals(tag, "grappling_hook");
     }
 }
