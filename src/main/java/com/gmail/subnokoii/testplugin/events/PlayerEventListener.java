@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public class PlayerEventListener implements Listener {
+    private PlayerEventListener() {}
+
     private static PlayerEventListener instance;
 
     public static PlayerEventListener get() {
@@ -163,8 +165,6 @@ public class PlayerEventListener implements Listener {
             }
         });
     }
-
-    private PlayerEventListener() {}
 
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {

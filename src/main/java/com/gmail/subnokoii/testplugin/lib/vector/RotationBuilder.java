@@ -14,18 +14,18 @@ public class RotationBuilder implements VectorBuilder {
     private final DimensionSize dimensionSize;
 
     public RotationBuilder() {
-        components = new double[3];
+        components = new double[]{0d, 0d};
         dimensionSize = new DimensionSize(2);
     }
 
     public RotationBuilder(double x, double y) {
-        components = new double[]{ x, y };
+        components = new double[]{x, y};
         dimensionSize = new DimensionSize(2);
     }
 
-    public RotationBuilder(double... allComponents) throws UnexpectedDimensionSizeException {
+    public RotationBuilder(double... allComponents) throws DimensionSizeMismatchException {
         if (allComponents.length != 2) {
-            throw new UnexpectedDimensionSizeException();
+            throw new DimensionSizeMismatchException();
         }
 
         double[] newArray = new double[2];

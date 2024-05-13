@@ -80,30 +80,81 @@ public class ScoreboardUtils {
             return objective.getScore(name).getScore();
         }
 
-        public void setScore(Entity entity, int value) {
+        public Objective setScore(Entity entity, int value) {
             objective.getScoreFor(entity).setScore(value);
+
+            return this;
         }
 
-        public void setScore(String name, int value) {
+        public Objective setScore(String name, int value) {
             objective.getScore(name).setScore(value);
+
+            return this;
         }
 
-        public void addScore(Entity entity, int value) {
-            final int addend = getScore(entity) + value;
-            setScore(entity, addend);
+        public Objective addScore(Entity entity, int value) {
+            setScore(entity, getScore(entity) + value);
+
+            return this;
         }
 
-        public void addScore(String name, int value) {
-            final int addend = getScore(name) + value;
-            setScore(name, addend);
+        public Objective addScore(String name, int value) {
+            setScore(name, getScore(name) + value);
+
+            return this;
         }
 
-        public void resetScore(Entity entity) {
+        public Objective subtractScore(Entity entity, int value) {
+            setScore(entity, getScore(entity) - value);
+
+            return this;
+        }
+
+        public Objective subtractScore(String name, int value) {
+            setScore(name, getScore(name) - value);
+
+            return this;
+        }
+
+        public Objective multiplyScore(Entity entity, int value) {
+            setScore(entity, getScore(entity) * value);
+
+            return this;
+        }
+
+        public Objective multiplyScore(String name, int value) {
+            final int subtrahend = getScore(name) * value;
+            setScore(name, subtrahend);
+
+            return this;
+        }
+
+        public Objective divideScore(Entity entity, int value) {
+            if (value == 0) return this;
+
+            setScore(entity, getScore(entity) / value);
+
+            return this;
+        }
+
+        public Objective divideScore(String name, int value) {
+            if (value == 0) return this;
+
+            setScore(name, getScore(name) / value);
+
+            return this;
+        }
+
+        public Objective resetScore(Entity entity) {
             objective.getScoreFor(entity).resetScore();
+
+            return this;
         }
 
-        public void resetScore(String name) {
+        public Objective resetScore(String name) {
             objective.getScore(name).resetScore();
+
+            return this;
         }
 
         public String getName() {

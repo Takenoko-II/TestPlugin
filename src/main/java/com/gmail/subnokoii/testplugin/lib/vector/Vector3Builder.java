@@ -25,9 +25,9 @@ public class Vector3Builder implements VectorBuilder {
         dimensionSize = new DimensionSize(3);
     }
 
-    public Vector3Builder(double... allComponents) throws UnexpectedDimensionSizeException {
+    public Vector3Builder(double... allComponents) throws DimensionSizeMismatchException {
         if (allComponents.length != 3) {
-            throw new UnexpectedDimensionSizeException();
+            throw new DimensionSizeMismatchException();
         }
 
         double[] newArray = new double[3];

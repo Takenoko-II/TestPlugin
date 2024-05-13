@@ -11,7 +11,7 @@ public final class ItemDataContainerAccessor {
 
     public ItemDataContainerAccessor(ItemStack itemStack) {
         if (itemStack == null) {
-            throw new RuntimeException();
+            throw new IllegalArgumentException("引数がnullのためDataContainerへのアクセサを作成できません");
         }
 
         this.itemStack = itemStack;
