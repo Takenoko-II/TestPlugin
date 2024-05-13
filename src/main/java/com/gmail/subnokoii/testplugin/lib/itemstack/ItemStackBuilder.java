@@ -46,7 +46,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder type(Material material) {
-        itemStack.setType(material);
+        itemStack = itemStack.withType(material);
 
         return this;
     }
@@ -54,8 +54,9 @@ public class ItemStackBuilder {
     public ItemStackBuilder type(String id) {
         final Material material = Material.getMaterial(id);
 
-        if (material == null) itemStack.setType(Material.AIR);
-        else itemStack.setType(material);
+        if (material == null) return this;
+
+        itemStack = itemStack.withType(material);
 
         return this;
     }
@@ -75,17 +76,17 @@ public class ItemStackBuilder {
         return this;
     }
 
-    public ItemStackBuilder name(String text) {
-        modifyItemMeta(builder -> {
+    public ItemStackBuilder customName(String text) {
+        modifyItemMeta(meta -> {
             final TextComponent component = createUnItalicText(text);
-            builder.displayName(component);
-            return builder;
+            meta.displayName(component);
+            return meta;
         });
 
         return this;
     }
 
-    public ItemStackBuilder name(String text, TextDecoration decoration) {
+    public ItemStackBuilder customName(String text, TextDecoration decoration) {
         modifyItemMeta(builder -> {
             final TextComponent component = createUnItalicText(text).decorate(decoration);
             builder.displayName(component);
@@ -95,7 +96,7 @@ public class ItemStackBuilder {
         return this;
     }
 
-    public ItemStackBuilder name(String text, Color color) {
+    public ItemStackBuilder customName(String text, Color color) {
         modifyItemMeta(builder -> {
             final TextComponent component = createUnItalicText(text).color(TextColor.color(color.asRGB()));
             builder.displayName(component);
@@ -105,7 +106,7 @@ public class ItemStackBuilder {
         return this;
     }
 
-    public ItemStackBuilder name(String text, TextDecoration decoration, Color color) {
+    public ItemStackBuilder customName(String text, TextDecoration decoration, Color color) {
         modifyItemMeta(builder -> {
             final TextComponent component = createUnItalicText(text).decorate(decoration).color(TextColor.color(color.asRGB()));
             builder.displayName(component);
@@ -420,24 +421,51 @@ public class ItemStackBuilder {
         return this;
     }
 
-    public ItemStackBuilder modify(UnaryOperator<ItemMeta> operator) {
-        modifyItemMeta(operator);
+    public ItemStackBuilder glint(boolean flag) {
+        modifyItemMeta(meta -> {
+            meta.setEnchantmentGlintOverride(flag);
+
+            return meta;
+        });
 
         return this;
     }
 
-    public ItemStackBuilder dataContainer(String key, Object value) {
-        itemStack = new ItemDataContainerAccessor(itemStack).set(key, value);
+    public ItemStackBuilder hideTooltip(boolean flag) {
+        modifyItemMeta(meta -> {
+            meta.setHideTooltip(flag);
+
+            return meta;
+        });
 
         return this;
     }
 
-    public ItemStack get() {
+    public ItemStackBuilder fireResistant(boolean flag) {
+        modifyItemMeta(meta -> {
+            meta.setFireResistant(flag);
+
+            return meta;
+        });
+
+        return this;
+    }
+
+    public ItemStackBuilder dataContainer(String path, Object value) {
+        itemStack = new ItemStackDataContainerAccessor(itemStack).set(path, value);
+
+        return this;
+    }
+
+    public ItemStack build() {
         return itemStack.clone();
     }
 
     public static ItemStackBuilder from(ItemStack itemStack) {
-        final ItemStackBuilder builder = new ItemStackBuilder(itemStack.getType());
-        return builder.modify(operator -> itemStack.clone().getItemMeta());
+        final ItemStackBuilder itemStackBuilder = new ItemStackBuilder(itemStack.getType());
+
+        itemStackBuilder.modifyItemMeta(meta -> itemStack.getItemMeta());
+
+        return itemStackBuilder;
     }
 }

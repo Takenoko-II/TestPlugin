@@ -6,10 +6,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
-public final class ItemDataContainerAccessor {
+public final class ItemStackDataContainerAccessor {
     private final ItemStack itemStack;
 
-    public ItemDataContainerAccessor(ItemStack itemStack) {
+    public ItemStackDataContainerAccessor(ItemStack itemStack) {
         if (itemStack == null) {
             throw new IllegalArgumentException("引数がnullのためDataContainerへのアクセサを作成できません");
         }

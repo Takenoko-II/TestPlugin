@@ -4,7 +4,6 @@ import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.*;
 import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
-import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.ui.*;
 import org.bukkit.*;
 import org.bukkit.command.*;
@@ -20,6 +19,11 @@ import java.util.Objects;
 
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
+
+    @Override
+    public void onLoad() {
+        getLogger().info("TestPluginを読み込んでいます...");
+    }
 
     @Override
     public void onEnable() {

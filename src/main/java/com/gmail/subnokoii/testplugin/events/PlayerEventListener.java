@@ -3,7 +3,7 @@ package com.gmail.subnokoii.testplugin.events;
 import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 
@@ -60,8 +61,8 @@ public class PlayerEventListener implements Listener {
             .getOrCreateObjective("plugin_api.on_left_click")
             .addScore(event.getPlayer(), 1);
 
-            final String type = new ItemDataContainerAccessor(itemStack).getString("on_left_click.type");
-            final String content = new ItemDataContainerAccessor(itemStack).getString("on_left_click.content");
+            final String type = new ItemStackDataContainerAccessor(itemStack).getString("on_left_click.type");
+            final String content = new ItemStackDataContainerAccessor(itemStack).getString("on_left_click.content");
 
             if (type != null && content != null) {
                 if (type.equals("run_command")) {
@@ -76,8 +77,8 @@ public class PlayerEventListener implements Listener {
 
             if (itemStack == null) return;
 
-            final String type = new ItemDataContainerAccessor(itemStack).getString("on_right_click.type");
-            final String content = new ItemDataContainerAccessor(itemStack).getString("on_right_click.content");
+            final String type = new ItemStackDataContainerAccessor(itemStack).getString("on_right_click.type");
+            final String content = new ItemStackDataContainerAccessor(itemStack).getString("on_right_click.content");
 
             if (type != null && content != null) {
                 switch (type) {
@@ -169,7 +170,7 @@ public class PlayerEventListener implements Listener {
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
         final ItemStack itemStack = event.getItemDrop().getItemStack();
-        final Boolean locked = new ItemDataContainerAccessor(itemStack).getBoolean("locked");
+        final Boolean locked = new ItemStackDataContainerAccessor(itemStack).getBoolean("locked");
 
         if (locked == null) return;
 
@@ -187,7 +188,7 @@ public class PlayerEventListener implements Listener {
         final ItemStack itemStack = event.getCurrentItem();
         if (itemStack == null) return;
 
-        final Boolean locked = new ItemDataContainerAccessor(itemStack).getBoolean("locked");
+        final Boolean locked = new ItemStackDataContainerAccessor(itemStack).getBoolean("locked");
 
         if (locked == null) return;
 
@@ -201,8 +202,8 @@ public class PlayerEventListener implements Listener {
         final ItemStack mainHandItem = event.getMainHandItem();
         final ItemStack offhandItem = event.getOffHandItem();
 
-        final Boolean mainHandLocked = new ItemDataContainerAccessor(mainHandItem).getBoolean("locked");
-        final Boolean offHandLocked = new ItemDataContainerAccessor(offhandItem).getBoolean("locked");
+        final Boolean mainHandLocked = new ItemStackDataContainerAccessor(mainHandItem).getBoolean("locked");
+        final Boolean offHandLocked = new ItemStackDataContainerAccessor(offhandItem).getBoolean("locked");
 
         if (Objects.equals(mainHandLocked, true) && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
@@ -221,10 +222,23 @@ public class PlayerEventListener implements Listener {
 
         final ItemStack serverSelector = BungeeCordUtils.getServerSelector();
 
-        if (!inventory.contains(serverSelector)) {
-            inventory.addItem(serverSelector);
-            player.updateInventory();
+        final ListIterator<ItemStack> itemStacks = inventory.iterator();
+
+        int i = 0;
+        while (itemStacks.hasNext()) {
+            final ItemStack itemStack = itemStacks.next();
+
+            if (itemStack == null) continue;
+
+            final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
+
+            if (Objects.equals(tag, "server_selector")) return;
+
+            if (i > 100) return;
+            i++;
         }
+
+        inventory.addItem(serverSelector);
     }
 
     @EventHandler
@@ -243,7 +257,7 @@ public class PlayerEventListener implements Listener {
         final Player player = event.getPlayer();
         final ItemStack itemStack = event.getItemStack();
 
-        final String tag = new ItemDataContainerAccessor(itemStack).getString("custom_item_tag");
+        final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
 
         if (tag != null) {
             switch (tag) {

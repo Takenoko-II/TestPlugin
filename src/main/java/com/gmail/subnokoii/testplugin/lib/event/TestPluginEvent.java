@@ -4,7 +4,7 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.event.data.CustomItemUseEvent;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
 import com.gmail.subnokoii.testplugin.lib.other.ScheduleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -80,7 +80,7 @@ public class TestPluginEvent implements Listener {
 
             if (itemStack == null) return;
 
-            final String tag = new ItemDataContainerAccessor(itemStack).getString("custom_item_tag");
+            final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
 
             if (tag == null) return;
 
@@ -104,7 +104,7 @@ public class TestPluginEvent implements Listener {
 
                 if (itemStack == null) return;
 
-                final String tag = new ItemDataContainerAccessor(itemStack).getString("custom_item_tag");
+                final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
 
                 if (tag == null) return;
 
@@ -137,7 +137,7 @@ public class TestPluginEvent implements Listener {
 
             final ItemStack itemStack = ((Player) damagingEntity).getEquipment().getItemInMainHand();
 
-            final String tag = new ItemDataContainerAccessor(itemStack).getString("custom_item_tag");
+            final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
 
             if (tag == null) return;
 

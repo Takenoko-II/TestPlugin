@@ -1,6 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.event.data;
 
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -24,7 +24,7 @@ public class CustomItemUseEvent {
         playerInteractEvent = event;
         player = event.getPlayer();
         itemStack = event.getItem();
-        tag = new ItemDataContainerAccessor(itemStack).getString("custom_item_tag");
+        tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
         this.isLeftClick = isLeftClick;
 
         if (event.getItem() == null || tag == null) {
@@ -42,7 +42,7 @@ public class CustomItemUseEvent {
 
         player = (Player) damagingEntity;
         itemStack = player.getEquipment().getItemInMainHand();
-        tag = new ItemDataContainerAccessor(itemStack).getString("custom_item_tag");
+        tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
         isLeftClick = true;
 
         if (tag == null) {

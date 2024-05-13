@@ -89,12 +89,14 @@ public class TextFileUtils {
         }
     }
 
-    public static java.util.stream.Stream<String> getAll(String path) {
-        try {
-            return Files.list(Path.of(path)).map(Path::toString);
+    public static String[] getAll(String path) {
+        try (final Stream<Path> list = Files.list(Path.of(path))) {
+            return list
+            .map(Path::toString)
+            .toArray(String[]::new);
         }
         catch (IOException e) {
-            return Stream.of();
+            return new String[0];
         }
     }
 }

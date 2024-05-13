@@ -92,10 +92,9 @@ public class Log implements CommandExecutor, TabCompleter {
                     }
 
                     if (args[2].equals("archive")) {
-                        final Stream<String> files = TextFileUtils.getAll("logs");
-                        files.forEach(file -> {
-                            if (file.endsWith(".log.gz")) TextFileUtils.delete(file);
-                        });
+                        for (final String file : TextFileUtils.getAll("logs")) {
+                            TextFileUtils.delete(file);
+                        }
                     }
                     else if (args[2].equals("latest")) {
                         TextFileUtils.erase("logs/latest.log");

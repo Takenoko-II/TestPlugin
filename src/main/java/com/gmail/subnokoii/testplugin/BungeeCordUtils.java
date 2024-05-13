@@ -8,9 +8,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 public class BungeeCordUtils {
@@ -18,20 +16,20 @@ public class BungeeCordUtils {
 
     public static ItemStack getServerSelector() {
         return new ItemStackBuilder(Material.COMPASS)
-        .name("Server Selector", Color.fromRGB(0x00FF55))
+        .customName("Server Selector", Color.fromRGB(0x00FF55))
         .lore("Right Click to Open", Color.GRAY)
-        .enchantment(Enchantment.INFINITY, 1)
-        .hideFlag(ItemFlag.HIDE_ENCHANTS)
+        .glint(true)
+        .maxCount(1)
         .dataContainer("locked", true)
         .dataContainer("custom_item_tag", "server_selector")
-        .get();
+        .build();
     }
 
     public static void openServerSelector(Player player) {
         new ChestUIBuilder("Battle of Apostolos", 1)
         .set(1, builder -> {
             return builder.type(Material.NETHER_STAR)
-            .name("Game", Color.AQUA)
+            .customName("Game", Color.AQUA)
             .lore("ゲームサーバーに移動", Color.GRAY)
             .onClick(response -> {
                 transfer(player, "game");
@@ -42,7 +40,7 @@ public class BungeeCordUtils {
         })
         .set(3, builder -> {
             return builder.type(Material.PAPER)
-            .name("Lobby", Color.WHITE)
+            .customName("Lobby", Color.WHITE)
             .lore("ロビーサーバーに移動", Color.GRAY)
             .glint(true)
             .onClick(response -> {
@@ -55,7 +53,7 @@ public class BungeeCordUtils {
         .set(5, builder -> {
             if (player.isOp()) {
                 return builder.type(Material.COMMAND_BLOCK)
-                .name("Development", Color.ORANGE)
+                .customName("Development", Color.ORANGE)
                 .lore("開発サーバーに移動", Color.GRAY)
                 .glint(true)
                 .onClick(response -> {
@@ -66,7 +64,7 @@ public class BungeeCordUtils {
                 });
             }
             else return builder.type(Material.BARRIER)
-            .name("Development", Color.ORANGE)
+            .customName("Development", Color.ORANGE)
             .lore("権限がないため利用できません", Color.RED)
             .onClick(response -> {
                 response.playSound(Sound.BLOCK_NOTE_BLOCK_BASS, 10, 1);
@@ -75,7 +73,7 @@ public class BungeeCordUtils {
         })
         .set(7, builder -> {
             return builder.type(Material.RED_BED)
-            .name("Respawn", Color.RED)
+            .customName("Respawn", Color.RED)
             .lore("ワールドのスポーンポイントに戻る", Color.GRAY)
             .onClick(response -> {
                 final Location spawnPoint = player.getWorld().getSpawnLocation();

@@ -2,7 +2,7 @@ package com.gmail.subnokoii.testplugin.events;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.gmail.subnokoii.testplugin.TestPlugin;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -179,7 +179,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
     private boolean isGrapplingHook(ItemStack itemStack) {
         if (itemStack == null) return false;
 
-        final String tag = new ItemDataContainerAccessor(itemStack).getString("custom_item_tag");
+        final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
         return itemStack.getType().equals(Material.FISHING_ROD) && Objects.equals(tag, "grappling_hook");
     }
 }

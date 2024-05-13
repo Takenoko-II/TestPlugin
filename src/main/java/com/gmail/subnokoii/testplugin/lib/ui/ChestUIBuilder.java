@@ -1,6 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -108,12 +108,12 @@ public class ChestUIBuilder {
         private Consumer<ChestUIClickEvent> listener = response -> {};
 
         public Button() {
-            itemStack = new ItemDataContainerAccessor(new ItemStack(Material.IRON_BARS)).set("id", UUID.randomUUID().toString());
+            itemStack = new ItemStackDataContainerAccessor(new ItemStack(Material.IRON_BARS)).set("id", UUID.randomUUID().toString());
         }
 
         public boolean matchId(ItemStack itemStack) {
-            final String id = new ItemDataContainerAccessor(itemStack).getString("id");
-            final String thisId = new ItemDataContainerAccessor(getItemStack()).getString("id");
+            final String id = new ItemStackDataContainerAccessor(itemStack).getString("id");
+            final String thisId = new ItemStackDataContainerAccessor(getItemStack()).getString("id");
 
             if (id == null) return false;
 
@@ -121,7 +121,7 @@ public class ChestUIBuilder {
         }
 
         public Button type(Material material) {
-            itemStack.setType(material);
+            itemStack = itemStack.withType(material);
 
             return this;
         }
@@ -130,10 +130,10 @@ public class ChestUIBuilder {
             final Material material = Material.getMaterial(id);
 
             if (material == null) {
-                throw new NullPointerException();
+                throw new IllegalArgumentException();
             }
 
-            itemStack.setType(material);
+            itemStack = itemStack.withType(material);
 
             return this;
         }
@@ -144,7 +144,7 @@ public class ChestUIBuilder {
             return this;
         }
 
-        public Button name(String name) {
+        public Button customName(String name) {
             final ItemMeta meta = itemStack.getItemMeta();
 
             meta.displayName(Component.text(name).decoration(TextDecoration.ITALIC, false));
@@ -153,7 +153,7 @@ public class ChestUIBuilder {
             return this;
         }
 
-        public Button name(String name, TextDecoration decoration) {
+        public Button customName(String name, TextDecoration decoration) {
             final ItemMeta meta = itemStack.getItemMeta();
 
             final Component component = Component.text(name).decoration(TextDecoration.ITALIC, false);
@@ -164,7 +164,7 @@ public class ChestUIBuilder {
             return this;
         }
 
-        public Button name(String name, Color color) {
+        public Button customName(String name, Color color) {
             final ItemMeta meta = itemStack.getItemMeta();
 
             final Component component = Component.text(name).decoration(TextDecoration.ITALIC, false);
@@ -175,7 +175,7 @@ public class ChestUIBuilder {
             return this;
         }
 
-        public Button name(String name, TextDecoration decoration, Color color) {
+        public Button customName(String name, TextDecoration decoration, Color color) {
             final ItemMeta meta = itemStack.getItemMeta();
 
             final Component component = Component.text(name).decoration(TextDecoration.ITALIC, false);
@@ -275,7 +275,7 @@ public class ChestUIBuilder {
             final PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
 
             meta.setBasePotionType(type);
-            meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+            meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
             itemStack.setItemMeta(meta);
 
             return this;
@@ -285,7 +285,7 @@ public class ChestUIBuilder {
             final PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
 
             meta.setColor(color);
-            meta.addItemFlags(ItemFlag.HIDE_ITEM_SPECIFICS);
+            meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
             itemStack.setItemMeta(meta);
 
             return this;
@@ -344,7 +344,7 @@ public class ChestUIBuilder {
         }
 
         public Button dataContainer(String key, Object value) {
-            itemStack = new ItemDataContainerAccessor(itemStack).set(key, value);
+            itemStack = new ItemStackDataContainerAccessor(itemStack).set(key, value);
 
             return this;
         }

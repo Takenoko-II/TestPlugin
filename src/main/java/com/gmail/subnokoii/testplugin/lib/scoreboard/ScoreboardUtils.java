@@ -7,26 +7,22 @@ import org.bukkit.scoreboard.*;
 import org.jetbrains.annotations.Nullable;
 
 public class ScoreboardUtils {
-    private static final ScoreboardManager manager = Bukkit.getScoreboardManager();
-
-    private static final Scoreboard mainScoreboard = manager.getMainScoreboard();
+    private static final Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
     public static Objective createObjective(String name) {
-        final org.bukkit.scoreboard.Objective newObjective = mainScoreboard
-        .registerNewObjective(name, Criteria.DUMMY, Component.text(name));
+        final org.bukkit.scoreboard.Objective newObjective = scoreboard.registerNewObjective(name, Criteria.DUMMY, Component.text(name));
 
         return new Objective(newObjective);
     }
 
     public static Objective createObjective(String name, Criteria criteria) {
-        final org.bukkit.scoreboard.Objective newObjective = mainScoreboard
-        .registerNewObjective(name, criteria, Component.text(name));
+        final org.bukkit.scoreboard.Objective newObjective = scoreboard.registerNewObjective(name, criteria, Component.text(name));
 
         return new Objective(newObjective);
     }
 
     public static @Nullable Objective getObjective(String name) {
-        final org.bukkit.scoreboard.Objective objective = mainScoreboard.getObjective(name);
+        final org.bukkit.scoreboard.Objective objective = scoreboard.getObjective(name);
 
         if (objective == null) return null;
 
@@ -34,7 +30,7 @@ public class ScoreboardUtils {
     }
 
     public static Objective getOrCreateObjective(String name) {
-        final org.bukkit.scoreboard.Objective objective = mainScoreboard.getObjective(name);
+        final org.bukkit.scoreboard.Objective objective = scoreboard.getObjective(name);
 
         if (objective == null) return createObjective(name);
 
@@ -42,7 +38,7 @@ public class ScoreboardUtils {
     }
 
     public static Objective getOrCreateObjective(String name, Criteria criteria) {
-        final org.bukkit.scoreboard.Objective objective = mainScoreboard.getObjective(name);
+        final org.bukkit.scoreboard.Objective objective = scoreboard.getObjective(name);
 
         if (objective == null) return createObjective(name, criteria);
 
@@ -50,7 +46,7 @@ public class ScoreboardUtils {
     }
 
     public static Objective[] getAllObjectives() {
-        return mainScoreboard
+        return scoreboard
         .getObjectives()
         .stream()
         .map(Objective::new)
@@ -58,7 +54,7 @@ public class ScoreboardUtils {
     }
 
     public static void removeObjective(String name) {
-        final org.bukkit.scoreboard.Objective objective = mainScoreboard.getObjective(name);
+        final org.bukkit.scoreboard.Objective objective = scoreboard.getObjective(name);
 
         if (objective == null) return;
 

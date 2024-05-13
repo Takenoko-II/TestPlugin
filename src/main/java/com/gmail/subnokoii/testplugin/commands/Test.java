@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,7 +79,7 @@ public class Test implements CommandExecutor, TabCompleter {
                             break;
                         }
                         case "log_archive_size": {
-                            final Optional<Long> size = TextFileUtils.getAll("logs")
+                            final Optional<Long> size = Arrays.stream(TextFileUtils.getAll("logs"))
                             .filter(path -> path.endsWith(".log.gz"))
                             .map(TextFileUtils::getSize)
                             .reduce(Long::sum);
@@ -135,14 +136,14 @@ public class Test implements CommandExecutor, TabCompleter {
                         case "grappling_hook": {
                             itemStackBuilder
                             .type(Material.FISHING_ROD)
-                            .name("Grappling Hook", Color.ORANGE)
+                            .customName("Grappling Hook", Color.ORANGE)
                             .dataContainer("custom_item_tag", "grappling_hook");
                             break;
                         }
                         case "instant_shoot_bow": {
                             itemStackBuilder
                             .type(Material.BOW)
-                            .name("Instant Shoot Bow", Color.ORANGE)
+                            .customName("Instant Shoot Bow", Color.ORANGE)
                             .dataContainer("custom_item_tag", "instant_shoot_bow");
                             break;
                         }
@@ -158,7 +159,7 @@ public class Test implements CommandExecutor, TabCompleter {
                         }
                     }
 
-                    player.getInventory().addItem(itemStackBuilder.get());
+                    player.getInventory().addItem(itemStackBuilder.build());
 
                     return true;
                 }
