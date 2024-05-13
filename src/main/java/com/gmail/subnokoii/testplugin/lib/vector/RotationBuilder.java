@@ -1,26 +1,29 @@
 package com.gmail.subnokoii.testplugin.lib.vector;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.List;
 import java.util.Vector;
+import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
 
 public class RotationBuilder implements VectorBuilder {
     private final double[] components;
 
-    private final VectorDimensionSize dimensionSize;
+    private final DimensionSize dimensionSize;
 
     public RotationBuilder() {
         components = new double[3];
-        dimensionSize = new VectorDimensionSize(2);
+        dimensionSize = new DimensionSize(2);
     }
 
     public RotationBuilder(double x, double y) {
         components = new double[]{ x, y };
-        dimensionSize = new VectorDimensionSize(2);
+        dimensionSize = new DimensionSize(2);
     }
 
-    public RotationBuilder(double[] allComponents) throws UnexpectedDimensionSizeException {
+    public RotationBuilder(double... allComponents) throws UnexpectedDimensionSizeException {
         if (allComponents.length != 2) {
             throw new UnexpectedDimensionSizeException();
         }
@@ -29,7 +32,7 @@ public class RotationBuilder implements VectorBuilder {
         System.arraycopy(allComponents, 0, newArray, 0, allComponents.length);
 
         components = newArray;
-        dimensionSize = new VectorDimensionSize(3);
+        dimensionSize = new DimensionSize(3);
     }
 
     public double getComponent(int index) {
@@ -37,7 +40,7 @@ public class RotationBuilder implements VectorBuilder {
     }
 
     public double[] getAllComponents() {
-        return components;
+        return components.clone();
     }
 
     public RotationBuilder setComponent(int index, double component) throws DimensionSizeMismatchException {
@@ -60,23 +63,23 @@ public class RotationBuilder implements VectorBuilder {
         return this;
     }
 
-    public double yaw() {
-        return components[0];
+    public float yaw() {
+        return (float) components[0];
     }
 
-    public void yaw(double value) {
+    public void yaw(float value) {
         components[0] = value;
     }
 
-    public double pitch() {
-        return components[1];
+    public float pitch() {
+        return (float) components[1];
     }
 
-    public void pitch(double value) {
+    public void pitch(float value) {
         components[1] = value;
     }
 
-    public VectorDimensionSize getDimensionSize() {
+    public DimensionSize getDimensionSize() {
         return dimensionSize;
     }
 
@@ -95,16 +98,52 @@ public class RotationBuilder implements VectorBuilder {
         return getDirection3d().getAngleBetween(rotation.getDirection3d());
     }
 
+    public RotationBuilder calculate(UnaryOperator<Double> operator) {
+        for (int i = 0; i < components.length; i++) {
+            components[i] = operator.apply(components[i]);
+        }
+
+        return this;
+    }
+
+    public RotationBuilder calculate(RotationBuilder other, BiFunction<Double, Double, Double> operator) {
+        for (int i = 0; i < components.length; i++) {
+            components[i] = operator.apply(components[i], other.components[i]);
+        }
+
+        return this;
+    }
+
+    public RotationBuilder multiplyByScalar(double scalar) {
+        return calculate(component -> component * scalar);
+    }
+
+    public RotationBuilder inverted() {
+        return multiplyByScalar(-1d);
+    }
+
+    public RotationBuilder fill(double value) {
+        return calculate(component -> value);
+    }
+
     public RotationBuilder add(RotationBuilder addend) {
-        return getDirection3d().add(addend.getDirection3d()).getRotation2d();
+        return calculate(addend, Double::sum);
     }
 
     public RotationBuilder subtract(RotationBuilder subtrahend) {
-        return getDirection3d().subtract(subtrahend.getDirection3d()).getRotation2d();
+        return add(subtrahend.copy().inverted());
     }
 
     public RotationBuilder copy() {
         return new RotationBuilder(components[0], components[1]);
+    }
+
+    public Location toLocation(Location location) {
+        return new Location(location.getWorld(), location.x(), location.y(), location.z(), yaw(), pitch());
+    }
+
+    public Location toLocation(Vector3Builder coordinate, World world) {
+        return new Location(world, coordinate.x(), coordinate.y(), coordinate.z(), yaw(), pitch());
     }
 
     public static RotationBuilder from(Vector<Double> vector) throws DimensionSizeMismatchException {

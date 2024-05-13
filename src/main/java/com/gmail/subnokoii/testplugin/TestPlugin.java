@@ -4,6 +4,7 @@ import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.*;
 import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
+import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.ui.*;
 import org.bukkit.*;
 import org.bukkit.command.*;
@@ -33,7 +34,7 @@ public final class TestPlugin extends JavaPlugin {
 
         PlayerEventListener.init();
         EntityEventListener.init();
-        ChestUIClickEventListener.init();
+        ChestUIClickEvent.Listener.init();
         TickEventListener.init();
 
         // コマンド登録

@@ -104,7 +104,7 @@ public class PlayerEventListener implements Listener {
 
                     location.add(new Vector3Builder(face.getModX(), face.getModY(), face.getModZ())).subtract(direction.length(0.5d));
 
-                    final Location destination = location.mergeWithLocation(previousLocation);
+                    final Location destination = location.toLocation(previousLocation);
 
                     player.teleport(destination);
                     player.getWorld().playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, 10.0f, 2.0f);

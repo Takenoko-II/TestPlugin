@@ -62,7 +62,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
         if (isGrapplingHook(itemInMainHand) || isGrapplingHook(itemInOffHand)) {
             if (Objects.equals(grapplingHookExists.get(player), true)) {
-                hook.teleport(grapplingHookLocation.get(player).mergeWithLocation(hook.getLocation()));
+                hook.teleport(grapplingHookLocation.get(player).toLocation(hook.getLocation()));
                 return;
             }
 

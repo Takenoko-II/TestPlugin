@@ -13,19 +13,19 @@ import java.util.function.UnaryOperator;
 public class Vector3Builder implements VectorBuilder {
     private final double[] components;
 
-    private final VectorDimensionSize dimensionSize;
+    private final DimensionSize dimensionSize;
 
     public Vector3Builder() {
         components = new double[]{0d, 0d, 0d};
-        dimensionSize = new VectorDimensionSize(3);
+        dimensionSize = new DimensionSize(3);
     }
 
     public Vector3Builder(double x, double y, double z) {
         components = new double[]{x, y, z};
-        dimensionSize = new VectorDimensionSize(3);
+        dimensionSize = new DimensionSize(3);
     }
 
-    public Vector3Builder(double[] allComponents) throws UnexpectedDimensionSizeException {
+    public Vector3Builder(double... allComponents) throws UnexpectedDimensionSizeException {
         if (allComponents.length != 3) {
             throw new UnexpectedDimensionSizeException();
         }
@@ -34,7 +34,7 @@ public class Vector3Builder implements VectorBuilder {
         System.arraycopy(allComponents, 0, newArray, 0, allComponents.length);
 
         components = newArray;
-        dimensionSize = new VectorDimensionSize(3);
+        dimensionSize = new DimensionSize(3);
     }
 
     public double getComponent(int index) {
@@ -42,7 +42,7 @@ public class Vector3Builder implements VectorBuilder {
     }
 
     public double[] getAllComponents() {
-        return components;
+        return components.clone();
     }
 
     public Vector3Builder setComponent(int index, double component) throws DimensionSizeMismatchException {
@@ -89,7 +89,7 @@ public class Vector3Builder implements VectorBuilder {
         components[2] = value;
     }
 
-    public VectorDimensionSize getDimensionSize() {
+    public DimensionSize getDimensionSize() {
         return dimensionSize;
     }
 
@@ -103,7 +103,7 @@ public class Vector3Builder implements VectorBuilder {
 
     public Vector3Builder calculate(Vector3Builder other, BiFunction<Double, Double, Double> operator) {
         for (int i = 0; i < components.length; i++) {
-            components[i] = operator.apply(components[i], other.getComponent(i));
+            components[i] = operator.apply(components[i], other.components[i]);
         }
 
         return this;
@@ -228,12 +228,20 @@ public class Vector3Builder implements VectorBuilder {
         return new Vector3Builder(components[0], components[1], components[2]);
     }
 
-    public Vector3LocalAxes getLocalAxes() {
-        return new Vector3LocalAxes(this);
+    public LocalAxes getLocalAxes() {
+        return new LocalAxes(this);
     }
 
-    public Location mergeWithLocation(Location location) {
+    public Location toLocation(Location location) {
         return new Location(location.getWorld(), components[0], components[1], components[2], location.getYaw(), location.getPitch());
+    }
+
+    public Location toLocation(RotationBuilder rotation, World world) {
+        return new Location(world, components[0], components[1], components[2], rotation.yaw(), rotation.pitch());
+    }
+
+    public Location toLocation(World world) {
+        return new Location(world, components[0], components[1], components[2], 0, 0);
     }
 
     public Vector<Double> toVector() {
@@ -248,7 +256,7 @@ public class Vector3Builder implements VectorBuilder {
     public RotationBuilder getRotation2d() {
         return new RotationBuilder(
             -Math.asin(components[1] / length()) * 180d / Math.PI,
-            -Math.atan2(components[0] / length(), components[2]/ length()) * 180d / Math.PI
+            -Math.atan2(components[0] / length(), components[2] / length()) * 180d / Math.PI
         );
     }
 
@@ -299,5 +307,31 @@ public class Vector3Builder implements VectorBuilder {
 
     public static Vector3Builder max(Vector3Builder a, Vector3Builder b) {
         return a.copy().calculate(b, Math::max);
+    }
+
+    public static final class LocalAxes {
+        private final Vector3Builder x;
+        private final Vector3Builder y;
+        private final Vector3Builder z;
+
+        public LocalAxes(Vector3Builder forward) {
+            z = forward.copy().normalized();
+
+            x = new Vector3Builder(z.z(), 0, -z.x()).normalized();
+
+            y = z.cross(x);
+        }
+
+        public Vector3Builder getX() {
+            return x.copy();
+        }
+
+        public Vector3Builder getY() {
+            return y.copy();
+        }
+
+        public Vector3Builder getZ() {
+            return z.copy();
+        }
     }
 }

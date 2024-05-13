@@ -7,7 +7,7 @@ public interface VectorBuilder {
 
     VectorBuilder setComponent(int index, double component) throws DimensionSizeMismatchException;
 
-    VectorBuilder setAllComponents(double[] allComponents) throws DimensionSizeMismatchException;
+    VectorBuilder setAllComponents(double... allComponents) throws DimensionSizeMismatchException;
 
     default boolean is(VectorBuilder vector) {
         if (this.getAllComponents().length != vector.getAllComponents().length) {
@@ -19,7 +19,23 @@ public interface VectorBuilder {
         && this.getComponent(2) == vector.getComponent(2);
     }
 
-    VectorDimensionSize getDimensionSize();
+    DimensionSize getDimensionSize();
 
     VectorBuilder copy();
+
+    final class DimensionSize {
+        private final int size;
+
+        public DimensionSize(int size) {
+            this.size = size;
+        }
+
+        public int getValue() {
+            return size;
+        }
+
+        public boolean match(VectorBuilder vector) {
+            return vector.getAllComponents().length == size;
+        }
+    }
 }

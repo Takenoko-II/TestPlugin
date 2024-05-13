@@ -20,8 +20,11 @@ public class ItemStackBuilder {
     private ItemStack itemStack;
 
     private void modifyItemMeta(UnaryOperator<ItemMeta> builder) {
-        final ItemMeta itemMeta = builder.apply(itemStack.getItemMeta());
-        itemStack.setItemMeta(itemMeta);
+        final ItemMeta itemMeta = itemStack.getItemMeta();
+
+        if (itemMeta == null) return;
+
+        itemStack.setItemMeta(builder.apply(itemMeta));
     }
 
     private TextComponent createUnItalicText(String text) {
