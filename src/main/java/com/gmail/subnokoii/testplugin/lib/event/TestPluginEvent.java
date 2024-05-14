@@ -3,19 +3,23 @@ package com.gmail.subnokoii.testplugin.lib.event;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.event.data.CustomItemUseEvent;
+import com.gmail.subnokoii.testplugin.lib.event.data.DataPackMessageReceiveEvent;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
 import com.gmail.subnokoii.testplugin.lib.other.ScheduleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -49,6 +53,10 @@ public class TestPluginEvent implements Listener {
 
         public void onCustomItemUse(Consumer<CustomItemUseEvent> listener) {
             TestPluginEvent.get().customItemUseEventListeners.add(listener);
+        }
+
+        public void onDataPackMessageReceive(Consumer<DataPackMessageReceiveEvent> listener) {
+            TestPluginEvent.get().dataPackMessageReceiveEventListeners.add(listener);
         }
 
         private EventRegisterer() {}
@@ -152,6 +160,35 @@ public class TestPluginEvent implements Listener {
         lastDamageByEntityTimestamp.remove(event.getEntity());
     }
 
+    @EventHandler
+    public void onTeleport(EntityTeleportEvent event) {
+        final Entity entity = event.getEntity();
+
+        if (!entity.getType().equals(EntityType.MARKER)) return;
+
+        final Set<String> tags = entity.getScoreboardTags();
+
+        tags.forEach(tag -> {
+            if (tag.startsWith("testplugin:")) {
+                final String message = tag.split("testplugin:", 2)[1];
+
+                final Entity[] entities = entity.getWorld()
+                .getEntities()
+                .stream()
+                .filter(e -> e.getScoreboardTags().contains("plugin_api.target"))
+                .toArray(Entity[]::new);
+
+                onDataPackMessageReceive(entities, message.split("\\s+"));
+            }
+        });
+    }
+
+    private void onDataPackMessageReceive(Entity[] targets, String[] message) {
+        dataPackMessageReceiveEventListeners.forEach(listener -> {
+            listener.accept(new DataPackMessageReceiveEvent(targets, message));
+        });
+    }
+
     private void leftClick(PlayerInteractEvent event) {
         playerLeftClickEventListeners.forEach(listener -> {
             listener.accept(new PlayerClickEvent(event));
@@ -169,6 +206,8 @@ public class TestPluginEvent implements Listener {
     private final Set<Consumer<PlayerClickEvent>> playerRightClickEventListeners = new HashSet<>();
 
     private final Set<Consumer<CustomItemUseEvent>> customItemUseEventListeners = new HashSet<>();
+
+    private final Set<Consumer<DataPackMessageReceiveEvent>> dataPackMessageReceiveEventListeners = new HashSet<>();
 
     private final Map<Player, Long> lastRightClickedTimestamp = new HashMap<>();
 

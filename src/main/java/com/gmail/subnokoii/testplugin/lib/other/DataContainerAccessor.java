@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public final class DataContainerAccessor {
     private final PersistentDataContainer container;
@@ -107,8 +108,14 @@ public final class DataContainerAccessor {
             else if (value instanceof Short) {
                 container.set(key, PersistentDataType.SHORT, (Short) value);
             }
+            else if (value instanceof PersistentDataContainer) {
+                container.set(key, PersistentDataType.TAG_CONTAINER, (PersistentDataContainer) value);
+            }
+            else if (value instanceof DataContainerAccessor) {
+                container.set(key, PersistentDataType.TAG_CONTAINER, ((DataContainerAccessor) value).container);
+            }
             else {
-                throw new RuntimeException("この型の値はDataContainerAccessorでは扱えません");
+                throw new IllegalArgumentException("その型の値はDataContainerAccessorにはアクセスできません");
             }
 
             return container;
@@ -135,5 +142,67 @@ public final class DataContainerAccessor {
         }
 
         return false;
+    }
+
+    public boolean equals(String path, Object value) {
+        final PersistentDataType<?, ?>[] types = new PersistentDataType[]{
+        PersistentDataType.TAG_CONTAINER,
+        PersistentDataType.STRING,
+        PersistentDataType.BOOLEAN,
+        PersistentDataType.INTEGER,
+        PersistentDataType.FLOAT,
+        PersistentDataType.DOUBLE,
+        PersistentDataType.LONG,
+        PersistentDataType.BYTE,
+        PersistentDataType.SHORT
+        };
+
+        for (final PersistentDataType<?, ?> type : types) {
+            if (Objects.equals(get(path, type), value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public @Nullable DataContainerAccessor getCompound(String path) {
+        final PersistentDataContainer dataContainer = get(path, PersistentDataType.TAG_CONTAINER);
+
+        if (dataContainer == null) return null;
+
+        return new DataContainerAccessor(dataContainer);
+    }
+
+    public @Nullable String getString(String path) {
+        return get(path, PersistentDataType.STRING);
+    }
+
+    public @Nullable Boolean getBoolean(String path) {
+        return get(path, PersistentDataType.BOOLEAN);
+    }
+
+    public @Nullable Integer getInteger(String path) {
+        return get(path, PersistentDataType.INTEGER);
+    }
+
+    public @Nullable Float getFloat(String path) {
+        return get(path, PersistentDataType.FLOAT);
+    }
+
+    public @Nullable Double getDouble(String path) {
+        return get(path, PersistentDataType.DOUBLE);
+    }
+
+    public @Nullable Byte getByte(String path) {
+        return get(path, PersistentDataType.BYTE);
+    }
+
+    public @Nullable Long getLong(String path) {
+        return get(path, PersistentDataType.LONG);
+    }
+
+    public @Nullable Short getShort(String path) {
+        return get(path, PersistentDataType.SHORT);
     }
 }

@@ -3,6 +3,7 @@ package com.gmail.subnokoii.testplugin.lib.itemstack;
 import com.gmail.subnokoii.testplugin.lib.other.DataContainerAccessor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,6 +44,22 @@ public final class ItemStackDataContainerAccessor {
         if (meta == null) return false;
 
         return new DataContainerAccessor(meta.getPersistentDataContainer()).has(path);
+    }
+
+    public boolean equals(String path, Object value) {
+        final ItemMeta meta = itemStack.getItemMeta();
+
+        if (meta == null) return false;
+
+        return new DataContainerAccessor(meta.getPersistentDataContainer()).equals(path, value);
+    }
+
+    public @Nullable DataContainerAccessor getCompound(String path) {
+        final PersistentDataContainer dataContainer = get(path, PersistentDataType.TAG_CONTAINER);
+
+        if (dataContainer == null) return null;
+
+        return new DataContainerAccessor(dataContainer);
     }
 
     public @Nullable String getString(String path) {

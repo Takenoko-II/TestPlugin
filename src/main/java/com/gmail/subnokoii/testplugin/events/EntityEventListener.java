@@ -31,9 +31,46 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
     public static void init() {
         if (instance == null) {
             instance = new EntityEventListener();
+
             Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.get());
             instance.runTaskTimer(TestPlugin.get(), 0L, 1L);
+
+            registerPluginEvents();
         }
+    }
+
+    private static void registerPluginEvents() {
+        TestPlugin.events().onDataPackMessageReceive(event -> {
+            final String id = event.getId();
+            final String[] parameters = event.getParameters();
+            final Entity[] targets = event.getTargets();
+
+            switch (id) {
+                case "foo": {
+                    if (parameters.length != 0) return;
+
+                    TestPlugin.log("Server", "foo!");
+
+                    break;
+                }
+                case "knockback": {
+                    if (parameters.length != 3) return;
+
+                    try {
+                        final double x = Double.parseDouble(parameters[0]);
+                        final double y = Double.parseDouble(parameters[1]);
+                        final double z = Double.parseDouble(parameters[2]);
+
+                        for (final Entity target : targets) {
+                            target.setVelocity(target.getVelocity().add(new Vector(x, y, z)));
+                        }
+                    }
+                    catch (IllegalArgumentException ignored) {}
+
+                    break;
+                }
+            }
+        });
     }
 
     private EntityEventListener() {}
@@ -123,52 +160,6 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
         if (Objects.equals(grapplingHookExists.get(player), true)) {
             grapplingHookExists.put(player, false);
             TestPlugin.log("Plugin", "set to false");
-        }
-    }
-
-    @EventHandler
-    public void onTeleport(EntityTeleportEvent event) {
-        final Entity entity = event.getEntity();
-
-        if (!entity.getType().equals(EntityType.MARKER)) return;
-
-        final Set<String> tags = entity.getScoreboardTags();
-
-        tags.forEach(tag -> {
-            if (tag.startsWith("testplugin:")) {
-                final String message = tag.split("testplugin:", 2)[1];
-
-                final Entity[] entities = entity.getWorld()
-                .getEntities()
-                .stream()
-                .filter(e -> e.getScoreboardTags().contains("plugin_api.target"))
-                .toArray(Entity[]::new);
-
-                onDataPackMessage(entities, message.split("\\s+"));
-            }
-        });
-    }
-
-    private void onDataPackMessage(Entity[] targets, String[] message) {
-        if (message.length >= 1) {
-            switch (message[0]) {
-                case "knockback": {
-                    if (message.length != 4) return;
-
-                    try {
-                        final double x = Double.parseDouble(message[1]);
-                        final double y = Double.parseDouble(message[2]);
-                        final double z = Double.parseDouble(message[3]);
-
-                        for (final Entity target : targets) {
-                            target.setVelocity(target.getVelocity().add(new Vector(x, y, z)));
-                        }
-                    }
-                    catch (IllegalArgumentException ignored) {}
-
-                    break;
-                }
-            }
         }
     }
 

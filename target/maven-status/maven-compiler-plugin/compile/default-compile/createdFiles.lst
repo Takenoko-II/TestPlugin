@@ -8,6 +8,7 @@ com\gmail\subnokoii\testplugin\lib\ui\ChestUIBuilder$Button.class
 com\gmail\subnokoii\testplugin\lib\event\TestPluginEvent.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIBuilder.class
 com\gmail\subnokoii\testplugin\lib\other\DataContainerAccessor.class
+com\gmail\subnokoii\testplugin\lib\event\data\DataPackMessageReceiveEvent.class
 com\gmail\subnokoii\testplugin\events\PlayerEventListener.class
 com\gmail\subnokoii\testplugin\TestPlugin.class
 com\gmail\subnokoii\testplugin\lib\vector\DimensionSizeMismatchException.class
