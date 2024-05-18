@@ -11,19 +11,17 @@ import java.util.function.UnaryOperator;
 public class RotationBuilder implements VectorBuilder {
     private final double[] components;
 
-    private final DimensionSize dimensionSize;
+    private final DimensionSize dimensionSize = new DimensionSize(2);
 
     public RotationBuilder() {
         components = new double[]{0d, 0d};
-        dimensionSize = new DimensionSize(2);
     }
 
     public RotationBuilder(double x, double y) {
         components = new double[]{x, y};
-        dimensionSize = new DimensionSize(2);
     }
 
-    public RotationBuilder(double... allComponents) throws DimensionSizeMismatchException {
+    public RotationBuilder(double... allComponents) {
         if (allComponents.length != 2) {
             throw new DimensionSizeMismatchException();
         }
@@ -32,7 +30,6 @@ public class RotationBuilder implements VectorBuilder {
         System.arraycopy(allComponents, 0, newArray, 0, allComponents.length);
 
         components = newArray;
-        dimensionSize = new DimensionSize(3);
     }
 
     public double getComponent(int index) {
@@ -43,7 +40,7 @@ public class RotationBuilder implements VectorBuilder {
         return components.clone();
     }
 
-    public RotationBuilder setComponent(int index, double component) throws DimensionSizeMismatchException {
+    public RotationBuilder setComponent(int index, double component) {
         if (index > 1) {
             throw new DimensionSizeMismatchException();
         }
@@ -53,7 +50,7 @@ public class RotationBuilder implements VectorBuilder {
         return this;
     }
 
-    public RotationBuilder setAllComponents(double[] componentsList) throws DimensionSizeMismatchException {
+    public RotationBuilder setAllComponents(double[] componentsList) {
         if (componentsList.length != 2) {
             throw new DimensionSizeMismatchException();
         }
@@ -83,6 +80,15 @@ public class RotationBuilder implements VectorBuilder {
         return dimensionSize;
     }
 
+    @Override
+    public RotationBuilder calc(UnaryOperator<Double> operator) {
+        return (RotationBuilder) VectorBuilder.super.calc(operator);
+    }
+
+    public RotationBuilder calc(Vector3Builder other, BiFunction<Double, Double, Double> operator) {
+        return (RotationBuilder) VectorBuilder.super.calc(other, operator);
+    }
+
     public Vector3Builder getDirection3d() {
         final double yaw = components[0];
         final double pitch = components[1];
@@ -98,40 +104,41 @@ public class RotationBuilder implements VectorBuilder {
         return getDirection3d().getAngleBetween(rotation.getDirection3d());
     }
 
-    public RotationBuilder calculate(UnaryOperator<Double> operator) {
-        for (int i = 0; i < components.length; i++) {
-            components[i] = operator.apply(components[i]);
-        }
-
-        return this;
-    }
-
-    public RotationBuilder calculate(RotationBuilder other, BiFunction<Double, Double, Double> operator) {
-        for (int i = 0; i < components.length; i++) {
-            components[i] = operator.apply(components[i], other.components[i]);
-        }
-
-        return this;
-    }
-
-    public RotationBuilder multiplyByScalar(double scalar) {
-        return calculate(component -> component * scalar);
+    public RotationBuilder scale(double scalar) {
+        return calc(component -> component * scalar);
     }
 
     public RotationBuilder inverted() {
-        return multiplyByScalar(-1d);
+        return scale(-1d);
     }
 
     public RotationBuilder fill(double value) {
-        return calculate(component -> value);
+        return calc(component -> value);
     }
 
     public RotationBuilder add(RotationBuilder addend) {
-        return calculate(addend, Double::sum);
+        return (RotationBuilder) calc(addend, Double::sum);
     }
 
     public RotationBuilder subtract(RotationBuilder subtrahend) {
         return add(subtrahend.copy().inverted());
+    }
+
+    public String toString(String format) {
+        final String yaw = String.format("%.2f", yaw());
+        final String pitch = String.format("%.2f", pitch());
+
+        return format
+        .replaceAll("\\$x", yaw)
+        .replaceAll("\\$y", pitch)
+        .replace("$c", yaw)
+        .replace("$c", pitch)
+        .replaceAll("\\$c", "");
+    }
+
+    @Override
+    public String toString() {
+        return toString("($x, $y)");
     }
 
     public RotationBuilder copy() {

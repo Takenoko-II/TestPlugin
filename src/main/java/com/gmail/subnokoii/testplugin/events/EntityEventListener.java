@@ -8,7 +8,6 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
@@ -128,11 +127,11 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
             vector.subtract(Vector3Builder.from(player.getLocation()));
             vector.add(new Vector3Builder(0d, 0.25d, 0d));
 
-            vector.calculate(component -> {
+            vector.calc(component -> {
                 final double absolute = Math.abs(component);
                 return component / absolute * Math.cbrt(absolute);
             })
-            .multiplyByScalar(0.7d);
+            .scale(0.7d);
 
             player.setVelocity(vector.toBukkitVector());
 

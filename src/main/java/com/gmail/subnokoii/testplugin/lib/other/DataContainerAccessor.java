@@ -70,12 +70,12 @@ public final class DataContainerAccessor {
         keys.remove(0);
 
         if (!keys.isEmpty()) {
-            PersistentDataContainer subContainer = null;
+            PersistentDataContainer subContainer;
 
-            try { subContainer = container.get(key, PersistentDataType.TAG_CONTAINER); }
-            catch (IllegalArgumentException ignored) {}
-
-            if (subContainer == null) {
+            if (container.has(key, PersistentDataType.TAG_CONTAINER)) {
+                subContainer = container.get(key, PersistentDataType.TAG_CONTAINER);
+            }
+            else {
                 subContainer = createNewContainer();
             }
 

@@ -1,23 +1,42 @@
 package com.gmail.subnokoii.testplugin.lib.vector;
 
+import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
+
 public interface VectorBuilder {
     double getComponent(int index);
 
     double[] getAllComponents();
 
-    VectorBuilder setComponent(int index, double component) throws DimensionSizeMismatchException;
+    VectorBuilder setComponent(int index, double component);
 
-    VectorBuilder setAllComponents(double... allComponents) throws DimensionSizeMismatchException;
+    VectorBuilder setAllComponents(double... allComponents);
 
-    default boolean is(VectorBuilder vector) {
-        if (this.getAllComponents().length != vector.getAllComponents().length) {
-            return false;
+    default boolean equals(VectorBuilder vector) {
+        for (int i = 0; i < getAllComponents().length; i++) {
+            if (getComponent(i) != vector.getComponent(i)) return false;
         }
 
-        return this.getComponent(0) == vector.getComponent(0)
-        && this.getComponent(1) == vector.getComponent(1)
-        && this.getComponent(2) == vector.getComponent(2);
+        return true;
     }
+
+    default VectorBuilder calc(UnaryOperator<Double> operator) {
+        for (int i = 0; i < getAllComponents().length; i++) {
+            setComponent(i, operator.apply(getComponent(i)));
+        }
+
+        return this;
+    }
+
+    default VectorBuilder calc(VectorBuilder other, BiFunction<Double, Double, Double> operator) {
+        for (int i = 0; i < getAllComponents().length; i++) {
+            setComponent(i, operator.apply(getComponent(i), other.getComponent(i)));
+        }
+
+        return this;
+    }
+
+    String toString();
 
     DimensionSize getDimensionSize();
 

@@ -10,8 +10,12 @@ import java.util.stream.Stream;
 
 public class TextFileUtils {
     public static List<String> read(String path) {
-        try { return Files.readAllLines(Path.of(path), StandardCharsets.UTF_8); }
-        catch (IOException e) { return null; }
+        try {
+            return Files.readAllLines(Path.of(path), StandardCharsets.UTF_8);
+        }
+        catch (IOException e) {
+            return null;
+        }
     }
 
     public static String read(String path, int line) {
@@ -23,8 +27,12 @@ public class TextFileUtils {
     }
 
     public static void overwrite(String path, List<String> texts) {
-        try { Files.write(Path.of(path), texts, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING); }
-        catch (IOException e) { throw new RuntimeException(e); }
+        try {
+            Files.write(Path.of(path), texts, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        }
+        catch (IOException e) {
+            throw new RuntimeException("ファイルの書き込みに失敗しました");
+        }
     }
 
     public static void overwrite(String path, String text, int line) {
