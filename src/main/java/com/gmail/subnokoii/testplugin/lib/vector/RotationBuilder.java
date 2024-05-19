@@ -2,6 +2,7 @@ package com.gmail.subnokoii.testplugin.lib.vector;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 
 import java.util.List;
 import java.util.Vector;
@@ -64,16 +65,20 @@ public class RotationBuilder implements VectorBuilder {
         return (float) components[0];
     }
 
-    public void yaw(float value) {
+    public RotationBuilder yaw(float value) {
         components[0] = value;
+
+        return this;
     }
 
     public float pitch() {
         return (float) components[1];
     }
 
-    public void pitch(float value) {
+    public RotationBuilder pitch(float value) {
         components[1] = value;
+
+        return this;
     }
 
     public DimensionSize getDimensionSize() {
@@ -153,7 +158,7 @@ public class RotationBuilder implements VectorBuilder {
         return new Location(world, coordinate.x(), coordinate.y(), coordinate.z(), yaw(), pitch());
     }
 
-    public static RotationBuilder from(Vector<Double> vector) throws DimensionSizeMismatchException {
+    public static RotationBuilder from(Vector<Double> vector) {
         if (vector.size() != 2) {
             throw new DimensionSizeMismatchException();
         }
@@ -165,7 +170,11 @@ public class RotationBuilder implements VectorBuilder {
         return new RotationBuilder(location.getYaw(), location.getPitch());
     }
 
-    public static RotationBuilder from(double[] array) throws DimensionSizeMismatchException {
+    public static RotationBuilder from(Entity entity) {
+        return RotationBuilder.from(entity.getLocation());
+    }
+
+    public static RotationBuilder from(double[] array) {
         if (array.length != 2) {
             throw new DimensionSizeMismatchException();
         }
@@ -173,7 +182,7 @@ public class RotationBuilder implements VectorBuilder {
         return new RotationBuilder(array[0], array[1]);
     }
 
-    public static RotationBuilder from(List<Double> list) throws DimensionSizeMismatchException {
+    public static RotationBuilder from(List<Double> list) {
         if (list.size() != 2) {
             throw new DimensionSizeMismatchException();
         }

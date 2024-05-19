@@ -8,6 +8,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 
 import java.util.Objects;
 
@@ -50,7 +51,9 @@ public class TickEventListener extends BukkitRunnable {
                     final Location location = entity.getLocation();
                     final Particle.DustOptions dustOptions = new Particle.DustOptions(Color.fromRGB(0x00FF00), 0.8f);
 
-                    player.spawnParticle(Particle.DUST, location, 8, 0.4d, 0.8d, 0.4d, 0.000000001d, dustOptions);
+                    final BoundingBox box = entity.getBoundingBox();
+
+                    player.spawnParticle(Particle.DUST, location, 10, box.getWidthX() / 2, box.getHeight(), box.getWidthZ() / 2, 0.000000001d, dustOptions);
                 }
                 else if (block != null) {
                     final Location location = block.getLocation();

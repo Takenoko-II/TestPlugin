@@ -19,7 +19,6 @@ import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -100,9 +99,11 @@ public class TestPluginEvent implements Listener {
             ScheduleUtils.runTimeout(() -> {
                 final Player player = event.getPlayer();
                 final long currentTime = System.currentTimeMillis();
+                final long lastAttackedTime = Objects.requireNonNullElse(lastAttackedTimestamp.get(player), 0L);
                 final long lastDroppedItemTime = Objects.requireNonNullElse(lastDroppedItemTimestamp.get(player), 0L);
                 final long lastRightClickedTime = Objects.requireNonNullElse(lastRightClickedTimestamp.get(player), 0L);
 
+                if (currentTime - lastAttackedTime < 50L) return;
                 if (currentTime - lastDroppedItemTime < 50L) return;
                 if (currentTime - lastRightClickedTime < 50L) return;
 
@@ -137,6 +138,7 @@ public class TestPluginEvent implements Listener {
         final long lastDamageByEntityTime = Objects.requireNonNullElse(lastDamageByEntityTimestamp.get(entity), 0L);
 
         lastDamageByEntityTimestamp.put(entity, currentTime);
+        lastAttackedTimestamp.put((Player) damagingEntity, currentTime);
 
         if (currentTime - lastDamageByEntityTime < 50L) return;
 
@@ -212,6 +214,8 @@ public class TestPluginEvent implements Listener {
     private final Map<Player, Long> lastRightClickedTimestamp = new HashMap<>();
 
     private final Map<Entity, Long> lastDamageByEntityTimestamp = new HashMap<>();
+
+    private final Map<Player, Long> lastAttackedTimestamp = new HashMap<>();
 
     private final Map<Player, Long> lastDroppedItemTimestamp = new HashMap<>();
 }

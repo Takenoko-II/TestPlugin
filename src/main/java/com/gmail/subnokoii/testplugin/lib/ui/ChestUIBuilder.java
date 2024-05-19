@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -103,12 +104,12 @@ public class ChestUIBuilder {
     }
 
     public static final class Button {
-        private ItemStack itemStack;
+        private final ItemStackBuilder itemStackBuilder = new ItemStackBuilder(Material.APPLE);
 
         private Consumer<ChestUIClickEvent> listener = response -> {};
 
         public Button() {
-            itemStack = new ItemStackDataContainerAccessor(new ItemStack(Material.IRON_BARS)).set("id", UUID.randomUUID().toString());
+            itemStackBuilder.dataContainer("id", UUID.randomUUID().toString());
         }
 
         public boolean matchId(ItemStack itemStack) {
@@ -121,7 +122,7 @@ public class ChestUIBuilder {
         }
 
         public Button type(Material material) {
-            itemStack = itemStack.withType(material);
+            itemStackBuilder.type(material);
 
             return this;
         }
@@ -133,218 +134,121 @@ public class ChestUIBuilder {
                 throw new IllegalArgumentException();
             }
 
-            itemStack = itemStack.withType(material);
+            itemStackBuilder.type(material);
 
             return this;
         }
 
         public Button count(int count) {
-            itemStack.setAmount(count);
+            itemStackBuilder.count(count);
+
+            return this;
+        }
+
+        public Button maxCount(int count) {
+            itemStackBuilder.maxCount(count);
 
             return this;
         }
 
         public Button customName(String name) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            meta.displayName(Component.text(name).decoration(TextDecoration.ITALIC, false));
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.customName(name);
 
             return this;
         }
 
         public Button customName(String name, TextDecoration decoration) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            final Component component = Component.text(name).decoration(TextDecoration.ITALIC, false);
-
-            meta.displayName(component.decorate(decoration));
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.customName(name, decoration);
 
             return this;
         }
 
         public Button customName(String name, Color color) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            final Component component = Component.text(name).decoration(TextDecoration.ITALIC, false);
-
-            meta.displayName(component.color(TextColor.color(color.asRGB())));
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.customName(name, color);
 
             return this;
         }
 
         public Button customName(String name, TextDecoration decoration, Color color) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            final Component component = Component.text(name).decoration(TextDecoration.ITALIC, false);
-
-            meta.displayName(component.decorate(decoration).color(TextColor.color(color.asRGB())));
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.customName(name, decoration, color);
 
             return this;
         }
 
         public Button lore(String lore) {
-            final ItemMeta meta = itemStack.getItemMeta();
-            List<Component> list = meta.lore();
-            if (list == null) list = new ArrayList<>();
-
-            list.add(Component.text(lore).decoration(TextDecoration.ITALIC, false));
-            meta.lore(list);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.lore(lore);
 
             return this;
         }
 
         public Button lore(String lore, TextDecoration decoration) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            final Component component = Component.text(lore).decoration(TextDecoration.ITALIC, false);
-
-            List<Component> list = meta.lore();
-            if (list == null) list = new ArrayList<>();
-
-            list.add(component.decorate(decoration));
-            meta.lore(list);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.lore(lore, decoration);
 
             return this;
         }
 
         public Button lore(String lore, Color color) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            final Component component = Component.text(lore).decoration(TextDecoration.ITALIC, false);
-
-            List<Component> list = meta.lore();
-            if (list == null) list = new ArrayList<>();
-
-            list.add(component.color(TextColor.color(color.asRGB())));
-            meta.lore(list);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.lore(lore, color);
 
             return this;
         }
 
         public Button lore(String lore, TextDecoration decoration, Color color) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            final Component component = Component.text(lore).decoration(TextDecoration.ITALIC, false);
-
-            List<Component> list = meta.lore();
-            if (list == null) list = new ArrayList<>();
-
-            list.add(component.decorate(decoration).color(TextColor.color(color.asRGB())));
-            meta.lore(list);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.lore(lore, decoration, color);
 
             return this;
         }
 
         public Button glint(boolean flag) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            meta.setEnchantmentGlintOverride(flag);
-
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.glint(flag);
 
             return this;
         }
 
         public Button customModelData(int data) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            meta.setCustomModelData(data);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.customModelData(data);
 
             return this;
         }
 
         public Button damage(int damage) {
-            final ItemMeta meta = itemStack.getItemMeta();
-
-            ((Damageable) meta).setDamage(damage);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.damage(damage);
 
             return this;
         }
 
         public Button potion(PotionType type) {
-            final PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
-
-            meta.setBasePotionType(type);
-            meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.potionType(type);
 
             return this;
         }
 
         public Button potionColor(Color color) {
-            final PotionMeta meta = (PotionMeta) itemStack.getItemMeta();
-
-            meta.setColor(color);
-            meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.potionColor(color);
 
             return this;
         }
 
         public Button playerHead(Player player) {
-            final SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-
-            meta.setOwningPlayer(player);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.playerHead(player);
 
             return this;
         }
 
         public Button leatherArmorColor(Color color) {
-            final LeatherArmorMeta meta = (LeatherArmorMeta) itemStack.getItemMeta();
-
-            meta.setColor(color);
-            meta.addItemFlags(ItemFlag.HIDE_DYE);
-            itemStack.setItemMeta(meta);
+            itemStackBuilder.leatherArmorColor(color);
 
             return this;
         }
 
-        public Button crossbowArrow(boolean flag) {
-            final CrossbowMeta meta = (CrossbowMeta) itemStack.getItemMeta();
-
-            final List<ItemStack> arrows = new ArrayList<>();
-
-            if (flag) {
-                arrows.add(new ItemStack(Material.ARROW));
-                meta.setChargedProjectiles(arrows);
-            }
-            else {
-                meta.setChargedProjectiles(arrows);
-            }
-
-            itemStack.setItemMeta(meta);
+        public Button crossbowArrow() {
+            itemStackBuilder.chargedProjectile(new ItemStack(Material.ARROW));
 
             return this;
         }
 
-        public Button lodestoneCompass(boolean flag) {
-            final CompassMeta meta = (CompassMeta) itemStack.getItemMeta();
-            meta.setLodestoneTracked(flag);
-            itemStack.setItemMeta(meta);
-
-            return this;
-        }
-
-        public Button modify(UnaryOperator<ItemMeta> operator) {
-            final ItemMeta meta = itemStack.getItemMeta();
-            itemStack.setItemMeta(operator.apply(meta));
-
-            return this;
-        }
-
-        public Button dataContainer(String key, Object value) {
-            itemStack = new ItemStackDataContainerAccessor(itemStack).set(key, value);
+        public Button dataContainer(String path, Object value) {
+            itemStackBuilder.dataContainer(path, value);
 
             return this;
         }
@@ -356,7 +260,7 @@ public class ChestUIBuilder {
         }
 
         public ItemStack getItemStack() {
-            return itemStack;
+            return itemStackBuilder.build();
         }
 
         public void click(Player clicker) {

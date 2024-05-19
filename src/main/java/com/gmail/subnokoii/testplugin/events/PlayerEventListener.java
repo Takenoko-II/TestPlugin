@@ -3,8 +3,11 @@ package com.gmail.subnokoii.testplugin.events;
 import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.other.ScheduleUtils;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
+import com.gmail.subnokoii.testplugin.lib.other.DisplayEditor;
 import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import net.kyori.adventure.text.Component;
@@ -12,6 +15,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,19 +59,43 @@ public class PlayerEventListener implements Listener {
         TestPlugin.events().onLeftClick(event -> {
             instance.onLeftClick(event);
 
+            final Player player = event.getPlayer();
             final ItemStack itemStack = event.getItemStack();
 
             ScoreboardUtils
             .getOrCreateObjective("plugin_api.on_left_click")
-            .addScore(event.getPlayer(), 1);
+            .addScore(player, 1);
 
             final String type = new ItemStackDataContainerAccessor(itemStack).getString("on_left_click.type");
             final String content = new ItemStackDataContainerAccessor(itemStack).getString("on_left_click.content");
 
             if (type != null && content != null) {
                 if (type.equals("run_command")) {
-                    TestPlugin.runCommand(event.getPlayer(), content);
+                    TestPlugin.runCommand(player, content);
                 }
+            }
+
+            if (new ItemStackDataContainerAccessor(itemStack).equals("custom_item_tag", "slash")) {
+                final Vector3Builder.LocalAxes axes = RotationBuilder.from(player).getDirection3d().getLocalAxes();
+
+                final Display display = DisplayEditor.spawnItemDisplay(
+                    Vector3Builder.from(player)
+                    .add(0, 1.3, 0)
+                    .add(axes.getZ().scale(1.75))
+                    .toLocation(player.getWorld()),
+                    new ItemStackBuilder(Material.KNOWLEDGE_BOOK)
+                    .customModelData(24792)
+                    .build()
+                )
+                .setScale(new Vector3Builder(5, 3, 0.1))
+                .rotate(axes.getZ(), (float) Math.random() * 180 - 90)
+                .rotate(axes.getX(), player.getPitch())
+                .rotate(new Vector3Builder(0, 1, 0), -(player.getYaw() + 90))
+                .getEntity();
+
+                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 3f, 1.2f);
+
+                ScheduleUtils.runTimeoutByGameTick(display::remove, 8L);
             }
         });
 

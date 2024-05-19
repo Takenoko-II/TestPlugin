@@ -1,15 +1,11 @@
-package com.gmail.subnokoii.testplugin.lib.vector;
+package com.gmail.subnokoii.testplugin.lib.other;
 
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
-import org.bukkit.Bukkit;
+import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import org.bukkit.Location;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
-import org.joml.AxisAngle4d;
-import org.w3c.dom.Text;
 
 import java.util.function.Consumer;
 
@@ -35,35 +31,24 @@ public class DisplayEditor {
         display.setTransformation(transformation);
     }
 
-    public DisplayEditor rotateLeft(Vector3Builder axis, float degree) {
+    public DisplayEditor rotate(Vector3Builder axis, float degree) {
+        final Vector3Builder normalized = axis.copy().normalized();
+
         transformation(t -> {
-            t.getLeftRotation().set(new AxisAngle4d(
-            degree * Math.PI / 180,
-            (float) axis.x(),
-            (float) axis.y(),
-            (float) axis.z()
-            ));
+            t.getLeftRotation().rotateAxis(
+                (float) (degree * Math.PI / 180),
+                (float) normalized.x(),
+                (float) normalized.y(),
+                (float) normalized.z()
+            );
         });
 
         return this;
     }
 
-    public DisplayEditor rotateRight(Vector3Builder axis, float degree) {
+    public DisplayEditor move(Vector3Builder vector3) {
         transformation(t -> {
-            t.getRightRotation().set(new AxisAngle4d(
-            degree * Math.PI / 180,
-            (float) axis.x(),
-            (float) axis.y(),
-            (float) axis.z()
-            ));
-        });
-
-        return this;
-    }
-
-    public DisplayEditor move(Vector3Builder vector) {
-        transformation(t -> {
-            t.getTranslation().add((float) vector.x(), (float) vector.y(), (float) vector.z());
+            t.getTranslation().add((float) vector3.x(), (float) vector3.y(), (float) vector3.z());
         });
 
         return this;

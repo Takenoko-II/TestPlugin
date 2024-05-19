@@ -58,10 +58,19 @@ public final class TestPlugin extends JavaPlugin {
         TestPlugin.log("Plugin", "TestPluginが停止しました");
     }
 
+    /**
+     * このプラグインのインスタンスを返します。
+     * @return TestPlugin
+     */
     public static TestPlugin get() {
         return plugin;
     }
 
+    /**
+     * ログにメッセージを書き込みます。
+     * @param target 書き込み先("Server" | "Plugin")
+     * @param messages メッセージ(複数可)
+     */
     public static void log(String target, String... messages) {
         final String text = String.join(", ", messages);
 
@@ -102,6 +111,13 @@ public final class TestPlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * 特定のエンティティを実行者にコマンドをコンソールに実行させます。
+     * ゲームルールを一時的に変更するためチャットへのログは流れません。
+     * @param entity 実行者
+     * @param command コマンドを表現する文字列
+     * @return コマンドの実行結果
+     */
     public static boolean runCommand(Entity entity, String command) {
         try {
             final Boolean sendCommandFeedback = Objects.requireNonNullElse(entity.getWorld().getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK), true);
@@ -117,10 +133,19 @@ public final class TestPlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * TestPluginが管理する独自イベントを登録します。
+     * @return TestPluginEvent.EventRegisterer
+     */
     public static TestPluginEvent.EventRegisterer events() {
         return TestPluginEvent.EventRegisterer.get();
     }
 
+    /**
+     * コマンドをプラグインと紐づけます。
+     * @param name コマンド名
+     * @param manager CommandExecutorとTabCompleterを同時に実装しているクラス
+     */
     private <T extends CommandExecutor & TabCompleter> void setCommandManager(String name, T manager) {
         final PluginCommand command = getCommand(name);
 

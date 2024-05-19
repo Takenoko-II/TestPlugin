@@ -1,6 +1,7 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
 import com.gmail.subnokoii.testplugin.TestPlugin;
+import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -22,8 +23,12 @@ public class ChestUIClickEvent {
         return player;
     }
 
-    public ChestUIBuilder.Button getClicked() {
-        return button;
+    public ItemStack getClickedItemStack() {
+        final ItemStack itemStack = button.getItemStack().clone();
+
+        new ItemStackDataContainerAccessor(itemStack).delete("id");
+
+        return itemStack;
     }
 
     public void close() {

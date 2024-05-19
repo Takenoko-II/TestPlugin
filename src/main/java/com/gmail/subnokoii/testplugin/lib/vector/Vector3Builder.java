@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -153,8 +154,16 @@ public class Vector3Builder implements VectorBuilder {
         return calc(vector3, Double::sum);
     }
 
+    public Vector3Builder add(double x, double y, double z) {
+        return add(new Vector3Builder(x, y, z));
+    }
+
     public Vector3Builder subtract(Vector3Builder vector3) {
         return add(vector3.inverted());
+    }
+
+    public Vector3Builder subtract(double x, double y, double z) {
+        return subtract(new Vector3Builder(x, y, z));
     }
 
     public Vector3Builder scale(double scalar) {
@@ -294,6 +303,10 @@ public class Vector3Builder implements VectorBuilder {
 
     public static Vector3Builder from(Location location) {
         return new Vector3Builder(location.x(), location.y(), location.z());
+    }
+
+    public static Vector3Builder from(Entity entity) {
+        return Vector3Builder.from(entity.getLocation());
     }
 
     public static Vector3Builder from(double[] array) {

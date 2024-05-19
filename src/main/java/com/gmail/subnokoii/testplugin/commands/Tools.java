@@ -27,9 +27,10 @@ public class Tools implements CommandExecutor, TabCompleter {
         .add(button -> {
             return button.type(Material.ENDER_EYE)
             .customName("Quick Teleporter", Color.fromRGB(0xA200FF))
+            .maxCount(1)
             .dataContainer("custom_item_tag", "quick_teleporter")
             .onClick(event -> {
-                event.getPlayer().getInventory().addItem(button.getItemStack().clone());
+                event.getPlayer().getInventory().addItem(event.getClickedItemStack());
             });
         })
         .add(button -> {
@@ -38,16 +39,17 @@ public class Tools implements CommandExecutor, TabCompleter {
             .potionColor(Color.fromRGB(0x2FFF90))
             .dataContainer("custom_item_tag", "data_getter")
             .onClick(event -> {
-                event.getPlayer().getInventory().addItem(button.getItemStack().clone());
+                event.getPlayer().getInventory().addItem(event.getClickedItemStack());
             });
         })
         .add(button -> {
             return button.type(Material.CLOCK)
+            .maxCount(1)
             .customName("Tick Progress Canceler", Color.fromRGB(0xFFF928))
             .glint(true)
             .dataContainer("custom_item_tag", "tick_progress_canceler")
             .onClick(event -> {
-                event.getPlayer().getInventory().addItem(button.getItemStack().clone());
+                event.getPlayer().getInventory().addItem(event.getClickedItemStack());
             });
         });
 

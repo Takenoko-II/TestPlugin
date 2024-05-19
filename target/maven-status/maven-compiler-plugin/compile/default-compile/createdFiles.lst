@@ -26,6 +26,7 @@ com\gmail\subnokoii\testplugin\lib\itemstack\ItemStackBuilder.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIClickEvent.class
 com\gmail\subnokoii\testplugin\lib\itemstack\ItemStackDataContainerAccessor.class
 com\gmail\subnokoii\testplugin\BungeeCordUtils.class
+com\gmail\subnokoii\testplugin\lib\other\DisplayEditor.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIClickEvent$Listener.class
 com\gmail\subnokoii\testplugin\lib\event\TestPluginEvent$EventRegisterer.class
 com\gmail\subnokoii\testplugin\lib\vector\Vector3Builder.class
