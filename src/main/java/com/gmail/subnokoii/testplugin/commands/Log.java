@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class Log implements CommandExecutor, TabCompleter {
     @Override

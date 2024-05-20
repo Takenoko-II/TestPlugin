@@ -4,7 +4,7 @@ import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.other.DataContainerAccessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
@@ -15,7 +15,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,7 +85,10 @@ public class Test implements CommandExecutor, TabCompleter {
                             .map(TextFileUtils::getSize)
                             .reduce(Long::sum);
 
-                            if (size.isEmpty()) throw new RuntimeException();
+                            if (size.isEmpty()) {
+                                sender.sendMessage(Component.text("予期しないエラーが発生しました").color(TextColor.color(252, 64, 72)));
+                                return false;
+                            }
 
                             sender.sendMessage("ログのアーカイブの合計ファイルサイズは" + (float) size.get() / 1024.0f + "KBです");
 
@@ -153,6 +155,19 @@ public class Test implements CommandExecutor, TabCompleter {
                             itemStackBuilder
                             .type(Material.APPLE)
                             .dataContainer("a.b.c.d", "value");
+                            break;
+                        }
+                        case "bar": {
+                            itemStackBuilder
+                            .type(Material.APPLE)
+                            .dataContainer("a.b.c.d", new DataContainerAccessor[]{
+                                DataContainerAccessor.create().set("e", "hoge"),
+                                DataContainerAccessor.create().set("f", 0),
+                                DataContainerAccessor.create().set("g", new DataContainerAccessor[]{
+                                    DataContainerAccessor.create().set("h", true),
+                                    DataContainerAccessor.create().set("i", 1L)
+                                })
+                            });
                             break;
                         }
                         default: {

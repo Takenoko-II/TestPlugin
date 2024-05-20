@@ -70,8 +70,12 @@ public class PlayerEventListener implements Listener {
             final String content = new ItemStackDataContainerAccessor(itemStack).getString("on_left_click.content");
 
             if (type != null && content != null) {
-                if (type.equals("run_command")) {
-                    TestPlugin.runCommand(player, content);
+                switch (type) {
+                    case "run_command":
+                        TestPlugin.runCommand(player, content);
+                        break;
+                    case "multiple":
+                        break;
                 }
             }
 
@@ -102,6 +106,10 @@ public class PlayerEventListener implements Listener {
         TestPlugin.events().onRightClick(event -> {
             final Player player = event.getPlayer();
             final ItemStack itemStack = event.getItemStack();
+
+            ScoreboardUtils
+            .getOrCreateObjective("plugin_api.on_right_click")
+            .addScore(player, 1);
 
             if (itemStack == null) return;
 

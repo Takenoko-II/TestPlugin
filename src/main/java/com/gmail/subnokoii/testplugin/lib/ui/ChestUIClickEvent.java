@@ -6,17 +6,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class ChestUIClickEvent {
     private final Player player;
 
-    private final ChestUIBuilder.Button button;
+    private final ItemStack itemStack;
 
-    public ChestUIClickEvent(Player player, ChestUIBuilder.Button button) {
+    public ChestUIClickEvent(Player player, ItemStack itemStack) {
         this.player = player;
-        this.button = button;
+        this.itemStack = itemStack;
     }
 
     public Player getPlayer() {
@@ -24,7 +25,7 @@ public class ChestUIClickEvent {
     }
 
     public ItemStack getClickedItemStack() {
-        final ItemStack itemStack = button.getItemStack().clone();
+        final ItemStack itemStack = this.itemStack.clone();
 
         new ItemStackDataContainerAccessor(itemStack).delete("id");
 

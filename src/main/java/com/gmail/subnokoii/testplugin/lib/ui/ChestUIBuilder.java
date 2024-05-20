@@ -10,9 +10,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
@@ -67,7 +65,7 @@ public class ChestUIBuilder {
         final Button button = modifier.apply(new Button());
 
         buttons[index] = button;
-        inventory.setItem(index, button.getItemStack());
+        inventory.setItem(index, button.itemStackBuilder.build());
 
         return this;
     }
@@ -80,7 +78,7 @@ public class ChestUIBuilder {
         if (index == -1) return this;
 
         buttons[index] = button;
-        inventory.setItem(index, button.getItemStack());
+        inventory.setItem(index, button.itemStackBuilder.build());
 
         return this;
     }
@@ -114,7 +112,7 @@ public class ChestUIBuilder {
 
         public boolean matchId(ItemStack itemStack) {
             final String id = new ItemStackDataContainerAccessor(itemStack).getString("id");
-            final String thisId = new ItemStackDataContainerAccessor(getItemStack()).getString("id");
+            final String thisId = new ItemStackDataContainerAccessor(itemStackBuilder.build()).getString("id");
 
             if (id == null) return false;
 
@@ -259,12 +257,8 @@ public class ChestUIBuilder {
             return this;
         }
 
-        public ItemStack getItemStack() {
-            return itemStackBuilder.build();
-        }
-
         public void click(Player clicker) {
-            listener.accept(new ChestUIClickEvent(clicker, this));
+            listener.accept(new ChestUIClickEvent(clicker, itemStackBuilder.build()));
         }
     }
 }

@@ -1,10 +1,12 @@
 package com.gmail.subnokoii.testplugin;
 
 import com.gmail.subnokoii.testplugin.commands.*;
-import com.gmail.subnokoii.testplugin.events.*;
+import com.gmail.subnokoii.testplugin.events.EntityEventListener;
+import com.gmail.subnokoii.testplugin.events.PlayerEventListener;
+import com.gmail.subnokoii.testplugin.events.TickEventListener;
 import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
-import com.gmail.subnokoii.testplugin.lib.ui.*;
+import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEvent;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
