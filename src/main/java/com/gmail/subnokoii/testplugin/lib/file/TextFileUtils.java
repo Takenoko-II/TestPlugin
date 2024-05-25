@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 public class TextFileUtils {
     /**
      * 指定のパスのテキストファイルを行ごとに読み取ります。
+     *
      * @param path サーバーフォルダからの相対パス
      * @return 行ごとの文字列もしくはnull
      */

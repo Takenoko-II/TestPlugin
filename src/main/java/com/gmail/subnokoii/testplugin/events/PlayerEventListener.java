@@ -4,7 +4,7 @@ import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.other.ScheduleUtils;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.other.DisplayEditor;
@@ -66,8 +66,8 @@ public class PlayerEventListener implements Listener {
             .getOrCreateObjective("plugin_api.on_left_click")
             .addScore(player, 1);
 
-            final String type = new ItemStackDataContainerAccessor(itemStack).getString("on_left_click.type");
-            final String content = new ItemStackDataContainerAccessor(itemStack).getString("on_left_click.content");
+            final String type = new ItemStackDataContainerManager(itemStack).getString("on_left_click.type");
+            final String content = new ItemStackDataContainerManager(itemStack).getString("on_left_click.content");
 
             if (type != null && content != null) {
                 switch (type) {
@@ -79,7 +79,7 @@ public class PlayerEventListener implements Listener {
                 }
             }
 
-            if (new ItemStackDataContainerAccessor(itemStack).equals("custom_item_tag", "slash")) {
+            if (new ItemStackDataContainerManager(itemStack).equals("custom_item_tag", "slash")) {
                 final Vector3Builder.LocalAxes axes = RotationBuilder.from(player).getDirection3d().getLocalAxes();
 
                 final Display display = DisplayEditor.spawnItemDisplay(
@@ -113,8 +113,8 @@ public class PlayerEventListener implements Listener {
 
             if (itemStack == null) return;
 
-            final String type = new ItemStackDataContainerAccessor(itemStack).getString("on_right_click.type");
-            final String content = new ItemStackDataContainerAccessor(itemStack).getString("on_right_click.content");
+            final String type = new ItemStackDataContainerManager(itemStack).getString("on_right_click.type");
+            final String content = new ItemStackDataContainerManager(itemStack).getString("on_right_click.content");
 
             if (type != null && content != null) {
                 switch (type) {
@@ -206,7 +206,7 @@ public class PlayerEventListener implements Listener {
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
         final ItemStack itemStack = event.getItemDrop().getItemStack();
-        final Boolean locked = new ItemStackDataContainerAccessor(itemStack).getBoolean("locked");
+        final Boolean locked = new ItemStackDataContainerManager(itemStack).getBoolean("locked");
 
         if (locked == null) return;
 
@@ -224,7 +224,7 @@ public class PlayerEventListener implements Listener {
         final ItemStack itemStack = event.getCurrentItem();
         if (itemStack == null) return;
 
-        final Boolean locked = new ItemStackDataContainerAccessor(itemStack).getBoolean("locked");
+        final Boolean locked = new ItemStackDataContainerManager(itemStack).getBoolean("locked");
 
         if (locked == null) return;
 
@@ -238,8 +238,8 @@ public class PlayerEventListener implements Listener {
         final ItemStack mainHandItem = event.getMainHandItem();
         final ItemStack offhandItem = event.getOffHandItem();
 
-        final Boolean mainHandLocked = new ItemStackDataContainerAccessor(mainHandItem).getBoolean("locked");
-        final Boolean offHandLocked = new ItemStackDataContainerAccessor(offhandItem).getBoolean("locked");
+        final Boolean mainHandLocked = new ItemStackDataContainerManager(mainHandItem).getBoolean("locked");
+        final Boolean offHandLocked = new ItemStackDataContainerManager(offhandItem).getBoolean("locked");
 
         if (Objects.equals(mainHandLocked, true) && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
@@ -266,7 +266,7 @@ public class PlayerEventListener implements Listener {
 
             if (itemStack == null) continue;
 
-            final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
+            final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
 
             if (Objects.equals(tag, "server_selector")) return;
 
@@ -293,7 +293,7 @@ public class PlayerEventListener implements Listener {
         final Player player = event.getPlayer();
         final ItemStack itemStack = event.getItemStack();
 
-        final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
+        final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
 
         if (tag != null) {
             switch (tag) {

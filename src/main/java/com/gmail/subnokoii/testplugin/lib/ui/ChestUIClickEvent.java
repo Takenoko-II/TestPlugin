@@ -1,12 +1,11 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
 import com.gmail.subnokoii.testplugin.TestPlugin;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,7 +26,7 @@ public class ChestUIClickEvent {
     public ItemStack getClickedItemStack() {
         final ItemStack itemStack = this.itemStack.clone();
 
-        new ItemStackDataContainerAccessor(itemStack).delete("id");
+        new ItemStackDataContainerManager(itemStack).delete("id");
 
         return itemStack;
     }

@@ -1,8 +1,9 @@
 package com.gmail.subnokoii.testplugin.events;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -65,6 +66,35 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                         }
                     }
                     catch (IllegalArgumentException ignored) {}
+
+                    break;
+                }
+                case "transfer": {
+                    if (parameters.length != 1) return;
+
+                    for (final Entity target : targets) {
+                        if (!(target instanceof Player)) continue;
+
+                        BungeeCordUtils.transfer((Player) target, parameters[0]);
+                    }
+
+                    break;
+                }
+                case "math": {
+                    if (parameters.length <= 1) return;
+
+                    switch (parameters[0]) {
+                        case "sin": {
+                            try {
+                                final double x = Double.parseDouble(parameters[1]);
+
+                                event.returnValue(x);
+                            }
+                            catch (IllegalArgumentException ignored) {}
+
+                            break;
+                        }
+                    }
 
                     break;
                 }
@@ -169,7 +199,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
     private boolean isGrapplingHook(ItemStack itemStack) {
         if (itemStack == null) return false;
 
-        final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
+        final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
         return itemStack.getType().equals(Material.FISHING_ROD) && Objects.equals(tag, "grappling_hook");
     }
 }

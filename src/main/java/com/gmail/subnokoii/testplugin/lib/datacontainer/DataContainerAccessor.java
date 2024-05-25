@@ -1,10 +1,11 @@
-package com.gmail.subnokoii.testplugin.lib.other;
+package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
 import com.gmail.subnokoii.testplugin.TestPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.ListPersistentDataType;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
-public class DataContainerAccessor {
+public final class DataContainerAccessor {
     private final PersistentDataContainer container;
 
     public DataContainerAccessor(PersistentDataContainer container) {
@@ -447,6 +448,14 @@ public class DataContainerAccessor {
     }
 
     public static DataContainerAccessor create() {
-        return new DataContainerAccessor(new ItemStack(Material.APPLE).getItemMeta().getPersistentDataContainer());
+        final List<World> worlds = Bukkit.getWorlds();
+
+        if (worlds.isEmpty()) {
+            throw new RuntimeException("ワールドが存在しません(！？)");
+        }
+
+        final PersistentDataContainer dataContainer = worlds.get(0).getPersistentDataContainer();
+
+        return new DataContainerAccessor(dataContainer.getAdapterContext().newPersistentDataContainer());
     }
 }

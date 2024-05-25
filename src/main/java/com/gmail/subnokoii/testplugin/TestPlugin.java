@@ -4,6 +4,7 @@ import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.EntityEventListener;
 import com.gmail.subnokoii.testplugin.events.PlayerEventListener;
 import com.gmail.subnokoii.testplugin.events.TickEventListener;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEvent;
@@ -52,12 +53,16 @@ public final class TestPlugin extends JavaPlugin {
 
         // BungeeCordに接続
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
+        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+
+        TestPlugin.database().set("info.last_enabled", formatter.format(timestamp));
     }
 
     @Override
     public void onDisable() {
-        TestPlugin.log("Server", "TestPluginが停止しました");
-        TestPlugin.log("Plugin", "TestPluginが停止しました");
+        TestPlugin.log("TestPluginが停止しました");
     }
 
     /**
@@ -78,21 +83,12 @@ public final class TestPlugin extends JavaPlugin {
 
         switch (target.toLowerCase()) {
             case "server": {
-                plugin.getLogger().info(text);
+                get().getLogger().info(text);
 
                 break;
             }
             case "plugin": {
                 final Path logPath = Path.of("plugins/TestPlugin-1.0-SNAPSHOT.log");
-
-                if (!Files.exists(logPath.getParent())) {
-                    try {
-                        Files.createDirectory(logPath.getParent());
-                    }
-                    catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
 
                 if (!Files.exists(logPath)) {
                     try {
@@ -155,5 +151,9 @@ public final class TestPlugin extends JavaPlugin {
 
         command.setExecutor(manager);
         command.setTabCompleter(manager);
+    }
+
+    public static FileDataContainerManager database() {
+        return new FileDataContainerManager(get());
     }
 }

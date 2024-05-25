@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.itemstack;
 
+import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.format.*;
 import org.bukkit.*;
@@ -549,7 +550,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder dataContainer(String path, Object value) {
-        new ItemStackDataContainerAccessor(itemStack).set(path, value);
+        new ItemStackDataContainerManager(itemStack).set(path, value);
 
         return this;
     }

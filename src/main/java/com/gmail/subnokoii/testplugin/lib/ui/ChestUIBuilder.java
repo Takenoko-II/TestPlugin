@@ -1,7 +1,7 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -111,8 +111,8 @@ public class ChestUIBuilder {
         }
 
         public boolean matchId(ItemStack itemStack) {
-            final String id = new ItemStackDataContainerAccessor(itemStack).getString("id");
-            final String thisId = new ItemStackDataContainerAccessor(itemStackBuilder.build()).getString("id");
+            final String id = new ItemStackDataContainerManager(itemStack).getString("id");
+            final String thisId = new ItemStackDataContainerManager(itemStackBuilder.build()).getString("id");
 
             if (id == null) return false;
 

@@ -5,7 +5,7 @@ import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.event.data.CustomItemUseEvent;
 import com.gmail.subnokoii.testplugin.lib.event.data.DataPackMessageReceiveEvent;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
-import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackDataContainerAccessor;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.other.ScheduleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
@@ -87,7 +87,7 @@ public class TestPluginEvent implements Listener {
 
             if (itemStack == null) return;
 
-            final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
+            final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
 
             if (tag == null) return;
 
@@ -113,7 +113,7 @@ public class TestPluginEvent implements Listener {
 
                 if (itemStack == null) return;
 
-                final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
+                final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
 
                 if (tag == null) return;
 
@@ -147,7 +147,7 @@ public class TestPluginEvent implements Listener {
 
             final ItemStack itemStack = ((Player) damagingEntity).getEquipment().getItemInMainHand();
 
-            final String tag = new ItemStackDataContainerAccessor(itemStack).getString("custom_item_tag");
+            final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
 
             if (tag == null) return;
 
@@ -180,14 +180,14 @@ public class TestPluginEvent implements Listener {
                 .filter(e -> e.getScoreboardTags().contains("plugin_api.target"))
                 .toArray(Entity[]::new);
 
-                onDataPackMessageReceive(entities, message.split("\\s+"));
+                onDataPackMessageReceive(entity, entities, message.split("\\s+"));
             }
         });
     }
 
-    private void onDataPackMessageReceive(Entity[] targets, String[] message) {
+    private void onDataPackMessageReceive(Entity entity, Entity[] targets, String[] message) {
         dataPackMessageReceiveEventListeners.forEach(listener -> {
-            listener.accept(new DataPackMessageReceiveEvent(targets, message));
+            listener.accept(new DataPackMessageReceiveEvent(entity, targets, message));
         });
     }
 
