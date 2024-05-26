@@ -35,6 +35,6 @@ public class DataPackMessageReceiveEvent {
     }
 
     public void returnValue(Object value) {
-        new EntityDataContainerManager(core).set("result", value);
+        new EntityDataContainerManager(core).set("out", value);
     }
 }

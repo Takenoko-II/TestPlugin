@@ -13,9 +13,6 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
@@ -84,25 +81,16 @@ public final class TestPlugin extends JavaPlugin {
         switch (target.toLowerCase()) {
             case "server": {
                 get().getLogger().info(text);
-
                 break;
             }
             case "plugin": {
-                final Path logPath = Path.of("plugins/TestPlugin-1.0-SNAPSHOT.log");
-
-                if (!Files.exists(logPath)) {
-                    try {
-                        Files.createFile(logPath);
-                    }
-                    catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                final String logPath = "plugins/TestPlugin-1.0-SNAPSHOT.log";
 
                 final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
-                TextFileUtils.write(logPath.toString(), "[" + formatter.format(timestamp) + "] " + text);
+                TextFileUtils.create(logPath);
+                TextFileUtils.write(logPath, "[" + formatter.format(timestamp) + "] " + text);
 
                 break;
             }

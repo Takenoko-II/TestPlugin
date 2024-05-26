@@ -1,11 +1,12 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
 import com.gmail.subnokoii.testplugin.TestPlugin;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
@@ -18,12 +19,12 @@ import java.util.function.BiConsumer;
 public final class DataContainerAccessor {
     private final PersistentDataContainer container;
 
-    public DataContainerAccessor(PersistentDataContainer container) {
-        this.container = container;
+    public DataContainerAccessor() {
+        this.container = DataContainerAccessor.newContainer();
     }
 
-    private PersistentDataContainer empty() {
-        return container.getAdapterContext().newPersistentDataContainer();
+    public DataContainerAccessor(PersistentDataContainer container) {
+        this.container = container;
     }
 
     private List<String> parsePath(String path) {
@@ -42,11 +43,11 @@ public final class DataContainerAccessor {
 
                 if (subContainer == null) {
                     // Never happens
-                    subContainer = empty();
+                    subContainer = DataContainerAccessor.newContainer();
                 }
             }
             else {
-                subContainer = empty();
+                subContainer = DataContainerAccessor.newContainer();
             }
 
             container.set(key, PersistentDataType.TAG_CONTAINER, access(keys, subContainer, consumer));
@@ -205,24 +206,24 @@ public final class DataContainerAccessor {
      */
     public boolean equals(String path, Object value) {
         final PersistentDataType<?, ?>[] dataTypes = new PersistentDataType[]{
-        PersistentDataType.BOOLEAN,
-        PersistentDataType.BYTE,
-        PersistentDataType.SHORT,
-        PersistentDataType.INTEGER,
-        PersistentDataType.LONG,
-        PersistentDataType.FLOAT,
-        PersistentDataType.DOUBLE,
-        PersistentDataType.STRING,
-        PersistentDataType.TAG_CONTAINER,
-        PersistentDataType.LIST.booleans(),
-        PersistentDataType.LIST.bytes(),
-        PersistentDataType.LIST.shorts(),
-        PersistentDataType.LIST.integers(),
-        PersistentDataType.LIST.longs(),
-        PersistentDataType.LIST.floats(),
-        PersistentDataType.LIST.doubles(),
-        PersistentDataType.LIST.strings(),
-        PersistentDataType.LIST.dataContainers()
+            PersistentDataType.BOOLEAN,
+            PersistentDataType.BYTE,
+            PersistentDataType.SHORT,
+            PersistentDataType.INTEGER,
+            PersistentDataType.LONG,
+            PersistentDataType.FLOAT,
+            PersistentDataType.DOUBLE,
+            PersistentDataType.STRING,
+            PersistentDataType.TAG_CONTAINER,
+            PersistentDataType.LIST.booleans(),
+            PersistentDataType.LIST.bytes(),
+            PersistentDataType.LIST.shorts(),
+            PersistentDataType.LIST.integers(),
+            PersistentDataType.LIST.longs(),
+            PersistentDataType.LIST.floats(),
+            PersistentDataType.LIST.doubles(),
+            PersistentDataType.LIST.strings(),
+            PersistentDataType.LIST.dataContainers()
         };
 
         for (final PersistentDataType<?, ?> type : dataTypes) {
@@ -327,7 +328,7 @@ public final class DataContainerAccessor {
     public @NotNull DataContainerAccessor getCompoundOrEmpty(String path) {
         final PersistentDataContainer dataContainer = get(path, PersistentDataType.TAG_CONTAINER);
 
-        return new DataContainerAccessor(Objects.requireNonNullElse(dataContainer, empty()));
+        return new DataContainerAccessor(Objects.requireNonNullElse(dataContainer, DataContainerAccessor.newContainer()));
     }
 
     /**
@@ -447,15 +448,131 @@ public final class DataContainerAccessor {
         return list.stream().map(DataContainerAccessor::new).toArray(DataContainerAccessor[]::new);
     }
 
-    public static DataContainerAccessor create() {
-        final List<World> worlds = Bukkit.getWorlds();
+    public Component toJson() {
+        return stringify(container, 1);
+    }
 
-        if (worlds.isEmpty()) {
-            throw new RuntimeException("ワールドが存在しません(！？)");
+    private static Component stringify(Object value, int indentation) {
+        if (value instanceof PersistentDataContainer) {
+            final String[] keys = ((PersistentDataContainer) value).getKeys().stream().map(NamespacedKey::asString).toArray(String[]::new);
+
+            final PersistentDataType<?, ?>[] dataTypes = new PersistentDataType[]{
+                PersistentDataType.BYTE,
+                PersistentDataType.BOOLEAN,
+                PersistentDataType.SHORT,
+                PersistentDataType.INTEGER,
+                PersistentDataType.LONG,
+                PersistentDataType.FLOAT,
+                PersistentDataType.DOUBLE,
+                PersistentDataType.STRING,
+                PersistentDataType.TAG_CONTAINER,
+                PersistentDataType.LIST.bytes(),
+                PersistentDataType.LIST.booleans(),
+                PersistentDataType.LIST.shorts(),
+                PersistentDataType.LIST.integers(),
+                PersistentDataType.LIST.longs(),
+                PersistentDataType.LIST.floats(),
+                PersistentDataType.LIST.doubles(),
+                PersistentDataType.LIST.strings(),
+                PersistentDataType.LIST.dataContainers()
+            };
+
+            TextComponent component = Component.text("{").color(NamedTextColor.WHITE);
+
+            for (int i = 0; i < keys.length; i++) {
+                final String key = keys[i].replace(TestPlugin.get().getName().toLowerCase() + ":", "");
+
+                for (final PersistentDataType<?, ?> type : dataTypes) {
+                    final Object childValue = new DataContainerAccessor((PersistentDataContainer) value).get(key, type);
+
+                    if (childValue != null) {
+                        component = component.append(Component.text("\n"))
+                        .append(Component.text("  ".repeat(indentation)))
+                        .append(Component.text("\"").color(NamedTextColor.WHITE))
+                        .append(Component.text(key).color(TextColor.color(NamedTextColor.AQUA))
+                        .append(Component.text("\": ").color(NamedTextColor.WHITE)))
+                        .append(stringify(childValue, indentation + 1));
+
+                        if (i != keys.length - 1) {
+                            component = component.append(Component.text(",").color(NamedTextColor.WHITE));
+                        }
+                        break;
+                    }
+                }
+            }
+
+            return component
+            .append(Component.text("\n"))
+            .append(Component.text("  ".repeat(indentation - 1)))
+            .append(Component.text("}").color(NamedTextColor.WHITE));
         }
+        else {
+            if (value instanceof String) {
+                return Component.text("\"").color(NamedTextColor.WHITE)
+                .append(Component.text(value.toString()).color(NamedTextColor.GREEN))
+                .append(Component.text("\"").color(NamedTextColor.WHITE));
+            }
+            else if (value instanceof Integer) {
+                return Component.text(value.toString()).color(NamedTextColor.GOLD);
+            }
+            else if (value instanceof Float) {
+                return Component.text(value.toString()).color(NamedTextColor.GOLD)
+                .append(Component.text("f").color(NamedTextColor.RED));
+            }
+            else if (value instanceof Byte) {
+                return Component.text(value.toString()).color(NamedTextColor.GOLD)
+                .append(Component.text("b").color(NamedTextColor.RED));
+            }
+            else if (value instanceof Boolean) {
+                if ((Boolean) value) {
+                    return Component.text("1").color(NamedTextColor.GOLD)
+                    .append(Component.text("b").color(NamedTextColor.RED));
+                }
+                else {
+                    return Component.text("0").color(NamedTextColor.GOLD)
+                    .append(Component.text("b").color(NamedTextColor.RED));
+                }
+            }
+            else if (value instanceof Double) {
+                return Component.text(value.toString()).color(NamedTextColor.GOLD)
+                .append(Component.text("d").color(NamedTextColor.RED));
+            }
+            else if (value instanceof Long) {
+                return Component.text(value.toString()).color(NamedTextColor.GOLD)
+                .append(Component.text("L").color(NamedTextColor.RED));
+            }
+            else if (value instanceof Short) {
+                return Component.text(value.toString()).color(NamedTextColor.GOLD)
+                .append(Component.text("s").color(NamedTextColor.RED));
+            }
+            else if (value instanceof List) {
+                final Object[] array = ((List<?>) value).toArray(Object[]::new);
 
-        final PersistentDataContainer dataContainer = worlds.get(0).getPersistentDataContainer();
+                Component component = Component.text("[\n").color(NamedTextColor.WHITE);
 
-        return new DataContainerAccessor(dataContainer.getAdapterContext().newPersistentDataContainer());
+                for (int i = 0; i < array.length; i++) {
+                    final Object element = array[i];
+
+                    component = component
+                    .append(Component.text("  ".repeat(indentation)))
+                    .append(stringify(element, indentation + 1));
+
+                    if (i != array.length - 1) {
+                        component = component.append(Component.text(",\n").color(NamedTextColor.WHITE));
+                    }
+                }
+
+                return component
+                .append(Component.text("\n"))
+                .append(Component.text("  ".repeat(indentation - 1) + "]").color(NamedTextColor.WHITE));
+            }
+            else return Component.text("<").color(NamedTextColor.GRAY)
+                .append(Component.text(value.getClass().getSimpleName()).color(TextColor.color(0, 255, 202)))
+                .append(Component.text(">").color(NamedTextColor.GRAY));
+        }
+    }
+
+    public static PersistentDataContainer newContainer() {
+        return Bukkit.getWorlds().get(0).getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
     }
 }

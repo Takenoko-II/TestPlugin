@@ -1,5 +1,7 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.persistence.PersistentDataType;
@@ -97,5 +99,20 @@ public final class BlockDataContainerManager extends DataContainerManager {
         final TileState tileState = (TileState) block.getState();
 
         return new DataContainerAccessor(tileState.getPersistentDataContainer()).equals(path, value);
+    }
+
+    /**
+     * データをJSONに変換します。
+     * @return JSON化されたPersistentDataContainer
+     */
+    @Override
+    public Component toJson() {
+        if (!(block.getState() instanceof TileState)) {
+            return Component.text("{\n}").color(NamedTextColor.WHITE);
+        }
+
+        final TileState tileState = (TileState) block.getState();
+
+        return new DataContainerAccessor(tileState.getPersistentDataContainer()).toJson();
     }
 }

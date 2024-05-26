@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -261,4 +262,10 @@ public abstract class DataContainerManager {
 
         return list.stream().map(DataContainerAccessor::new).toArray(DataContainerAccessor[]::new);
     }
+
+    /**
+     * データをJSONに変換します。
+     * @return JSON化されたPersistentDataContainer
+     */
+    public abstract Component toJson();
 }

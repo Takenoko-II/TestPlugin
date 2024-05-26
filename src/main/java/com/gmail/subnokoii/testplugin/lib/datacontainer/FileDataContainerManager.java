@@ -1,7 +1,10 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
 import com.gmail.subnokoii.testplugin.lib.file.BinaryFileUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -44,7 +47,6 @@ public final class FileDataContainerManager extends DataContainerManager {
 
         try {
             final byte[] data = container.serializeToBytes();
-
             BinaryFileUtils.overwrite(filePath, data);
         }
         catch (IOException e) {
@@ -66,7 +68,7 @@ public final class FileDataContainerManager extends DataContainerManager {
         PersistentDataContainer container = getPersistentDataContainer();
 
         if (container == null) {
-            container = Bukkit.getWorlds().get(0).getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
+            container = DataContainerAccessor.newContainer();
         }
 
         new DataContainerAccessor(container).set(path, value);
@@ -81,13 +83,12 @@ public final class FileDataContainerManager extends DataContainerManager {
         PersistentDataContainer container = getPersistentDataContainer();
 
         if (container == null) {
-            container = Bukkit.getWorlds().get(0).getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
+            container = DataContainerAccessor.newContainer();
         }
 
         new DataContainerAccessor(container).delete(path);
 
         setPersistentDataContainer(container);
-
         return this;
     }
 
@@ -107,5 +108,14 @@ public final class FileDataContainerManager extends DataContainerManager {
         if (container == null) return false;
 
         return new DataContainerAccessor(container).equals(path, value);
+    }
+
+    @Override
+    public Component toJson() {
+        final PersistentDataContainer container = getPersistentDataContainer();
+
+        if (container == null) return Component.text("{\n}").color(NamedTextColor.WHITE);
+
+        return new DataContainerAccessor(container).toJson();
     }
 }

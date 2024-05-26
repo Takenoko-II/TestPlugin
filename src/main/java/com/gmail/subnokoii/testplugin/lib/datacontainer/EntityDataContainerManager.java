@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
@@ -66,5 +67,14 @@ public final class EntityDataContainerManager extends DataContainerManager {
     @Override
     public boolean equals(String path, Object value) {
         return new DataContainerAccessor(entity.getPersistentDataContainer()).equals(path, value);
+    }
+
+    /**
+     * データをJSONに変換します。
+     * @return JSON化されたPersistentDataContainer
+     */
+    @Override
+    public Component toJson() {
+        return new DataContainerAccessor(entity.getPersistentDataContainer()).toJson();
     }
 }

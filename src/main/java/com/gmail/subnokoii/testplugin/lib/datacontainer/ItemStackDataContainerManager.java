@@ -1,5 +1,7 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -91,5 +93,18 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
         if (meta == null) return false;
 
         return new DataContainerAccessor(meta.getPersistentDataContainer()).equals(path, value);
+    }
+
+    /**
+     * データをJSONに変換します。
+     * @return JSON化されたPersistentDataContainer
+     */
+    @Override
+    public Component toJson() {
+        final ItemMeta meta = itemStack.getItemMeta();
+
+        if (meta == null) return Component.text("{\n}").color(NamedTextColor.WHITE);
+
+        return new DataContainerAccessor(meta.getPersistentDataContainer()).toJson();
     }
 }

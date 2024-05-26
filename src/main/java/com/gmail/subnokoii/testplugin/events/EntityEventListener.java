@@ -46,10 +46,13 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
             final Entity[] targets = event.getTargets();
 
             switch (id) {
-                case "foo": {
-                    if (parameters.length != 0) return;
+                case "logging": {
+                    if (parameters.length < 1) return;
 
-                    TestPlugin.log("Server", "foo!");
+                    final String message = String.join(" ", parameters);
+
+                    TestPlugin.log("Server", message);
+                    TestPlugin.log("Plugin", message);
 
                     break;
                 }
@@ -83,14 +86,151 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                 case "math": {
                     if (parameters.length <= 1) return;
 
+                    final double x;
+
+                    try {
+                        x = Double.parseDouble(parameters[1]);
+                    }
+                    catch (IllegalArgumentException e) {
+                        return;
+                    }
+
                     switch (parameters[0]) {
                         case "sin": {
-                            try {
-                                final double x = Double.parseDouble(parameters[1]);
+                            event.returnValue(Math.sin(x * Math.PI / 180));
+                            break;
+                        }
+                        case "cos": {
+                            event.returnValue(Math.cos(x * Math.PI / 180));
+                            break;
+                        }
+                        case "tan": {
+                            event.returnValue(Math.tan(x * Math.PI / 180));
+                            break;
+                        }
+                        case "sqrt": {
+                            event.returnValue(Math.sqrt(x));
+                            break;
+                        }
+                        case "cbrt": {
+                            event.returnValue(Math.cbrt(x));
+                            break;
+                        }
+                    }
 
-                                event.returnValue(x);
+                    break;
+                }
+                case "database": {
+                    if (parameters.length < 1) return;
+
+                    switch (parameters[0]) {
+                        case "get": {
+                            if (parameters.length == 3) {
+                                switch (parameters[1]) {
+                                    case "boolean": {
+                                        event.returnValue(TestPlugin.database().getBoolean(parameters[2]));
+                                        break;
+                                    }
+                                    case "byte": {
+                                        event.returnValue(TestPlugin.database().getByte(parameters[2]));
+                                        break;
+                                    }
+                                    case "short": {
+                                        event.returnValue(TestPlugin.database().getShort(parameters[2]));
+                                        break;
+                                    }
+                                    case "int": {
+                                        event.returnValue(TestPlugin.database().getInteger(parameters[2]));
+                                        break;
+                                    }
+                                    case "long": {
+                                        event.returnValue(TestPlugin.database().getLong(parameters[2]));
+                                        break;
+                                    }
+                                    case "float": {
+                                        event.returnValue(TestPlugin.database().getFloat(parameters[2]));
+                                        break;
+                                    }
+                                    case "double": {
+                                        event.returnValue(TestPlugin.database().getDouble(parameters[2]));
+                                        break;
+                                    }
+                                    case "string": {
+                                        event.returnValue(TestPlugin.database().getString(parameters[2]));
+                                        break;
+                                    }
+                                }
                             }
-                            catch (IllegalArgumentException ignored) {}
+
+                            break;
+                        }
+                        case "set": {
+                            if (parameters.length < 4) return;
+
+                            Object value = null;
+
+                            switch (parameters[1]) {
+                                case "boolean": {
+                                    try {
+                                        value = Boolean.parseBoolean(parameters[3]);
+                                    }
+                                    catch (IllegalArgumentException ignored) {}
+                                    break;
+                                }
+                                case "byte": {
+                                    try {
+                                        value = Byte.parseByte(parameters[3]);
+                                    }
+                                    catch (IllegalArgumentException ignored) {}
+                                    break;
+                                }
+                                case "short": {
+                                    try {
+                                        value = Short.parseShort(parameters[3]);
+                                    }
+                                    catch (IllegalArgumentException ignored) {}
+                                    break;
+                                }
+                                case "int": {
+                                    try {
+                                        value = Integer.parseInt(parameters[3]);
+                                    }
+                                    catch (IllegalArgumentException ignored) {}
+                                    break;
+                                }
+                                case "long": {
+                                    try {
+                                        value = Long.parseLong(parameters[3]);
+                                    }
+                                    catch (IllegalArgumentException ignored) {}
+                                    break;
+                                }
+                                case "float": {
+                                    try {
+                                        value = Float.parseFloat(parameters[3]);
+                                    }
+                                    catch (IllegalArgumentException ignored) {}
+                                    break;
+                                }
+                                case "double": {
+                                    try {
+                                        value = Double.parseDouble(parameters[3]);
+                                    }
+                                    catch (IllegalArgumentException ignored) {}
+                                    break;
+                                }
+                                case "string": {
+                                    try {
+                                        value = String.join(" ", Arrays.copyOfRange(parameters, 3, parameters.length));
+                                    }
+                                    catch (IllegalArgumentException ignored) {}
+                                    break;
+                                }
+                            }
+
+                            if (value == null) return;
+
+                            TestPlugin.database().set(parameters[2], value);
 
                             break;
                         }
