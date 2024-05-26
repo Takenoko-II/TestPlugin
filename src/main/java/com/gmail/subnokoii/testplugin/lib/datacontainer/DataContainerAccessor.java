@@ -205,28 +205,7 @@ public final class DataContainerAccessor {
      * @return 等しい値であれば真
      */
     public boolean equals(String path, Object value) {
-        final PersistentDataType<?, ?>[] dataTypes = new PersistentDataType[]{
-            PersistentDataType.BOOLEAN,
-            PersistentDataType.BYTE,
-            PersistentDataType.SHORT,
-            PersistentDataType.INTEGER,
-            PersistentDataType.LONG,
-            PersistentDataType.FLOAT,
-            PersistentDataType.DOUBLE,
-            PersistentDataType.STRING,
-            PersistentDataType.TAG_CONTAINER,
-            PersistentDataType.LIST.booleans(),
-            PersistentDataType.LIST.bytes(),
-            PersistentDataType.LIST.shorts(),
-            PersistentDataType.LIST.integers(),
-            PersistentDataType.LIST.longs(),
-            PersistentDataType.LIST.floats(),
-            PersistentDataType.LIST.doubles(),
-            PersistentDataType.LIST.strings(),
-            PersistentDataType.LIST.dataContainers()
-        };
-
-        for (final PersistentDataType<?, ?> type : dataTypes) {
+        for (final PersistentDataType<?, ?> type : PERSISTENT_DATA_TYPES) {
             if (Objects.equals(get(path, type), value)) {
                 return true;
             }
@@ -448,6 +427,23 @@ public final class DataContainerAccessor {
         return list.stream().map(DataContainerAccessor::new).toArray(DataContainerAccessor[]::new);
     }
 
+    /**
+     * 指定パスに何かデータがあればそれを取得します。
+     * @param path 名前空間を省略したドット区切りのNBTパス
+     * @return Object型の値、値が存在しなければnull
+     */
+    public final @Nullable Object getObject(String path) {
+        for (final PersistentDataType<?, ?> dataType : PERSISTENT_DATA_TYPES) {
+            final Object value = get(path, dataType);
+
+            if (value == null) continue;
+
+            return value;
+        }
+
+        return null;
+    }
+
     public Component toJson() {
         return stringify(container, 1);
     }
@@ -456,33 +452,14 @@ public final class DataContainerAccessor {
         if (value instanceof PersistentDataContainer) {
             final String[] keys = ((PersistentDataContainer) value).getKeys().stream().map(NamespacedKey::asString).toArray(String[]::new);
 
-            final PersistentDataType<?, ?>[] dataTypes = new PersistentDataType[]{
-                PersistentDataType.BYTE,
-                PersistentDataType.BOOLEAN,
-                PersistentDataType.SHORT,
-                PersistentDataType.INTEGER,
-                PersistentDataType.LONG,
-                PersistentDataType.FLOAT,
-                PersistentDataType.DOUBLE,
-                PersistentDataType.STRING,
-                PersistentDataType.TAG_CONTAINER,
-                PersistentDataType.LIST.bytes(),
-                PersistentDataType.LIST.booleans(),
-                PersistentDataType.LIST.shorts(),
-                PersistentDataType.LIST.integers(),
-                PersistentDataType.LIST.longs(),
-                PersistentDataType.LIST.floats(),
-                PersistentDataType.LIST.doubles(),
-                PersistentDataType.LIST.strings(),
-                PersistentDataType.LIST.dataContainers()
-            };
-
             TextComponent component = Component.text("{").color(NamedTextColor.WHITE);
 
             for (int i = 0; i < keys.length; i++) {
                 final String key = keys[i].replace(TestPlugin.get().getName().toLowerCase() + ":", "");
 
-                for (final PersistentDataType<?, ?> type : dataTypes) {
+                boolean foundTypeFlag = false;
+
+                for (final PersistentDataType<?, ?> type : PERSISTENT_DATA_TYPES) {
                     final Object childValue = new DataContainerAccessor((PersistentDataContainer) value).get(key, type);
 
                     if (childValue != null) {
@@ -496,8 +473,24 @@ public final class DataContainerAccessor {
                         if (i != keys.length - 1) {
                             component = component.append(Component.text(",").color(NamedTextColor.WHITE));
                         }
+
+                        foundTypeFlag = true;
+
                         break;
                     }
+                }
+
+                if (!foundTypeFlag) {
+                    component = component.append(Component.text("\n"))
+                    .append(Component.text("  ".repeat(indentation)))
+                    .append(Component.text("\"").color(NamedTextColor.WHITE))
+                    .append(Component.text(key).color(TextColor.color(NamedTextColor.AQUA))
+                    .append(Component.text("\": ").color(NamedTextColor.WHITE)))
+                    .append(
+                        Component.text("<").color(NamedTextColor.GRAY)
+                        .append(Component.text("UNSUPPORTED TYPE VALUE").color(NamedTextColor.RED))
+                        .append(Component.text(">").color(NamedTextColor.GRAY))
+                    );
                 }
             }
 
@@ -506,73 +499,96 @@ public final class DataContainerAccessor {
             .append(Component.text("  ".repeat(indentation - 1)))
             .append(Component.text("}").color(NamedTextColor.WHITE));
         }
-        else {
-            if (value instanceof String) {
-                return Component.text("\"").color(NamedTextColor.WHITE)
-                .append(Component.text(value.toString()).color(NamedTextColor.GREEN))
-                .append(Component.text("\"").color(NamedTextColor.WHITE));
-            }
-            else if (value instanceof Integer) {
-                return Component.text(value.toString()).color(NamedTextColor.GOLD);
-            }
-            else if (value instanceof Float) {
-                return Component.text(value.toString()).color(NamedTextColor.GOLD)
-                .append(Component.text("f").color(NamedTextColor.RED));
-            }
-            else if (value instanceof Byte) {
-                return Component.text(value.toString()).color(NamedTextColor.GOLD)
+        else if (value instanceof String) {
+            return Component.text("\"").color(NamedTextColor.WHITE)
+            .append(Component.text(value.toString()).color(NamedTextColor.GREEN))
+            .append(Component.text("\"").color(NamedTextColor.WHITE));
+        }
+        else if (value instanceof Integer) {
+            return Component.text(value.toString()).color(NamedTextColor.GOLD);
+        }
+        else if (value instanceof Float) {
+            return Component.text(value.toString()).color(NamedTextColor.GOLD)
+            .append(Component.text("f").color(NamedTextColor.RED));
+        }
+        else if (value instanceof Byte) {
+            return Component.text(value.toString()).color(NamedTextColor.GOLD)
+            .append(Component.text("b").color(NamedTextColor.RED));
+        }
+        else if (value instanceof Boolean) {
+            if ((Boolean) value) {
+                return Component.text("1").color(NamedTextColor.GOLD)
                 .append(Component.text("b").color(NamedTextColor.RED));
             }
-            else if (value instanceof Boolean) {
-                if ((Boolean) value) {
-                    return Component.text("1").color(NamedTextColor.GOLD)
-                    .append(Component.text("b").color(NamedTextColor.RED));
-                }
-                else {
-                    return Component.text("0").color(NamedTextColor.GOLD)
-                    .append(Component.text("b").color(NamedTextColor.RED));
-                }
+            else {
+                return Component.text("0").color(NamedTextColor.GOLD)
+                .append(Component.text("b").color(NamedTextColor.RED));
             }
-            else if (value instanceof Double) {
-                return Component.text(value.toString()).color(NamedTextColor.GOLD)
-                .append(Component.text("d").color(NamedTextColor.RED));
-            }
-            else if (value instanceof Long) {
-                return Component.text(value.toString()).color(NamedTextColor.GOLD)
-                .append(Component.text("L").color(NamedTextColor.RED));
-            }
-            else if (value instanceof Short) {
-                return Component.text(value.toString()).color(NamedTextColor.GOLD)
-                .append(Component.text("s").color(NamedTextColor.RED));
-            }
-            else if (value instanceof List) {
-                final Object[] array = ((List<?>) value).toArray(Object[]::new);
-
-                Component component = Component.text("[\n").color(NamedTextColor.WHITE);
-
-                for (int i = 0; i < array.length; i++) {
-                    final Object element = array[i];
-
-                    component = component
-                    .append(Component.text("  ".repeat(indentation)))
-                    .append(stringify(element, indentation + 1));
-
-                    if (i != array.length - 1) {
-                        component = component.append(Component.text(",\n").color(NamedTextColor.WHITE));
-                    }
-                }
-
-                return component
-                .append(Component.text("\n"))
-                .append(Component.text("  ".repeat(indentation - 1) + "]").color(NamedTextColor.WHITE));
-            }
-            else return Component.text("<").color(NamedTextColor.GRAY)
-                .append(Component.text(value.getClass().getSimpleName()).color(TextColor.color(0, 255, 202)))
-                .append(Component.text(">").color(NamedTextColor.GRAY));
         }
+        else if (value instanceof Double) {
+            return Component.text(value.toString()).color(NamedTextColor.GOLD)
+            .append(Component.text("d").color(NamedTextColor.RED));
+        }
+        else if (value instanceof Long) {
+            return Component.text(value.toString()).color(NamedTextColor.GOLD)
+            .append(Component.text("L").color(NamedTextColor.RED));
+        }
+        else if (value instanceof Short) {
+            return Component.text(value.toString()).color(NamedTextColor.GOLD)
+            .append(Component.text("s").color(NamedTextColor.RED));
+        }
+        else if (value instanceof List) {
+            final Object[] array = ((List<?>) value).toArray(Object[]::new);
+
+            Component component = Component.text("[\n").color(NamedTextColor.WHITE);
+
+            for (int i = 0; i < array.length; i++) {
+                final Object element = array[i];
+
+                component = component
+                .append(Component.text("  ".repeat(indentation)))
+                .append(stringify(element, indentation + 1));
+
+                if (i != array.length - 1) {
+                    component = component.append(Component.text(",\n").color(NamedTextColor.WHITE));
+                }
+            }
+
+            return component
+            .append(Component.text("\n"))
+            .append(Component.text("  ".repeat(indentation - 1) + "]").color(NamedTextColor.WHITE));
+        }
+        else return Component.text("<").color(NamedTextColor.GRAY)
+            .append(Component.text(value.getClass().getSimpleName()).color(TextColor.color(0, 255, 202)))
+            .append(Component.text(">").color(NamedTextColor.GRAY));
+
     }
 
     public static PersistentDataContainer newContainer() {
         return Bukkit.getWorlds().get(0).getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
     }
+
+    /**
+     * ほぼ全ての基本データ型のリスト
+     */
+    public static final PersistentDataType<?, ?>[] PERSISTENT_DATA_TYPES = new PersistentDataType[]{
+        PersistentDataType.BYTE,
+        PersistentDataType.BOOLEAN,
+        PersistentDataType.SHORT,
+        PersistentDataType.INTEGER,
+        PersistentDataType.LONG,
+        PersistentDataType.FLOAT,
+        PersistentDataType.DOUBLE,
+        PersistentDataType.STRING,
+        PersistentDataType.TAG_CONTAINER,
+        PersistentDataType.LIST.bytes(),
+        PersistentDataType.LIST.booleans(),
+        PersistentDataType.LIST.shorts(),
+        PersistentDataType.LIST.integers(),
+        PersistentDataType.LIST.longs(),
+        PersistentDataType.LIST.floats(),
+        PersistentDataType.LIST.doubles(),
+        PersistentDataType.LIST.strings(),
+        PersistentDataType.LIST.dataContainers()
+    };
 }

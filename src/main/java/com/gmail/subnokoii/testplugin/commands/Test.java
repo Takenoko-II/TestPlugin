@@ -190,12 +190,12 @@ public class Test implements CommandExecutor, TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (args.length == 1) {
-            if (sender.isOp()) return List.of("get_info", "get_server_selector", "get_experimental_item");
+            if (sender.isOp()) return List.of("get_info", "get_server_selector", "get_experimental_item", "get_database");
             else return List.of("get_server_selector");
         }
         else if (args.length == 2) {
             if (args[0].equals("get_info")) {
-                return List.of("plugin_name", "api_version", "ip", "port", "current_tick", "max_players", "log_archive_size", "bukkit_version", "database");
+                return List.of("plugin_name", "api_version", "ip", "port", "current_tick", "max_players", "log_archive_size", "bukkit_version");
             }
             else if (args[0].equals("get_experimental_item")) {
                 return List.of("grappling_hook", "instant_shoot_bow");

@@ -6,18 +6,18 @@ import org.bukkit.entity.Entity;
 import java.util.Arrays;
 
 public class DataPackMessageReceiveEvent {
-    private final Entity core;
+    private final Entity messenger;
 
     private final Entity[] targets;
 
     private final String[] message;
 
-    public DataPackMessageReceiveEvent(Entity core, Entity[] targets, String[] message) {
+    public DataPackMessageReceiveEvent(Entity messenger, Entity[] targets, String[] message) {
         if (message.length == 0) {
             throw new IllegalArgumentException("messageの長さは1以上である必要があります");
         }
 
-        this.core = core;
+        this.messenger = messenger;
         this.targets = targets;
         this.message = message;
     }
@@ -35,6 +35,6 @@ public class DataPackMessageReceiveEvent {
     }
 
     public void returnValue(Object value) {
-        new EntityDataContainerManager(core).set("out", value);
+        new EntityDataContainerManager(messenger).set("out", value);
     }
 }

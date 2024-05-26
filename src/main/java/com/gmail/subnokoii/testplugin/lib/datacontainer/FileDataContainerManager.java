@@ -15,10 +15,6 @@ import java.io.IOException;
 public final class FileDataContainerManager extends DataContainerManager {
     private final String filePath;
 
-    public FileDataContainerManager(JavaPlugin plugin) {
-        this.filePath = "plugins/" + plugin.getName() + ".bin";
-    }
-
     public FileDataContainerManager(String path) {
         this.filePath = path;
     }

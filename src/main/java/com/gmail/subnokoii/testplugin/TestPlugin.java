@@ -1,9 +1,7 @@
 package com.gmail.subnokoii.testplugin;
 
 import com.gmail.subnokoii.testplugin.commands.*;
-import com.gmail.subnokoii.testplugin.events.EntityEventListener;
-import com.gmail.subnokoii.testplugin.events.PlayerEventListener;
-import com.gmail.subnokoii.testplugin.events.TickEventListener;
+import com.gmail.subnokoii.testplugin.events.*;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
@@ -30,12 +28,10 @@ public final class TestPlugin extends JavaPlugin {
         // 準備
         plugin = this;
 
-        TestPlugin.log("Server", "TestPluginが起動しました");
-        TestPlugin.log("Plugin", "TestPluginが起動しました");
+        TestPlugin.log("*", "TestPluginが起動しました");
 
         // イベントリスナー登録
         TestPluginEvent.init();
-
         PlayerEventListener.init();
         EntityEventListener.init();
         ChestUIClickEvent.Listener.init();
@@ -59,7 +55,7 @@ public final class TestPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        TestPlugin.log("TestPluginが停止しました");
+        TestPlugin.log("*", "TestPluginが停止しました");
     }
 
     /**
@@ -84,15 +80,21 @@ public final class TestPlugin extends JavaPlugin {
                 break;
             }
             case "plugin": {
-                final String logPath = "plugins/TestPlugin-1.0-SNAPSHOT.log";
-
                 final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
-                TextFileUtils.create(logPath);
-                TextFileUtils.write(logPath, "[" + formatter.format(timestamp) + "] " + text);
+                TextFileUtils.create(LOG_FILE_PATH);
+                TextFileUtils.write(LOG_FILE_PATH, "[" + formatter.format(timestamp) + "] " + text);
 
                 break;
+            }
+            case "*": {
+                log("Server", messages);
+                log("Plugin", messages);
+                break;
+            }
+            default: {
+                throw new IllegalArgumentException("ログターゲットが無効です");
             }
         }
     }
@@ -142,6 +144,10 @@ public final class TestPlugin extends JavaPlugin {
     }
 
     public static FileDataContainerManager database() {
-        return new FileDataContainerManager(get());
+        return new FileDataContainerManager(DATABASE_FILE_PATH);
     }
+
+    public static final String LOG_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.log";
+
+    public static final String DATABASE_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.bin";
 }

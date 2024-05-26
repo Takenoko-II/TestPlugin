@@ -264,6 +264,23 @@ public abstract class DataContainerManager {
     }
 
     /**
+     * 指定パスに何かデータがあればそれを取得します。
+     * @param path 名前空間を省略したドット区切りのNBTパス
+     * @return Object型の値、値が存在しなければnull
+     */
+    public final @Nullable Object getObject(String path) {
+        for (final PersistentDataType<?, ?> dataType : DataContainerAccessor.PERSISTENT_DATA_TYPES) {
+            final Object value = get(path, dataType);
+
+            if (value == null) continue;
+
+            return value;
+        }
+
+        return null;
+    }
+
+    /**
      * データをJSONに変換します。
      * @return JSON化されたPersistentDataContainer
      */

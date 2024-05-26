@@ -169,10 +169,11 @@ public class TestPluginEvent implements Listener {
         if (!entity.getType().equals(EntityType.MARKER)) return;
 
         final Set<String> tags = entity.getScoreboardTags();
+        final String namespace = TestPlugin.get().getName().toLowerCase() + ":";
 
         tags.forEach(tag -> {
-            if (tag.startsWith("testplugin:")) {
-                final String message = tag.split("testplugin:", 2)[1];
+            if (tag.startsWith(namespace)) {
+                final String message = tag.split(namespace, 2)[1];
 
                 final Entity[] entities = entity.getWorld()
                 .getEntities()
