@@ -10,7 +10,15 @@ import org.jetbrains.annotations.Nullable;
 public final class BlockDataContainerManager extends DataContainerManager {
     private final Block block;
 
+    /**
+     * タイルエンティティ内のカスタムデータを操作するためのオブジェクトを作成します。
+     * @param block 使用するブロック
+     */
     public BlockDataContainerManager(Block block) {
+        if (block == null) {
+            throw new IllegalArgumentException("Blockが必要ですがnullが渡されました");
+        }
+
         this.block = block;
     }
 

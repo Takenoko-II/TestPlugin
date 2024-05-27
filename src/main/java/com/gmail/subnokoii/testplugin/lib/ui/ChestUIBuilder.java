@@ -43,8 +43,8 @@ public class ChestUIBuilder {
         builders.add(this);
     }
 
-    public ChestUIBuilder(String name, Color color, int line) {
-        final Component component = Component.text(name).color(TextColor.color(color.asRGB()));
+    public ChestUIBuilder(String name, TextColor color, int line) {
+        final Component component = Component.text(name).color(color);
 
         inventory = Bukkit.createInventory(null, line * 9, component);
         buttons = new Button[line * 9];
@@ -52,8 +52,8 @@ public class ChestUIBuilder {
         builders.add(this);
     }
 
-    public ChestUIBuilder(String name, TextDecoration decoration, Color color, int line) {
-        final Component component = Component.text(name).decorate(decoration).color(TextColor.color(color.asRGB()));
+    public ChestUIBuilder(String name, TextDecoration decoration, TextColor color, int line) {
+        final Component component = Component.text(name).decorate(decoration).color(color);
 
         inventory = Bukkit.createInventory(null, line * 9, component);
         buttons = new Button[line * 9];
@@ -102,7 +102,7 @@ public class ChestUIBuilder {
     }
 
     public static final class Button {
-        private final ItemStackBuilder itemStackBuilder = new ItemStackBuilder(Material.APPLE);
+        private final ItemStackBuilder itemStackBuilder = new ItemStackBuilder(Material.KNOWLEDGE_BOOK);
 
         private Consumer<ChestUIClickEvent> listener = response -> {};
 

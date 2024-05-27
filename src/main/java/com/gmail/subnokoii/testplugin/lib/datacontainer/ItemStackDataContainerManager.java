@@ -10,7 +10,15 @@ import org.jetbrains.annotations.Nullable;
 public final class ItemStackDataContainerManager extends DataContainerManager {
     private final ItemStack itemStack;
 
+    /**
+     * アイテム内のカスタムデータを操作するためのオブジェクトを作成します。
+     * @param itemStack 使用するアイテム
+     */
     public ItemStackDataContainerManager(ItemStack itemStack) {
+        if (itemStack == null) {
+            throw new IllegalArgumentException("ItemStackが必要ですがnullが渡されました");
+        }
+
         this.itemStack = itemStack;
     }
 

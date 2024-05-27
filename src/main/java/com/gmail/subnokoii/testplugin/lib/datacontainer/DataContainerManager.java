@@ -1,15 +1,12 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.Bukkit;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 
 public abstract class DataContainerManager {
     /**
@@ -133,17 +130,6 @@ public abstract class DataContainerManager {
         if (dataContainer == null) return null;
 
         return new DataContainerAccessor(dataContainer);
-    }
-
-    /**
-     * 指定パスにコンパウンドタグがあればそれを取得します。
-     * @param path 名前空間を省略したドット区切りのNBTパス
-     * @return コンパウンドタグ、値が存在しないか型が違っていれば空のコンパウンドタグ
-     */
-    public final @NotNull DataContainerAccessor getCompoundOrEmpty(String path) {
-        final PersistentDataContainer dataContainer = get(path, PersistentDataType.TAG_CONTAINER);
-
-        return new DataContainerAccessor(Objects.requireNonNullElse(dataContainer, new ItemStack(Material.APPLE).getItemMeta().getPersistentDataContainer()));
     }
 
     /**
@@ -285,4 +271,20 @@ public abstract class DataContainerManager {
      * @return JSON化されたPersistentDataContainer
      */
     public abstract Component toJson();
+
+    /**
+     * PersistentDataContainerを新たに作成します。
+     * @return 新しい空のPersistentDataContainer
+     */
+    public static PersistentDataContainer newContainer() {
+        return Bukkit.getWorlds().get(0).getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
+    }
+
+    /**
+     * DataContainerAccessorを空のデータを用いて新たに作成します。
+     * @return 空のアクセサ
+     */
+    public static DataContainerAccessor newCompound() {
+        return new DataContainerAccessor(newContainer());
+    }
 }

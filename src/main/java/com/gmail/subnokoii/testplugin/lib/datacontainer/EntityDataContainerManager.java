@@ -8,7 +8,15 @@ import org.jetbrains.annotations.Nullable;
 public final class EntityDataContainerManager extends DataContainerManager {
     private final Entity entity;
 
+    /**
+     * エンティティ内のカスタムデータを操作するためのオブジェクトを作成します。
+     * @param entity 使用するエンティティ
+     */
     public EntityDataContainerManager(Entity entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("Entityが必要ですがnullが渡されました");
+        }
+
         this.entity = entity;
     }
 

@@ -5,11 +5,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -19,11 +17,11 @@ import java.util.function.BiConsumer;
 public final class DataContainerAccessor {
     private final PersistentDataContainer container;
 
-    public DataContainerAccessor() {
-        this.container = DataContainerAccessor.newContainer();
-    }
-
     public DataContainerAccessor(PersistentDataContainer container) {
+        if (container == null) {
+            throw new IllegalArgumentException("PersistentDataContainerが必要ですがnullが渡されました");
+        }
+
         this.container = container;
     }
 
@@ -43,11 +41,11 @@ public final class DataContainerAccessor {
 
                 if (subContainer == null) {
                     // Never happens
-                    subContainer = DataContainerAccessor.newContainer();
+                    subContainer = DataContainerManager.newContainer();
                 }
             }
             else {
-                subContainer = DataContainerAccessor.newContainer();
+                subContainer = DataContainerManager.newContainer();
             }
 
             container.set(key, PersistentDataType.TAG_CONTAINER, access(keys, subContainer, consumer));
@@ -300,17 +298,6 @@ public final class DataContainerAccessor {
     }
 
     /**
-     * 指定パスにコンパウンドタグがあればそれを取得します。
-     * @param path 名前空間を省略したドット区切りのNBTパス
-     * @return コンパウンドタグ、値が存在しないか型が違っていれば空のコンパウンドタグ
-     */
-    public @NotNull DataContainerAccessor getCompoundOrEmpty(String path) {
-        final PersistentDataContainer dataContainer = get(path, PersistentDataType.TAG_CONTAINER);
-
-        return new DataContainerAccessor(Objects.requireNonNullElse(dataContainer, DataContainerAccessor.newContainer()));
-    }
-
-    /**
      * 指定パスにboolean型の配列があればそれを取得します。
      * @param path 名前空間を省略したドット区切りのNBTパス
      * @return boolean型の配列、値が存在しないか型が違っていればnull
@@ -432,7 +419,7 @@ public final class DataContainerAccessor {
      * @param path 名前空間を省略したドット区切りのNBTパス
      * @return Object型の値、値が存在しなければnull
      */
-    public final @Nullable Object getObject(String path) {
+    public @Nullable Object getObject(String path) {
         for (final PersistentDataType<?, ?> dataType : PERSISTENT_DATA_TYPES) {
             final Object value = get(path, dataType);
 
@@ -444,6 +431,10 @@ public final class DataContainerAccessor {
         return null;
     }
 
+    /**
+     * データをJSONに変換します。
+     * @return JSON化されたPersistentDataContainer
+     */
     public Component toJson() {
         return stringify(container, 1);
     }
@@ -488,7 +479,7 @@ public final class DataContainerAccessor {
                     .append(Component.text("\": ").color(NamedTextColor.WHITE)))
                     .append(
                         Component.text("<").color(NamedTextColor.GRAY)
-                        .append(Component.text("UNSUPPORTED TYPE VALUE").color(NamedTextColor.RED))
+                        .append(Component.text("Unsupported Type Value").color(NamedTextColor.RED))
                         .append(Component.text(">").color(NamedTextColor.GRAY))
                     );
                 }
@@ -562,10 +553,6 @@ public final class DataContainerAccessor {
             .append(Component.text(value.getClass().getSimpleName()).color(TextColor.color(0, 255, 202)))
             .append(Component.text(">").color(NamedTextColor.GRAY));
 
-    }
-
-    public static PersistentDataContainer newContainer() {
-        return Bukkit.getWorlds().get(0).getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
     }
 
     /**

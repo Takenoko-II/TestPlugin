@@ -46,11 +46,6 @@ public final class TestPlugin extends JavaPlugin {
 
         // BungeeCordに接続
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-
-        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-
-        TestPlugin.database().set("info.last_enabled", formatter.format(timestamp));
     }
 
     @Override
@@ -147,7 +142,7 @@ public final class TestPlugin extends JavaPlugin {
         return new FileDataContainerManager(DATABASE_FILE_PATH);
     }
 
-    public static final String LOG_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.log";
+    private static final String LOG_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.log";
 
-    public static final String DATABASE_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.bin";
+    private static final String DATABASE_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.bin";
 }
