@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.ui;
 
+import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
 import net.kyori.adventure.text.Component;
@@ -13,10 +14,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
@@ -102,7 +100,7 @@ public class ChestUIBuilder {
     }
 
     public static final class Button {
-        private final ItemStackBuilder itemStackBuilder = new ItemStackBuilder(Material.KNOWLEDGE_BOOK);
+        private final ItemStackBuilder itemStackBuilder = new ItemStackBuilder(Material.APPLE);
 
         private Consumer<ChestUIClickEvent> listener = response -> {};
 
