@@ -2,6 +2,7 @@ package com.gmail.subnokoii.testplugin.commands;
 
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -26,7 +27,7 @@ public class Tools implements CommandExecutor, TabCompleter {
         ChestUIBuilder tools = new ChestUIBuilder("Plugin Tools", 1)
         .add(button -> {
             return button.type(Material.ENDER_EYE)
-            .customName("Quick Teleporter", Color.fromRGB(0xA200FF))
+            .customName("Quick Teleporter", NamedTextColor.LIGHT_PURPLE)
             .maxCount(1)
             .dataContainer("custom_item_tag", "quick_teleporter")
             .onClick(event -> {
@@ -35,7 +36,7 @@ public class Tools implements CommandExecutor, TabCompleter {
         })
         .add(button -> {
             return button.type(Material.LINGERING_POTION)
-            .customName("Data Getter", Color.fromRGB(0x2FFF90))
+            .customName("Data Getter", NamedTextColor.GREEN)
             .potionColor(Color.fromRGB(0x2FFF90))
             .dataContainer("custom_item_tag", "data_getter")
             .onClick(event -> {
@@ -45,7 +46,7 @@ public class Tools implements CommandExecutor, TabCompleter {
         .add(button -> {
             return button.type(Material.CLOCK)
             .maxCount(1)
-            .customName("Tick Progress Canceler", Color.fromRGB(0xFFF928))
+            .customName("Tick Progress Canceler", NamedTextColor.GOLD)
             .glint(true)
             .dataContainer("custom_item_tag", "tick_progress_canceler")
             .onClick(event -> {

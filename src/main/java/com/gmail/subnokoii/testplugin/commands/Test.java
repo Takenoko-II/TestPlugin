@@ -142,14 +142,14 @@ public class Test implements CommandExecutor, TabCompleter {
                         case "grappling_hook": {
                             itemStackBuilder
                             .type(Material.FISHING_ROD)
-                            .customName("Grappling Hook", Color.ORANGE)
+                            .customName("Grappling Hook", NamedTextColor.GOLD)
                             .dataContainer("custom_item_tag", "grappling_hook");
                             break;
                         }
                         case "instant_shoot_bow": {
                             itemStackBuilder
                             .type(Material.BOW)
-                            .customName("Instant Shoot Bow", Color.ORANGE)
+                            .customName("Instant Shoot Bow", NamedTextColor.GOLD)
                             .dataContainer("custom_item_tag", "instant_shoot_bow");
                             break;
                         }

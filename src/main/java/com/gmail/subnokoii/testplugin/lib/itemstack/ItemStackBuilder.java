@@ -77,6 +77,15 @@ public class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder itemName(String text, TextDecoration decoration, TextColor color) {
+        modifyItemMeta(meta -> {
+            meta.itemName(Component.text(text).decorate(decoration).color(color));
+            return meta;
+        });
+
+        return this;
+    }
+
     public ItemStackBuilder customName(String text) {
         modifyItemMeta(meta -> {
             final TextComponent component = createUnItalicText(text);
@@ -97,9 +106,9 @@ public class ItemStackBuilder {
         return this;
     }
 
-    public ItemStackBuilder customName(String text, Color color) {
+    public ItemStackBuilder customName(String text, TextColor color) {
         modifyItemMeta(builder -> {
-            final TextComponent component = createUnItalicText(text).color(TextColor.color(color.asRGB()));
+            final TextComponent component = createUnItalicText(text).color(color);
             builder.displayName(component);
             return builder;
         });
@@ -107,9 +116,9 @@ public class ItemStackBuilder {
         return this;
     }
 
-    public ItemStackBuilder customName(String text, TextDecoration decoration, Color color) {
+    public ItemStackBuilder customName(String text, TextDecoration decoration, TextColor color) {
         modifyItemMeta(builder -> {
-            final TextComponent component = createUnItalicText(text).decorate(decoration).color(TextColor.color(color.asRGB()));
+            final TextComponent component = createUnItalicText(text).decorate(decoration).color(color);
             builder.displayName(component);
             return builder;
         });

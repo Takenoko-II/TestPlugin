@@ -4,6 +4,8 @@ import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +18,7 @@ public class BungeeCordUtils {
 
     public static ItemStack getServerSelector() {
         return new ItemStackBuilder(Material.COMPASS)
-        .customName("Server Selector", Color.fromRGB(0x00FF55))
+        .customName("Server Selector", NamedTextColor.GREEN)
         .lore("Right Click to Open", Color.GRAY)
         .glint(true)
         .maxCount(1)
@@ -29,7 +31,7 @@ public class BungeeCordUtils {
         new ChestUIBuilder("Battle of Apostolos", 1)
         .set(1, builder -> {
             return builder.type(Material.NETHER_STAR)
-            .customName("Game", Color.AQUA)
+            .customName("Game", NamedTextColor.AQUA)
             .lore("ゲームサーバーに移動", Color.GRAY)
             .onClick(response -> {
                 transfer(player, "game");
@@ -40,7 +42,7 @@ public class BungeeCordUtils {
         })
         .set(3, builder -> {
             return builder.type(Material.PAPER)
-            .customName("Lobby", Color.WHITE)
+            .customName("Lobby")
             .lore("ロビーサーバーに移動", Color.GRAY)
             .glint(true)
             .onClick(response -> {
@@ -53,7 +55,7 @@ public class BungeeCordUtils {
         .set(5, builder -> {
             if (player.isOp()) {
                 return builder.type(Material.COMMAND_BLOCK)
-                .customName("Development", Color.ORANGE)
+                .customName("Development", NamedTextColor.GOLD)
                 .lore("開発サーバーに移動", Color.GRAY)
                 .glint(true)
                 .onClick(response -> {
@@ -64,7 +66,7 @@ public class BungeeCordUtils {
                 });
             }
             else return builder.type(Material.BARRIER)
-            .customName("Development", Color.ORANGE)
+            .customName("Development", NamedTextColor.GOLD)
             .lore("権限がないため利用できません", Color.RED)
             .onClick(response -> {
                 response.playSound(Sound.BLOCK_NOTE_BLOCK_BASS, 10, 1);
@@ -73,7 +75,7 @@ public class BungeeCordUtils {
         })
         .set(7, builder -> {
             return builder.type(Material.RED_BED)
-            .customName("Respawn", Color.RED)
+            .customName("Respawn", NamedTextColor.RED)
             .lore("ワールドのスポーンポイントに戻る", Color.GRAY)
             .onClick(response -> {
                 final Location spawnPoint = player.getWorld().getSpawnLocation();

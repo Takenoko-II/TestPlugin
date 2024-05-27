@@ -159,13 +159,13 @@ public class ChestUIBuilder {
             return this;
         }
 
-        public Button customName(String name, Color color) {
+        public Button customName(String name, TextColor color) {
             itemStackBuilder.customName(name, color);
 
             return this;
         }
 
-        public Button customName(String name, TextDecoration decoration, Color color) {
+        public Button customName(String name, TextDecoration decoration, TextColor color) {
             itemStackBuilder.customName(name, decoration, color);
 
             return this;
