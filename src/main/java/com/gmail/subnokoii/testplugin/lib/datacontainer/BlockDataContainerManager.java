@@ -1,6 +1,7 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
@@ -36,7 +37,7 @@ public final class BlockDataContainerManager extends DataContainerManager {
 
         final TileState tileState = (TileState) block.getState();
 
-        return new DataContainerAccessor(tileState.getPersistentDataContainer()).get(path, type);
+        return new DataContainerCompound(tileState.getPersistentDataContainer()).get(path, type);
     }
 
     /**
@@ -53,7 +54,7 @@ public final class BlockDataContainerManager extends DataContainerManager {
 
         final TileState tileState = (TileState) block.getState();
 
-        new DataContainerAccessor(tileState.getPersistentDataContainer()).set(path, value);
+        new DataContainerCompound(tileState.getPersistentDataContainer()).set(path, value);
 
         return this;
     }
@@ -71,7 +72,7 @@ public final class BlockDataContainerManager extends DataContainerManager {
 
         final TileState tileState = (TileState) block.getState();
 
-        new DataContainerAccessor(tileState.getPersistentDataContainer()).delete(path);
+        new DataContainerCompound(tileState.getPersistentDataContainer()).delete(path);
 
         return this;
     }
@@ -89,7 +90,7 @@ public final class BlockDataContainerManager extends DataContainerManager {
 
         final TileState tileState = (TileState) block.getState();
 
-        return new DataContainerAccessor(tileState.getPersistentDataContainer()).has(path);
+        return new DataContainerCompound(tileState.getPersistentDataContainer()).has(path);
     }
 
     /**
@@ -106,7 +107,7 @@ public final class BlockDataContainerManager extends DataContainerManager {
 
         final TileState tileState = (TileState) block.getState();
 
-        return new DataContainerAccessor(tileState.getPersistentDataContainer()).equals(path, value);
+        return new DataContainerCompound(tileState.getPersistentDataContainer()).equals(path, value);
     }
 
     /**
@@ -114,13 +115,13 @@ public final class BlockDataContainerManager extends DataContainerManager {
      * @return JSON化されたPersistentDataContainer
      */
     @Override
-    public Component toJson() {
+    public TextComponent toJson() {
         if (!(block.getState() instanceof TileState)) {
             return Component.text("{\n}").color(NamedTextColor.WHITE);
         }
 
         final TileState tileState = (TileState) block.getState();
 
-        return new DataContainerAccessor(tileState.getPersistentDataContainer()).toJson();
+        return new DataContainerCompound(tileState.getPersistentDataContainer()).toJson();
     }
 }

@@ -15,3 +15,5 @@ commands:
     description: 'プラグイン製のツールを取り出すためのUIを表示します'
   test:
     description: 'デバッグ用コマンドのため機能が頻繁に追加・削除・変更されます'
+  database:
+    description: 'データベーステスト用'

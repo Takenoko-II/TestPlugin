@@ -2,8 +2,8 @@ package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
 import com.gmail.subnokoii.testplugin.lib.file.BinaryFileUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +23,15 @@ public final class FileDataContainerManager extends DataContainerManager {
         }
 
         this.filePath = path;
+
+        final byte[] data = BinaryFileUtils.read(filePath);
+
+        if (data == null) {
+            setPersistentDataContainer(DataContainerManager.newContainer());
+        }
+        else if (data.length == 0) {
+            setPersistentDataContainer(DataContainerManager.newContainer());
+        }
     }
 
     private @Nullable PersistentDataContainer getPersistentDataContainer() {
@@ -68,7 +77,7 @@ public final class FileDataContainerManager extends DataContainerManager {
 
         if (container == null) return null;
 
-        return new DataContainerAccessor(container).get(path, type);
+        return new DataContainerCompound(container).get(path, type);
     }
 
     /**
@@ -85,7 +94,7 @@ public final class FileDataContainerManager extends DataContainerManager {
             container = DataContainerManager.newContainer();
         }
 
-        new DataContainerAccessor(container).set(path, value);
+        new DataContainerCompound(container).set(path, value);
 
         setPersistentDataContainer(container);
 
@@ -105,7 +114,7 @@ public final class FileDataContainerManager extends DataContainerManager {
             container = DataContainerManager.newContainer();
         }
 
-        new DataContainerAccessor(container).delete(path);
+        new DataContainerCompound(container).delete(path);
 
         setPersistentDataContainer(container);
         return this;
@@ -122,7 +131,7 @@ public final class FileDataContainerManager extends DataContainerManager {
 
         if (container == null) return false;
 
-        return new DataContainerAccessor(container).has(path);
+        return new DataContainerCompound(container).has(path);
     }
 
     /**
@@ -137,7 +146,7 @@ public final class FileDataContainerManager extends DataContainerManager {
 
         if (container == null) return false;
 
-        return new DataContainerAccessor(container).equals(path, value);
+        return new DataContainerCompound(container).equals(path, value);
     }
 
     /**
@@ -145,11 +154,11 @@ public final class FileDataContainerManager extends DataContainerManager {
      * @return JSON化されたPersistentDataContainer
      */
     @Override
-    public Component toJson() {
+    public TextComponent toJson() {
         final PersistentDataContainer container = getPersistentDataContainer();
 
         if (container == null) return Component.text("{\n}").color(NamedTextColor.WHITE);
 
-        return new DataContainerAccessor(container).toJson();
+        return new DataContainerCompound(container).toJson();
     }
 }

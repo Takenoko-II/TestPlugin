@@ -1,6 +1,6 @@
 com\gmail\subnokoii\testplugin\commands\Test.class
-com\gmail\subnokoii\testplugin\lib\datacontainer\DataContainerAccessor.class
 com\gmail\subnokoii\testplugin\lib\other\ScheduleUtils$3.class
+com\gmail\subnokoii\testplugin\lib\event\TestPluginEvent$EventRegistrar.class
 com\gmail\subnokoii\testplugin\lib\event\data\CustomItemUseEvent.class
 com\gmail\subnokoii\testplugin\lib\datacontainer\ItemStackDataContainerManager.class
 com\gmail\subnokoii\testplugin\commands\Tools.class
@@ -19,6 +19,7 @@ com\gmail\subnokoii\testplugin\commands\Lobby.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorBuilder$DimensionSize.class
 com\gmail\subnokoii\testplugin\commands\Log.class
 com\gmail\subnokoii\testplugin\lib\datacontainer\BlockDataContainerManager.class
+com\gmail\subnokoii\testplugin\commands\ManageDatabase.class
 com\gmail\subnokoii\testplugin\events\EntityEventListener.class
 com\gmail\subnokoii\testplugin\lib\event\data\PlayerClickEvent.class
 com\gmail\subnokoii\testplugin\lib\vector\RotationBuilder.class
@@ -33,9 +34,9 @@ com\gmail\subnokoii\testplugin\BungeeCordUtils.class
 com\gmail\subnokoii\testplugin\lib\other\DisplayEditor.class
 com\gmail\subnokoii\testplugin\lib\file\BinaryFileUtils.class
 com\gmail\subnokoii\testplugin\lib\ui\ChestUIClickEvent$Listener.class
-com\gmail\subnokoii\testplugin\lib\event\TestPluginEvent$EventRegisterer.class
 com\gmail\subnokoii\testplugin\lib\vector\Vector3Builder.class
 com\gmail\subnokoii\testplugin\commands\Foo.class
 com\gmail\subnokoii\testplugin\lib\other\ScheduleUtils$1.class
 com\gmail\subnokoii\testplugin\events\TickEventListener.class
+com\gmail\subnokoii\testplugin\lib\datacontainer\DataContainerCompound.class
 com\gmail\subnokoii\testplugin\lib\scoreboard\ScoreboardUtils$Objective.class

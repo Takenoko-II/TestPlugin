@@ -49,7 +49,7 @@ public class PlayerEventListener implements Listener {
         if (instance == null) {
             instance = new PlayerEventListener();
 
-            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.get());
+            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.getInstance());
 
             registerPluginEvents();
         }
@@ -72,7 +72,7 @@ public class PlayerEventListener implements Listener {
             if (type != null && content != null) {
                 switch (type) {
                     case "run_command":
-                        TestPlugin.runCommand(player, content);
+                        TestPlugin.runCommandAsEntity(player, content);
                         break;
                     case "multiple":
                         break;
@@ -119,7 +119,7 @@ public class PlayerEventListener implements Listener {
             if (type != null && content != null) {
                 switch (type) {
                     case "run_command":
-                        TestPlugin.runCommand(player, content);
+                        TestPlugin.runCommandAsEntity(player, content);
                         break;
                 }
             }

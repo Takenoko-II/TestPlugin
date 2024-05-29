@@ -1,6 +1,7 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -34,7 +35,7 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
 
         if (meta == null) return null;
 
-        return new DataContainerAccessor(meta.getPersistentDataContainer()).get(path, type);
+        return new DataContainerCompound(meta.getPersistentDataContainer()).get(path, type);
     }
 
     /**
@@ -49,7 +50,7 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
 
         if (meta == null) return this;
 
-        new DataContainerAccessor(meta.getPersistentDataContainer()).set(path, value);
+        new DataContainerCompound(meta.getPersistentDataContainer()).set(path, value);
 
         itemStack.setItemMeta(meta);
 
@@ -67,7 +68,7 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
 
         if (meta == null) return this;
 
-        new DataContainerAccessor(meta.getPersistentDataContainer()).delete(path);
+        new DataContainerCompound(meta.getPersistentDataContainer()).delete(path);
 
         itemStack.setItemMeta(meta);
 
@@ -85,7 +86,7 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
 
         if (meta == null) return false;
 
-        return new DataContainerAccessor(meta.getPersistentDataContainer()).has(path);
+        return new DataContainerCompound(meta.getPersistentDataContainer()).has(path);
     }
 
     /**
@@ -100,7 +101,7 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
 
         if (meta == null) return false;
 
-        return new DataContainerAccessor(meta.getPersistentDataContainer()).equals(path, value);
+        return new DataContainerCompound(meta.getPersistentDataContainer()).equals(path, value);
     }
 
     /**
@@ -108,11 +109,11 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
      * @return JSON化されたPersistentDataContainer
      */
     @Override
-    public Component toJson() {
+    public TextComponent toJson() {
         final ItemMeta meta = itemStack.getItemMeta();
 
         if (meta == null) return Component.text("{\n}").color(NamedTextColor.WHITE);
 
-        return new DataContainerAccessor(meta.getPersistentDataContainer()).toJson();
+        return new DataContainerCompound(meta.getPersistentDataContainer()).toJson();
     }
 }

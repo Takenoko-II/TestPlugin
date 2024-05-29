@@ -26,7 +26,7 @@ public class TickEventListener extends BukkitRunnable {
     public static void init() {
         if (instance == null) {
             instance = new TickEventListener();
-            instance.runTaskTimer(TestPlugin.get(), 0L, 1L);
+            instance.runTaskTimer(TestPlugin.getInstance(), 0L, 1L);
         }
     }
 

@@ -40,7 +40,7 @@ public class ChestUIClickEvent {
     }
 
     public boolean runCommand(String command) {
-        return TestPlugin.runCommand(player, command);
+        return TestPlugin.runCommandAsEntity(player, command);
     }
 
     public static final class Listener implements org.bukkit.event.Listener {
@@ -57,7 +57,7 @@ public class ChestUIClickEvent {
         public static void init() {
             if (instance == null) {
                 instance = new Listener();
-                Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.get());
+                Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.getInstance());
             }
         }
 

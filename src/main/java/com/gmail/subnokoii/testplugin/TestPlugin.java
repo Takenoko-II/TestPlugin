@@ -43,9 +43,12 @@ public final class TestPlugin extends JavaPlugin {
         setCommandManager("lobby", new Lobby());
         setCommandManager("tools", new Tools());
         setCommandManager("test", new Test());
+        setCommandManager("database", new ManageDatabase());
 
         // BungeeCordに接続
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
+        TestPlugin.runCommandAsConsole("database get");
     }
 
     @Override
@@ -57,7 +60,7 @@ public final class TestPlugin extends JavaPlugin {
      * このプラグインのインスタンスを返します。
      * @return TestPlugin
      */
-    public static TestPlugin get() {
+    public static TestPlugin getInstance() {
         return plugin;
     }
 
@@ -71,7 +74,7 @@ public final class TestPlugin extends JavaPlugin {
 
         switch (target.toLowerCase()) {
             case "server": {
-                get().getLogger().info(text);
+                getInstance().getLogger().info(text);
                 break;
             }
             case "plugin": {
@@ -101,7 +104,7 @@ public final class TestPlugin extends JavaPlugin {
      * @param command コマンドを表現する文字列
      * @return コマンドの実行結果
      */
-    public static boolean runCommand(Entity entity, String command) {
+    public static boolean runCommandAsEntity(Entity entity, String command) {
         try {
             final Boolean sendCommandFeedback = Objects.requireNonNullElse(entity.getWorld().getGameRuleValue(GameRule.SEND_COMMAND_FEEDBACK), true);
 
@@ -117,11 +120,26 @@ public final class TestPlugin extends JavaPlugin {
     }
 
     /**
+     * コマンドをコンソールに実行させます。
+     * ゲームルールを一時的に変更するためチャットへのログは流れません。
+     * @param command コマンドを表現する文字列
+     * @return コマンドの実行結果
+     */
+    public static boolean runCommandAsConsole(String command) {
+        try {
+            return Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+        }
+        catch (CommandException e) {
+            return false;
+        }
+    }
+
+    /**
      * TestPluginが管理する独自イベントを登録します。
      * @return TestPluginEvent.EventRegisterer
      */
-    public static TestPluginEvent.EventRegisterer events() {
-        return TestPluginEvent.EventRegisterer.get();
+    public static TestPluginEvent.EventRegistrar events() {
+        return TestPluginEvent.EventRegistrar.get();
     }
 
     /**

@@ -1,10 +1,7 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
 import com.gmail.subnokoii.testplugin.TestPlugin;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -14,10 +11,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
-public final class DataContainerAccessor {
+public final class DataContainerCompound {
     private final PersistentDataContainer container;
 
-    public DataContainerAccessor(PersistentDataContainer container) {
+    public DataContainerCompound(PersistentDataContainer container) {
         if (container == null) {
             throw new IllegalArgumentException("PersistentDataContainerが必要ですがnullが渡されました");
         }
@@ -30,7 +27,7 @@ public final class DataContainerAccessor {
     }
 
     private PersistentDataContainer access(List<String> keys, PersistentDataContainer container, BiConsumer<PersistentDataContainer, NamespacedKey> consumer) {
-        final NamespacedKey key = new NamespacedKey(TestPlugin.get(), keys.get(0));
+        final NamespacedKey key = new NamespacedKey(TestPlugin.getInstance(), keys.get(0));
         keys.remove(0);
 
         if (!keys.isEmpty()) {
@@ -63,7 +60,7 @@ public final class DataContainerAccessor {
         PersistentDataContainer container = this.container;
 
         for (int i = 0; i < keys.length; i++) {
-            final NamespacedKey namespacedKey = new NamespacedKey(TestPlugin.get(), keys[i]);
+            final NamespacedKey namespacedKey = new NamespacedKey(TestPlugin.getInstance(), keys[i]);
 
             if (container == null) {
                 return null;
@@ -96,7 +93,7 @@ public final class DataContainerAccessor {
      * @param value セットする値
      * @return このインスタンス
      */
-    public DataContainerAccessor set(String path, Object value) {
+    public DataContainerCompound set(String path, Object value) {
         access(parsePath(path), this.container, (container, key) -> {
             if (value instanceof Boolean) {
                 container.set(key, PersistentDataType.BOOLEAN, (Boolean) value);
@@ -125,8 +122,8 @@ public final class DataContainerAccessor {
             else if (value instanceof PersistentDataContainer) {
                 container.set(key, PersistentDataType.TAG_CONTAINER, (PersistentDataContainer) value);
             }
-            else if (value instanceof DataContainerAccessor) {
-                container.set(key, PersistentDataType.TAG_CONTAINER, ((DataContainerAccessor) value).container);
+            else if (value instanceof DataContainerCompound) {
+                container.set(key, PersistentDataType.TAG_CONTAINER, ((DataContainerCompound) value).container);
             }
             else if (value instanceof Boolean[]) {
                 container.set(key, PersistentDataType.LIST.booleans(), List.of((Boolean[]) value));
@@ -152,9 +149,9 @@ public final class DataContainerAccessor {
             else if (value instanceof PersistentDataContainer[]) {
                 container.set(key, PersistentDataType.LIST.dataContainers(), List.of((PersistentDataContainer[]) value));
             }
-            else if (value instanceof DataContainerAccessor[]) {
+            else if (value instanceof DataContainerCompound[]) {
                 final PersistentDataContainer[] list = Arrays
-                .stream(((DataContainerAccessor[]) value))
+                .stream(((DataContainerCompound[]) value))
                 .map(accessor -> accessor.container)
                 .toArray(PersistentDataContainer[]::new);
 
@@ -173,7 +170,7 @@ public final class DataContainerAccessor {
      * @param path 名前空間を省略したドット区切りのNBTパス
      * @return このインスタンス
      */
-    public DataContainerAccessor delete(String path) {
+    public DataContainerCompound delete(String path) {
         access(parsePath(path), container, (container, key) -> {
             container.remove(key);
         });
@@ -203,7 +200,7 @@ public final class DataContainerAccessor {
      * @return 等しい値であれば真
      */
     public boolean equals(String path, Object value) {
-        for (final PersistentDataType<?, ?> type : PERSISTENT_DATA_TYPES) {
+        for (final PersistentDataType<?, ?> type : DataContainerManager.PERSISTENT_DATA_TYPES) {
             if (Objects.equals(get(path, type), value)) {
                 return true;
             }
@@ -289,12 +286,12 @@ public final class DataContainerAccessor {
      * @param path 名前空間を省略したドット区切りのNBTパス
      * @return コンパウンドタグ、値が存在しないか型が違っていればnull
      */
-    public @Nullable DataContainerAccessor getCompound(String path) {
+    public @Nullable DataContainerCompound getCompound(String path) {
         final PersistentDataContainer dataContainer = get(path, PersistentDataType.TAG_CONTAINER);
 
         if (dataContainer == null) return null;
 
-        return new DataContainerAccessor(dataContainer);
+        return new DataContainerCompound(dataContainer);
     }
 
     /**
@@ -406,12 +403,12 @@ public final class DataContainerAccessor {
      * @param path 名前空間を省略したドット区切りのNBTパス
      * @return コンパウンドタグの配列、値が存在しないか型が違っていればnull
      */
-    public @Nullable DataContainerAccessor[] getCompoundArray(String path) {
+    public @Nullable DataContainerCompound[] getCompoundArray(String path) {
         final List<PersistentDataContainer> list = get(path, PersistentDataType.LIST.dataContainers());
 
         if (list == null) return null;
 
-        return list.stream().map(DataContainerAccessor::new).toArray(DataContainerAccessor[]::new);
+        return list.stream().map(DataContainerCompound::new).toArray(DataContainerCompound[]::new);
     }
 
     /**
@@ -420,7 +417,7 @@ public final class DataContainerAccessor {
      * @return Object型の値、値が存在しなければnull
      */
     public @Nullable Object getObject(String path) {
-        for (final PersistentDataType<?, ?> dataType : PERSISTENT_DATA_TYPES) {
+        for (final PersistentDataType<?, ?> dataType : DataContainerManager.PERSISTENT_DATA_TYPES) {
             final Object value = get(path, dataType);
 
             if (value == null) continue;
@@ -435,147 +432,7 @@ public final class DataContainerAccessor {
      * データをJSONに変換します。
      * @return JSON化されたPersistentDataContainer
      */
-    public Component toJson() {
-        return stringify(container, 1);
+    public TextComponent toJson() {
+        return DataContainerManager.stringify(container);
     }
-
-    private static Component stringify(Object value, int indentation) {
-        if (value instanceof PersistentDataContainer) {
-            final String[] keys = ((PersistentDataContainer) value).getKeys().stream().map(NamespacedKey::asString).toArray(String[]::new);
-
-            TextComponent component = Component.text("{").color(NamedTextColor.WHITE);
-
-            for (int i = 0; i < keys.length; i++) {
-                final String key = keys[i].replace(TestPlugin.get().getName().toLowerCase() + ":", "");
-
-                boolean foundTypeFlag = false;
-
-                for (final PersistentDataType<?, ?> type : PERSISTENT_DATA_TYPES) {
-                    final Object childValue = new DataContainerAccessor((PersistentDataContainer) value).get(key, type);
-
-                    if (childValue != null) {
-                        component = component.append(Component.text("\n"))
-                        .append(Component.text("  ".repeat(indentation)))
-                        .append(Component.text("\"").color(NamedTextColor.WHITE))
-                        .append(Component.text(key).color(TextColor.color(NamedTextColor.AQUA))
-                        .append(Component.text("\": ").color(NamedTextColor.WHITE)))
-                        .append(stringify(childValue, indentation + 1));
-
-                        if (i != keys.length - 1) {
-                            component = component.append(Component.text(",").color(NamedTextColor.WHITE));
-                        }
-
-                        foundTypeFlag = true;
-
-                        break;
-                    }
-                }
-
-                if (!foundTypeFlag) {
-                    component = component.append(Component.text("\n"))
-                    .append(Component.text("  ".repeat(indentation)))
-                    .append(Component.text("\"").color(NamedTextColor.WHITE))
-                    .append(Component.text(key).color(TextColor.color(NamedTextColor.AQUA))
-                    .append(Component.text("\": ").color(NamedTextColor.WHITE)))
-                    .append(
-                        Component.text("<").color(NamedTextColor.GRAY)
-                        .append(Component.text("Unsupported Type Value").color(NamedTextColor.RED))
-                        .append(Component.text(">").color(NamedTextColor.GRAY))
-                    );
-                }
-            }
-
-            return component
-            .append(Component.text("\n"))
-            .append(Component.text("  ".repeat(indentation - 1)))
-            .append(Component.text("}").color(NamedTextColor.WHITE));
-        }
-        else if (value instanceof String) {
-            return Component.text("\"").color(NamedTextColor.WHITE)
-            .append(Component.text(value.toString()).color(NamedTextColor.GREEN))
-            .append(Component.text("\"").color(NamedTextColor.WHITE));
-        }
-        else if (value instanceof Integer) {
-            return Component.text(value.toString()).color(NamedTextColor.GOLD);
-        }
-        else if (value instanceof Float) {
-            return Component.text(value.toString()).color(NamedTextColor.GOLD)
-            .append(Component.text("f").color(NamedTextColor.RED));
-        }
-        else if (value instanceof Byte) {
-            return Component.text(value.toString()).color(NamedTextColor.GOLD)
-            .append(Component.text("b").color(NamedTextColor.RED));
-        }
-        else if (value instanceof Boolean) {
-            if ((Boolean) value) {
-                return Component.text("1").color(NamedTextColor.GOLD)
-                .append(Component.text("b").color(NamedTextColor.RED));
-            }
-            else {
-                return Component.text("0").color(NamedTextColor.GOLD)
-                .append(Component.text("b").color(NamedTextColor.RED));
-            }
-        }
-        else if (value instanceof Double) {
-            return Component.text(value.toString()).color(NamedTextColor.GOLD)
-            .append(Component.text("d").color(NamedTextColor.RED));
-        }
-        else if (value instanceof Long) {
-            return Component.text(value.toString()).color(NamedTextColor.GOLD)
-            .append(Component.text("L").color(NamedTextColor.RED));
-        }
-        else if (value instanceof Short) {
-            return Component.text(value.toString()).color(NamedTextColor.GOLD)
-            .append(Component.text("s").color(NamedTextColor.RED));
-        }
-        else if (value instanceof List) {
-            final Object[] array = ((List<?>) value).toArray(Object[]::new);
-
-            Component component = Component.text("[\n").color(NamedTextColor.WHITE);
-
-            for (int i = 0; i < array.length; i++) {
-                final Object element = array[i];
-
-                component = component
-                .append(Component.text("  ".repeat(indentation)))
-                .append(stringify(element, indentation + 1));
-
-                if (i != array.length - 1) {
-                    component = component.append(Component.text(",\n").color(NamedTextColor.WHITE));
-                }
-            }
-
-            return component
-            .append(Component.text("\n"))
-            .append(Component.text("  ".repeat(indentation - 1) + "]").color(NamedTextColor.WHITE));
-        }
-        else return Component.text("<").color(NamedTextColor.GRAY)
-            .append(Component.text(value.getClass().getSimpleName()).color(TextColor.color(0, 255, 202)))
-            .append(Component.text(">").color(NamedTextColor.GRAY));
-
-    }
-
-    /**
-     * ほぼ全ての基本データ型のリスト
-     */
-    public static final PersistentDataType<?, ?>[] PERSISTENT_DATA_TYPES = new PersistentDataType[]{
-        PersistentDataType.BYTE,
-        PersistentDataType.BOOLEAN,
-        PersistentDataType.SHORT,
-        PersistentDataType.INTEGER,
-        PersistentDataType.LONG,
-        PersistentDataType.FLOAT,
-        PersistentDataType.DOUBLE,
-        PersistentDataType.STRING,
-        PersistentDataType.TAG_CONTAINER,
-        PersistentDataType.LIST.bytes(),
-        PersistentDataType.LIST.booleans(),
-        PersistentDataType.LIST.shorts(),
-        PersistentDataType.LIST.integers(),
-        PersistentDataType.LIST.longs(),
-        PersistentDataType.LIST.floats(),
-        PersistentDataType.LIST.doubles(),
-        PersistentDataType.LIST.strings(),
-        PersistentDataType.LIST.dataContainers()
-    };
 }

@@ -18,7 +18,7 @@ public class ScheduleUtils {
                 callback.run();
             }
         }
-        .runTaskLater(TestPlugin.get(), delay);
+        .runTaskLater(TestPlugin.getInstance(), delay);
     }
 
     /**
@@ -31,7 +31,7 @@ public class ScheduleUtils {
                 callback.run();
             }
         }
-        .runTaskLater(TestPlugin.get(), 0L);
+        .runTaskLater(TestPlugin.getInstance(), 0L);
     }
 
     /**

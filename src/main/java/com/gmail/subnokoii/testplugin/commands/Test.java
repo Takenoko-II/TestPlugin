@@ -2,14 +2,11 @@ package com.gmail.subnokoii.testplugin.commands;
 
 import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
-import com.gmail.subnokoii.testplugin.lib.datacontainer.EntityDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
-import com.gmail.subnokoii.testplugin.lib.datacontainer.DataContainerAccessor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -49,17 +46,17 @@ public class Test implements CommandExecutor, TabCompleter {
                 else {
                     switch (args[1]) {
                         case "plugin_name": {
-                            final String name = TestPlugin.get().getName();
+                            final String name = TestPlugin.getInstance().getName();
                             sender.sendMessage("現在のプラグイン名は" + name + "です");
                             break;
                         }
                         case "api_version": {
-                            final String version = TestPlugin.get().getPluginMeta().getAPIVersion();
+                            final String version = TestPlugin.getInstance().getPluginMeta().getAPIVersion();
                             sender.sendMessage("APIのバージョンは" + version + "です");
                             break;
                         }
                         case "ip": {
-                            final String ip = TestPlugin.get().getServer().getIp();
+                            final String ip = TestPlugin.getInstance().getServer().getIp();
 
                             if (ip.isEmpty()) sender.sendMessage("このサーバーはIPを持っていません");
                             else sender.sendMessage("このサーバーのIPは" + ip + "です");
@@ -67,17 +64,17 @@ public class Test implements CommandExecutor, TabCompleter {
                             break;
                         }
                         case "port": {
-                            final int port = TestPlugin.get().getServer().getPort();
+                            final int port = TestPlugin.getInstance().getServer().getPort();
                             sender.sendMessage("このサーバーのポートは" + port + "です");
                             break;
                         }
                         case "current_tick": {
-                            final int tick = TestPlugin.get().getServer().getCurrentTick();
+                            final int tick = TestPlugin.getInstance().getServer().getCurrentTick();
                             sender.sendMessage("現在のtickは" + tick + "です");
                             break;
                         }
                         case "max_players": {
-                            final int maxPlayers = TestPlugin.get().getServer().getMaxPlayers();
+                            final int maxPlayers = TestPlugin.getInstance().getServer().getMaxPlayers();
                             sender.sendMessage("このサーバーのプレイヤーの最大人数は" + maxPlayers + "です");
                             break;
                         }
@@ -97,7 +94,7 @@ public class Test implements CommandExecutor, TabCompleter {
                             break;
                         }
                         case "bukkit_version": {
-                            final String version = TestPlugin.get().getServer().getBukkitVersion();
+                            final String version = TestPlugin.getInstance().getServer().getBukkitVersion();
                             sender.sendMessage("このサーバーのBukkitのバージョンは" + version + "です");
                             break;
                         }

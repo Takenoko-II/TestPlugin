@@ -37,11 +37,11 @@ public class TestPluginEvent implements Listener {
     public static void init() {
         if (instance == null) {
             instance = new TestPluginEvent();
-            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.get());
+            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.getInstance());
         }
     }
 
-    public static final class EventRegisterer {
+    public static final class EventRegistrar {
         public void onLeftClick(Consumer<PlayerClickEvent> listener) {
             TestPluginEvent.get().playerLeftClickEventListeners.add(listener);
         }
@@ -58,14 +58,14 @@ public class TestPluginEvent implements Listener {
             TestPluginEvent.get().dataPackMessageReceiveEventListeners.add(listener);
         }
 
-        private EventRegisterer() {}
+        private EventRegistrar() {}
 
-        private static EventRegisterer registerer;
+        private static EventRegistrar registrar;
 
-        public static EventRegisterer get() {
-            if (registerer == null) registerer = new EventRegisterer();
+        public static EventRegistrar get() {
+            if (registrar == null) registrar = new EventRegistrar();
 
-            return registerer;
+            return registrar;
         }
     }
 
@@ -169,7 +169,7 @@ public class TestPluginEvent implements Listener {
         if (!entity.getType().equals(EntityType.MARKER)) return;
 
         final Set<String> tags = entity.getScoreboardTags();
-        final String namespace = TestPlugin.get().getName().toLowerCase() + ":";
+        final String namespace = TestPlugin.getInstance().getName().toLowerCase() + ":";
 
         tags.forEach(tag -> {
             if (tag.startsWith(namespace)) {

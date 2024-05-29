@@ -1,6 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +28,7 @@ public final class EntityDataContainerManager extends DataContainerManager {
      */
     @Override
     public @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
-        return new DataContainerAccessor(entity.getPersistentDataContainer()).get(path, type);
+        return new DataContainerCompound(entity.getPersistentDataContainer()).get(path, type);
     }
 
     /**
@@ -39,7 +39,7 @@ public final class EntityDataContainerManager extends DataContainerManager {
      */
     @Override
     public EntityDataContainerManager set(String path, Object value) {
-        new DataContainerAccessor(entity.getPersistentDataContainer()).set(path, value);
+        new DataContainerCompound(entity.getPersistentDataContainer()).set(path, value);
 
         return this;
     }
@@ -51,7 +51,7 @@ public final class EntityDataContainerManager extends DataContainerManager {
      */
     @Override
     public EntityDataContainerManager delete(String path) {
-        new DataContainerAccessor(entity.getPersistentDataContainer()).delete(path);
+        new DataContainerCompound(entity.getPersistentDataContainer()).delete(path);
 
         return this;
     }
@@ -63,7 +63,7 @@ public final class EntityDataContainerManager extends DataContainerManager {
      */
     @Override
     public boolean has(String path) {
-        return new DataContainerAccessor(entity.getPersistentDataContainer()).has(path);
+        return new DataContainerCompound(entity.getPersistentDataContainer()).has(path);
     }
 
     /**
@@ -74,7 +74,7 @@ public final class EntityDataContainerManager extends DataContainerManager {
      */
     @Override
     public boolean equals(String path, Object value) {
-        return new DataContainerAccessor(entity.getPersistentDataContainer()).equals(path, value);
+        return new DataContainerCompound(entity.getPersistentDataContainer()).equals(path, value);
     }
 
     /**
@@ -82,7 +82,7 @@ public final class EntityDataContainerManager extends DataContainerManager {
      * @return JSON化されたPersistentDataContainer
      */
     @Override
-    public Component toJson() {
-        return new DataContainerAccessor(entity.getPersistentDataContainer()).toJson();
+    public TextComponent toJson() {
+        return new DataContainerCompound(entity.getPersistentDataContainer()).toJson();
     }
 }

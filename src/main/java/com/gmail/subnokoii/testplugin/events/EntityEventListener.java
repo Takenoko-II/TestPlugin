@@ -32,8 +32,8 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
         if (instance == null) {
             instance = new EntityEventListener();
 
-            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.get());
-            instance.runTaskTimer(TestPlugin.get(), 0L, 1L);
+            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.getInstance());
+            instance.runTaskTimer(TestPlugin.getInstance(), 0L, 1L);
 
             registerPluginEvents();
         }

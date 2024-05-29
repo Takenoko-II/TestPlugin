@@ -5,7 +5,6 @@ import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -78,7 +77,7 @@ public class BungeeCordUtils {
             .customName("Respawn", NamedTextColor.RED)
             .lore("ワールドのスポーンポイントに戻る", Color.GRAY)
             .onClick(response -> {
-                final Location spawnPoint = player.getWorld().getSpawnLocation();
+                final Location spawnPoint = player.getWorld().getSpawnLocation().add(0.5d, 0.0d, 0.5d);
                 player.teleport(spawnPoint);
                 player.sendMessage("スポーンポイントに戻ります...");
                 response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
@@ -94,7 +93,7 @@ public class BungeeCordUtils {
         output.writeUTF(targetServer);
         final byte[] data = output.toByteArray();
 
-        player.sendPluginMessage(TestPlugin.get(), "BungeeCord", data);
+        player.sendPluginMessage(TestPlugin.getInstance(), "BungeeCord", data);
 
         TestPlugin.log("Plugin", player.getName() + "からBungeeCordチャンネルにプラグインメッセージが送信されました: [\"Connect\", \"" + targetServer + "\"]");
     }

@@ -236,9 +236,9 @@ public class Vector3Builder implements VectorBuilder {
         .replaceAll("\\$x", x)
         .replaceAll("\\$y", y)
         .replaceAll("\\$z", z)
-        .replace("$c", x)
-        .replace("$c", y)
-        .replace("$c", z)
+        .replaceFirst("\\$c", x)
+        .replaceFirst("\\$c", y)
+        .replaceFirst("\\$c", z)
         .replaceAll("\\$c", "");
     }
 

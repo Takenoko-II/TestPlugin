@@ -136,8 +136,8 @@ public class RotationBuilder implements VectorBuilder {
         return format
         .replaceAll("\\$x", yaw)
         .replaceAll("\\$y", pitch)
-        .replace("$c", yaw)
-        .replace("$c", pitch)
+        .replaceFirst("\\$c", yaw)
+        .replaceFirst("\\$c", pitch)
         .replaceAll("\\$c", "");
     }
 
