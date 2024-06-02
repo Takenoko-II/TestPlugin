@@ -33,6 +33,7 @@ public class Vector3Builder implements VectorBuilder {
         System.arraycopy(allComponents, 0, components, 0, allComponents.length);
     }
 
+    @Override
     public double getComponent(int index) {
         if (index > components.length - 1) {
             throw new DimensionSizeMismatchException();
@@ -41,10 +42,12 @@ public class Vector3Builder implements VectorBuilder {
         return components[index];
     }
 
+    @Override
     public double[] getAllComponents() {
         return components.clone();
     }
 
+    @Override
     public Vector3Builder setComponent(int index, double component) {
         if (index > 2) {
             throw new DimensionSizeMismatchException();
@@ -55,6 +58,7 @@ public class Vector3Builder implements VectorBuilder {
         return this;
     }
 
+    @Override
     public Vector3Builder setAllComponents(double[] allComponents) {
         if (allComponents.length != 3) {
             throw new DimensionSizeMismatchException();
@@ -157,7 +161,7 @@ public class Vector3Builder implements VectorBuilder {
     }
 
     public Vector3Builder subtract(Vector3Builder vector3) {
-        return add(vector3.inverted());
+        return add(vector3.copy().inverted());
     }
 
     public Vector3Builder subtract(double x, double y, double z) {
@@ -176,22 +180,22 @@ public class Vector3Builder implements VectorBuilder {
         return scale(-1d);
     }
 
-    public Vector3Builder directionTo(Vector3Builder vector3) {
+    public Vector3Builder getDirectionTo(Vector3Builder vector3) {
         return vector3.copy()
         .subtract(this)
         .normalized();
     }
 
-    public double getDistanceBetween(Vector3Builder vector3) {
-        double summaryOfSquare = 0d;
+    public double getDistanceBetween(Vector3Builder other) {
+        double sumOfSquare = 0d;
 
         for (int i = 0; i < 3; i++) {
             final double a = components[i];
-            final double b = vector3.getComponent(i);
-            summaryOfSquare += (a - b) * (a - b);
+            final double b = other.components[i];
+            sumOfSquare += (a - b) * (a - b);
         }
 
-        return Math.sqrt(summaryOfSquare);
+        return Math.sqrt(sumOfSquare);
     }
 
     public Vector3Builder projection(Vector3Builder vector3) {
@@ -278,8 +282,8 @@ public class Vector3Builder implements VectorBuilder {
 
     public RotationBuilder getRotation2d() {
         return new RotationBuilder(
-            -Math.asin(y() / length()) * 180d / Math.PI,
-            -Math.atan2(x() / length(), z() / length()) * 180d / Math.PI
+            -Math.atan2(x() / length(), z() / length()) * 180d / Math.PI,
+            -Math.asin(y() / length()) * 180d / Math.PI
         );
     }
 

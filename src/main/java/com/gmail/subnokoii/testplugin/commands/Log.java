@@ -70,10 +70,10 @@ public class Log implements CommandExecutor, TabCompleter {
                 final String text = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
                 if (args[0].equals("server")) {
-                    TestPlugin.log("Server", text);
+                    TestPlugin.log(TestPlugin.LoggingTarget.SERVER, text);
                 }
                 else if (args[0].equals("plugin")) {
-                    TestPlugin.log("Plugin", text);
+                    TestPlugin.log(TestPlugin.LoggingTarget.PLUGIN, text);
                 }
                 else {
                     commandSender.sendMessage(Component.text("送信先が無効です").color(TextColor.color(252, 64, 72)));
@@ -91,9 +91,9 @@ public class Log implements CommandExecutor, TabCompleter {
                     }
 
                     if (args[2].equals("archive")) {
-                        for (final String file : TextFileUtils.getAll("logs")) {
-                            TextFileUtils.delete(file);
-                        }
+                        Arrays.stream(TextFileUtils.getAll("logs"))
+                        .filter(path -> path.endsWith(".log.gz"))
+                        .forEach(TextFileUtils::delete);
                     }
                     else if (args[2].equals("latest")) {
                         TextFileUtils.erase("logs/latest.log");

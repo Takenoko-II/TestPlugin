@@ -401,10 +401,6 @@ public abstract class DataContainerManager {
         return stringify(value, 1);
     }
 
-    private DataContainerCompound parseCompound(String value) {
-        return DataContainerManager.newCompound();
-    }
-
     /**
      * PersistentDataContainerを新たに作成します。
      * @return 新しい空のPersistentDataContainer

@@ -27,7 +27,7 @@ public class RotationBuilder implements VectorBuilder {
             throw new DimensionSizeMismatchException();
         }
 
-        double[] newArray = new double[2];
+        final double[] newArray = new double[2];
         System.arraycopy(allComponents, 0, newArray, 0, allComponents.length);
 
         components = newArray;
@@ -90,7 +90,7 @@ public class RotationBuilder implements VectorBuilder {
         return (RotationBuilder) VectorBuilder.super.calc(operator);
     }
 
-    public RotationBuilder calc(Vector3Builder other, BiFunction<Double, Double, Double> operator) {
+    public RotationBuilder calc(RotationBuilder other, BiFunction<Double, Double, Double> operator) {
         return (RotationBuilder) VectorBuilder.super.calc(other, operator);
     }
 
@@ -122,7 +122,7 @@ public class RotationBuilder implements VectorBuilder {
     }
 
     public RotationBuilder add(RotationBuilder addend) {
-        return (RotationBuilder) calc(addend, Double::sum);
+        return calc(addend, Double::sum);
     }
 
     public RotationBuilder subtract(RotationBuilder subtrahend) {

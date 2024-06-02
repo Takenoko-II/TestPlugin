@@ -10,14 +10,13 @@ import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.other.DisplayEditor;
 import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
+import com.gmail.subnokoii.testplugin.lib.vector.Shape;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
+import org.bukkit.Color;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
@@ -134,16 +133,14 @@ public class PlayerEventListener implements Listener {
 
                     final Block block = player.getTargetBlockExact(127);
                     final BlockFace face = player.getTargetBlockFace(127);
-                    final Location previousLocation = player.getLocation();
 
                     if (block == null || face == null) break;
 
-                    final Vector3Builder location = Vector3Builder.from(block.getLocation());
-                    final Vector3Builder direction = RotationBuilder.from(previousLocation).getDirection3d();
+                    final Vector3Builder direction = RotationBuilder.from(player).getDirection3d();
 
-                    location.add(new Vector3Builder(face.getModX(), face.getModY(), face.getModZ())).subtract(direction.length(0.5d));
-
-                    final Location destination = location.toLocation(previousLocation);
+                    final Location destination = Vector3Builder.from(block, face)
+                    .subtract(direction.length(0.5d))
+                    .toLocation(player.getLocation());
 
                     player.teleport(destination);
                     player.getWorld().playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, 10.0f, 2.0f);
@@ -281,12 +278,12 @@ public class PlayerEventListener implements Listener {
     public void onLogin(PlayerLoginEvent event) {
         final Player player = event.getPlayer();
 
-        TestPlugin.log("Plugin", player.getName() + " joined the server.");
+        TestPlugin.log(TestPlugin.LoggingTarget.PLUGIN, player.getName() + " joined the server.");
     }
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
-        TestPlugin.log("Plugin", event.getPlayer().getName() + " left.");
+        TestPlugin.log(TestPlugin.LoggingTarget.PLUGIN, event.getPlayer().getName() + " left.");
     }
 
     public void onLeftClick(PlayerClickEvent event) {
@@ -320,8 +317,98 @@ public class PlayerEventListener implements Listener {
                     player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 5f, 1f);
                     break;
                 }
+                case "magic": {
+                    final Runnable runner = () -> {
+                        final Vector3Builder.LocalAxes localAxes = RotationBuilder.from(player).getDirection3d().getLocalAxes();
+                        final Vector3Builder x = localAxes.getX().length(Math.floor(Math.random() * 10) + 1 - 5);
+                        final Vector3Builder y = localAxes.getY().length(Math.floor(Math.random() * 5 + 1 - 2.5));
+
+                        magicCircle(player, x.copy().add(y), (float) (Math.floor(Math.random() * 3) + 1));
+                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 10f, 0.8f);
+                    };
+
+                    ScheduleUtils.runTimeoutByGameTick(runner, 0);
+                    ScheduleUtils.runTimeoutByGameTick(runner, 6);
+                    ScheduleUtils.runTimeoutByGameTick(runner, 12);
+                    ScheduleUtils.runTimeoutByGameTick(runner, 18);
+                    ScheduleUtils.runTimeoutByGameTick(runner, 24);
+                    ScheduleUtils.runTimeoutByGameTick(runner, 30);
+
+                    break;
+                }
             }
         }
+    }
+
+    private void magicCircle(Player player, Vector3Builder offset, float size) {
+        final Vector3Builder center = Vector3Builder.from(player.getEyeLocation())
+        .add(RotationBuilder.from(player).getDirection3d().length(2))
+        .add(offset);
+
+        final World world = player.getWorld();
+
+        final Shape pointedStar = new Shape(Shape.Type.EIGHT_POINTED_STAR, RotationBuilder.from(player));
+        pointedStar.setScale(size);
+        pointedStar.rotate((float) (Math.random() * 360));
+        pointedStar.setParticleDecoration(new Shape.DustDecoration().setCount(3));
+        pointedStar.draw(world, center);
+
+        final Shape pentagram = new Shape(Shape.Type.PENTAGRAM, RotationBuilder.from(player));
+        pentagram.setScale(size / 2);
+        pentagram.rotate((float) (Math.random() * 360));
+        pentagram.setParticleDecoration(new Shape.DustDecoration().setSize(0.75f).setCount(3));
+        pentagram.draw(world, center);
+
+        final Shape circle = new Shape(Shape.Type.PERFECT_CIRCLE, RotationBuilder.from(player));
+        circle.setScale(size);
+        circle.setParticleDecoration(new Shape.DustDecoration().setSize(0.75f));
+        circle.draw(world, center);
+
+        final Shape smallCircle = new Shape(Shape.Type.PERFECT_CIRCLE, RotationBuilder.from(player));
+        smallCircle.setDensity(0.05f);
+        smallCircle.setScale(size / 4);
+        smallCircle.setParticleDecoration(
+            new Shape.DustTransitionDecoration()
+            .setFromColor(Color.fromRGB(0xC406FF))
+            .setToColor(Color.BLACK)
+        );
+
+        for (int i = 0; i < 8; i++) {
+            final Vector3Builder vector = circle.getPointOnCircle(center, (float) (Math.random() * 360));
+            smallCircle.draw(world, vector);
+        }
+
+        final Vector3Builder target = Vector3Builder.from(player.getEyeLocation())
+        .add(RotationBuilder.from(player).getDirection3d().length(20));
+
+        final RotationBuilder direction = center.getDirectionTo(target).getRotation2d();
+
+        final Shape line = new Shape(Shape.Type.STRAIGHT_LINE, direction);
+        line.setScale(30);
+        line.setParticleDecoration(new Shape.DustDecoration().setColor(Color.fromRGB(0xFF0000)));
+        line.draw(world, center);
+
+        final Shape.ParticleDecoration flame = new Shape.ParticleDecoration(Particle.FLAME);
+        flame.getOffset().add(new Vector3Builder(0.5, 0.5, 0.5));
+        flame.setSpeed(0.2);
+        line.setParticleDecoration(flame);
+        line.draw(world, center);
+
+        world.spawnParticle(
+            Particle.PORTAL,
+            center.toLocation(world),
+            30,
+            0.8d, 0.8d, 0.8d,
+            1.0d
+        );
+
+        world.spawnParticle(
+            Particle.FLASH,
+            center.toLocation(world),
+            3,
+            0.0d, 0.0d, 0.0d,
+            0.0d
+        );
     }
 
     @EventHandler

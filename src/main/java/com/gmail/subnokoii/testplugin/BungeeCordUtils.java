@@ -95,6 +95,6 @@ public class BungeeCordUtils {
 
         player.sendPluginMessage(TestPlugin.getInstance(), "BungeeCord", data);
 
-        TestPlugin.log("Plugin", player.getName() + "からBungeeCordチャンネルにプラグインメッセージが送信されました: [\"Connect\", \"" + targetServer + "\"]");
+        TestPlugin.log(TestPlugin.LoggingTarget.PLUGIN, player.getName() + "からBungeeCordチャンネルにプラグインメッセージが送信されました: [\"Connect\", \"" + targetServer + "\"]");
     }
 }

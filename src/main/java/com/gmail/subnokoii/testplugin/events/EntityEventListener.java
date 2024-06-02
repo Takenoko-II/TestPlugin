@@ -51,8 +51,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
                     final String message = String.join(" ", parameters);
 
-                    TestPlugin.log("Server", message);
-                    TestPlugin.log("Plugin", message);
+                    TestPlugin.log(TestPlugin.LoggingTarget.ALL, message);
 
                     break;
                 }
@@ -210,7 +209,6 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
         if (Objects.equals(grapplingHookExists.get(player), true)) {
             grapplingHookExists.put(player, false);
-            TestPlugin.log("Plugin", "set to false");
         }
     }
 

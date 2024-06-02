@@ -2,6 +2,7 @@ package com.gmail.subnokoii.testplugin;
 
 import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.*;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.EntityDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
@@ -9,11 +10,14 @@ import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEvent;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
@@ -28,7 +32,7 @@ public final class TestPlugin extends JavaPlugin {
         // 準備
         plugin = this;
 
-        TestPlugin.log("*", "TestPluginが起動しました");
+        TestPlugin.log(LoggingTarget.ALL, "TestPluginが起動しました");
 
         // イベントリスナー登録
         TestPluginEvent.init();
@@ -48,12 +52,12 @@ public final class TestPlugin extends JavaPlugin {
         // BungeeCordに接続
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-        TestPlugin.runCommandAsConsole("database get");
+        getComponentLogger().info(TestPlugin.database().toJson());
     }
 
     @Override
     public void onDisable() {
-        TestPlugin.log("*", "TestPluginが停止しました");
+        TestPlugin.log(LoggingTarget.ALL, "TestPluginが停止しました");
     }
 
     /**
@@ -66,18 +70,18 @@ public final class TestPlugin extends JavaPlugin {
 
     /**
      * ログにメッセージを書き込みます。
-     * @param target 書き込み先("Server" | "Plugin")
+     * @param target 書き込み先(TestPlugin.LoggingTarget)
      * @param messages メッセージ(複数可)
      */
-    public static void log(String target, String... messages) {
+    public static void log(LoggingTarget target, String... messages) {
         final String text = String.join(", ", messages);
 
-        switch (target.toLowerCase()) {
-            case "server": {
+        switch (target) {
+            case SERVER: {
                 getInstance().getLogger().info(text);
                 break;
             }
-            case "plugin": {
+            case PLUGIN: {
                 final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                 final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
@@ -86,9 +90,9 @@ public final class TestPlugin extends JavaPlugin {
 
                 break;
             }
-            case "*": {
-                log("Server", messages);
-                log("Plugin", messages);
+            case ALL: {
+                log(LoggingTarget.SERVER, messages);
+                log(LoggingTarget.PLUGIN, messages);
                 break;
             }
             default: {
@@ -163,4 +167,10 @@ public final class TestPlugin extends JavaPlugin {
     private static final String LOG_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.log";
 
     private static final String DATABASE_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.bin";
+
+    public enum LoggingTarget {
+        SERVER,
+        PLUGIN,
+        ALL
+    }
 }
