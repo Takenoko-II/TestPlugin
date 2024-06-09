@@ -6,8 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
@@ -181,6 +180,10 @@ public class Vector3Builder implements VectorBuilder {
     }
 
     public Vector3Builder getDirectionTo(Vector3Builder vector3) {
+        if (this.equals(vector3)) {
+            throw new IllegalArgumentException("2つのベクトルは完全に一致しています");
+        }
+
         return vector3.copy()
         .subtract(this)
         .normalized();
@@ -259,15 +262,15 @@ public class Vector3Builder implements VectorBuilder {
         return new LocalAxes(this);
     }
 
-    public Location toLocation(Location location) {
+    public Location withLocation(Location location) {
         return new Location(location.getWorld(), x(), y(), z(), location.getYaw(), location.getPitch());
     }
 
-    public Location toLocation(RotationBuilder rotation, World world) {
+    public Location withRotationAndWorld(RotationBuilder rotation, World world) {
         return new Location(world, x(), y(), z(), rotation.yaw(), rotation.pitch());
     }
 
-    public Location toLocation(World world) {
+    public Location withWorld(World world) {
         return new Location(world, x(), y(), z(), 0, 0);
     }
 
@@ -285,6 +288,23 @@ public class Vector3Builder implements VectorBuilder {
             -Math.atan2(x() / length(), z() / length()) * 180d / Math.PI,
             -Math.asin(y() / length()) * 180d / Math.PI
         );
+    }
+
+    public Vector3Builder selectClosest(Vector3Builder... points) {
+        if (points.length == 0) {
+            throw new IllegalArgumentException("配列の長さが0です");
+        }
+
+        int index = -1;
+        double distance = Double.POSITIVE_INFINITY;
+
+        for (int i = 0; i < points.length; i++) {
+            if (distance > getDistanceBetween(points[i])) {
+                index = i;
+            }
+        }
+
+        return points[index];
     }
 
     public org.bukkit.util.Vector toBukkitVector() {
@@ -342,7 +362,9 @@ public class Vector3Builder implements VectorBuilder {
 
     public static final class LocalAxes {
         private final Vector3Builder x;
+
         private final Vector3Builder y;
+
         private final Vector3Builder z;
 
         public LocalAxes(Vector3Builder forward) {

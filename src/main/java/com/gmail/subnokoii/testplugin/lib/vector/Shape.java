@@ -57,7 +57,7 @@ public final class Shape {
             if (decoration instanceof DustDecoration) {
                 world.spawnParticle(
                     decoration.particle,
-                    vector3.toLocation(world),
+                    vector3.withWorld(world),
                     decoration.count,
                     decoration.offset.x(), decoration.offset.y(), decoration.offset.z(),
                     decoration.speed,
@@ -70,7 +70,7 @@ public final class Shape {
             else if (decoration instanceof DustTransitionDecoration) {
                 world.spawnParticle(
                     decoration.particle,
-                    vector3.toLocation(world),
+                    vector3.withWorld(world),
                     decoration.count,
                     decoration.offset.x(), decoration.offset.y(), decoration.offset.z(),
                     decoration.speed,
@@ -84,7 +84,7 @@ public final class Shape {
             else {
                 world.spawnParticle(
                     decoration.particle,
-                    vector3.toLocation(world),
+                    vector3.withWorld(world),
                     decoration.count,
                     decoration.offset.x(), decoration.offset.y(), decoration.offset.z(),
                     decoration.speed

@@ -9,6 +9,7 @@ import com.gmail.subnokoii.testplugin.lib.other.ScheduleUtils;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.other.DisplayEditor;
 import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
+import com.gmail.subnokoii.testplugin.lib.vector.TiltedBoundingBox;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import com.gmail.subnokoii.testplugin.lib.vector.Shape;
 import net.kyori.adventure.text.Component;
@@ -25,6 +26,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.BoundingBox;
 
 import java.util.HashMap;
 import java.util.ListIterator;
@@ -85,7 +87,7 @@ public class PlayerEventListener implements Listener {
                     Vector3Builder.from(player)
                     .add(0, 1.3, 0)
                     .add(axes.getZ().scale(1.75))
-                    .toLocation(player.getWorld()),
+                    .withWorld(player.getWorld()),
                     new ItemStackBuilder(Material.KNOWLEDGE_BOOK)
                     .customModelData(24792)
                     .build()
@@ -140,7 +142,7 @@ public class PlayerEventListener implements Listener {
 
                     final Location destination = Vector3Builder.from(block, face)
                     .subtract(direction.length(0.5d))
-                    .toLocation(player.getLocation());
+                    .withLocation(player.getLocation());
 
                     player.teleport(destination);
                     player.getWorld().playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, 10.0f, 2.0f);
@@ -195,6 +197,28 @@ public class PlayerEventListener implements Listener {
                 case "server_selector": {
                     event.cancel();
                     BungeeCordUtils.openServerSelector(player);
+                    break;
+                }
+                case "boundingBox": {
+                    final TiltedBoundingBox boundingBox = new TiltedBoundingBox(2, 1, 3);
+                    boundingBox.put(
+                        player.getWorld(),
+                        Vector3Builder.from(player.getEyeLocation())
+                        .add(RotationBuilder.from(player).getDirection3d().scale(2))
+                    );
+
+                    final RotationBuilder rotation = RotationBuilder.from(player);
+                    rotation.pitch(0);
+                    rotation.add(new RotationBuilder(90, Math.floor(Math.random() * 180) + 1 - 90));
+                    boundingBox.rotate(rotation);
+                    boundingBox.displayOutline();
+
+                    for (Entity entity : boundingBox.getIntersection()) {
+                        if (entity instanceof Damageable) {
+                            ((Damageable) entity).damage(1);
+                        }
+                    }
+                    break;
                 }
             }
         });
@@ -396,7 +420,7 @@ public class PlayerEventListener implements Listener {
 
         world.spawnParticle(
             Particle.PORTAL,
-            center.toLocation(world),
+            center.withWorld(world),
             30,
             0.8d, 0.8d, 0.8d,
             1.0d
@@ -404,7 +428,7 @@ public class PlayerEventListener implements Listener {
 
         world.spawnParticle(
             Particle.FLASH,
-            center.toLocation(world),
+            center.withWorld(world),
             3,
             0.0d, 0.0d, 0.0d,
             0.0d

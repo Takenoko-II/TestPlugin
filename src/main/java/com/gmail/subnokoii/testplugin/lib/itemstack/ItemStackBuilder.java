@@ -20,7 +20,7 @@ import java.util.function.UnaryOperator;
 public class ItemStackBuilder {
     private ItemStack itemStack;
 
-    private void modifyItemMeta(UnaryOperator<ItemMeta> builder) {
+    private void edit(UnaryOperator<ItemMeta> builder) {
         final ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (itemMeta == null) return;
@@ -69,7 +69,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder maxCount(int count) {
-        modifyItemMeta(meta -> {
+        edit(meta -> {
             meta.setMaxStackSize(count);
             return meta;
         });
@@ -78,7 +78,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder itemName(String text, TextDecoration decoration, TextColor color) {
-        modifyItemMeta(meta -> {
+        edit(meta -> {
             meta.itemName(Component.text(text).decorate(decoration).color(color));
             return meta;
         });
@@ -87,7 +87,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder customName(String text) {
-        modifyItemMeta(meta -> {
+        edit(meta -> {
             final TextComponent component = createUnItalicText(text);
             meta.displayName(component);
             return meta;
@@ -97,7 +97,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder customName(String text, TextDecoration decoration) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             final TextComponent component = createUnItalicText(text).decorate(decoration);
             builder.displayName(component);
             return builder;
@@ -107,7 +107,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder customName(String text, TextColor color) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             final TextComponent component = createUnItalicText(text).color(color);
             builder.displayName(component);
             return builder;
@@ -117,7 +117,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder customName(String text, TextDecoration decoration, TextColor color) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             final TextComponent component = createUnItalicText(text).decorate(decoration).color(color);
             builder.displayName(component);
             return builder;
@@ -127,7 +127,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder lore(String text) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             final TextComponent component = createUnItalicText(text);
 
             final List<TextComponent> list = new ArrayList<>();
@@ -140,7 +140,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder lore(String text, TextDecoration decoration) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             final TextComponent component = createUnItalicText(text).decorate(decoration);
 
             final List<TextComponent> list = new ArrayList<>();
@@ -153,7 +153,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder lore(String text, Color color) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             final TextComponent component = createUnItalicText(text).color(TextColor.color(color.asRGB()));
 
             final List<TextComponent> list = new ArrayList<>();
@@ -166,7 +166,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder lore(String text, TextDecoration decoration, Color color) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             final TextComponent component = createUnItalicText(text).decorate(decoration).color(TextColor.color(color.asRGB()));
 
             final List<TextComponent> list = new ArrayList<>();
@@ -179,7 +179,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder enchantment(Enchantment enchantment, int level) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             builder.addEnchant(enchantment, level, false);
             return builder;
         });
@@ -188,7 +188,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder hideFlag(ItemFlag itemFlag) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             builder.addItemFlags(itemFlag);
             return builder;
         });
@@ -197,7 +197,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder damage(int damage) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof Damageable)) {
                 return builder;
             }
@@ -210,7 +210,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder unBreakable(boolean flag) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             builder.setUnbreakable(flag);
             return builder;
         });
@@ -219,7 +219,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder repairCost(int cost) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof Repairable)) {
                 return builder;
             }
@@ -232,7 +232,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder playerHead(Player player) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof SkullMeta)) {
                 return builder;
             }
@@ -245,7 +245,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder attributeModifier(Attribute attribute, EquipmentSlot slot, double amount) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             builder.addAttributeModifier(attribute, new AttributeModifier(UUID.randomUUID(), attribute.name(), amount, AttributeModifier.Operation.ADD_NUMBER, slot));
             return builder;
         });
@@ -254,7 +254,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder attributeModifier(Attribute attribute, EquipmentSlot slot, double amount, AttributeModifier.Operation operation) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             builder.addAttributeModifier(attribute, new AttributeModifier(UUID.randomUUID(), attribute.name(), amount, operation, slot));
             return builder;
         });
@@ -263,7 +263,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder attributeModifier(Attribute attribute, EquipmentSlot slot, double amount, AttributeModifier.Operation operation, UUID uuid) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             builder.addAttributeModifier(attribute, new AttributeModifier(uuid, attribute.name(), amount, operation, slot));
             return builder;
         });
@@ -272,7 +272,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder customModelData(int value) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             builder.setCustomModelData(value);
             return builder;
         });
@@ -281,7 +281,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder potionType(PotionType type) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof PotionMeta)) {
                 return builder;
             }
@@ -294,7 +294,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder potionEffect(PotionEffectType effectType) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof PotionMeta)) {
                 return builder;
             }
@@ -307,7 +307,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder potionEffect(PotionEffectType effectType, int duration) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof PotionMeta)) {
                 return builder;
             }
@@ -320,7 +320,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder potionEffect(PotionEffectType effectType, int duration, int amplifier) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof PotionMeta)) {
                 return builder;
             }
@@ -333,7 +333,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder potionEffect(PotionEffectType effectType, int duration, int amplifier, boolean ambient) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof PotionMeta)) {
                 return builder;
             }
@@ -346,7 +346,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder potionEffect(PotionEffectType effectType, int duration, int amplifier, boolean ambient, boolean showParticles) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof PotionMeta)) {
                 return builder;
             }
@@ -359,7 +359,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder potionColor(Color color) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof PotionMeta)) {
                 return builder;
             }
@@ -372,7 +372,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder chargedProjectile(ItemStack itemStack) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof CrossbowMeta)) {
                 return builder;
             }
@@ -385,7 +385,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder leatherArmorColor(Color color) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof LeatherArmorMeta)) {
                 return builder;
             }
@@ -398,7 +398,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder lodeStoneTracked(boolean flag) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof CompassMeta)) {
                 return builder;
             }
@@ -411,7 +411,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder lodeStoneLocation(Location location) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof CompassMeta)) {
                 return builder;
             }
@@ -425,7 +425,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder armorTrim(TrimMaterial material, TrimPattern pattern) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof ColorableArmorMeta)) {
                 return builder;
             }
@@ -438,7 +438,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder bookAuthor(String name) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof BookMeta)) {
                 return builder;
             }
@@ -451,7 +451,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder bookTitle(String name) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof BookMeta)) {
                 return builder;
             }
@@ -464,7 +464,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder bookGeneration(BookMeta.Generation generation) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof BookMeta)) {
                 return builder;
             }
@@ -477,7 +477,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder bookPage(Component component) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof BookMeta)) {
                 return builder;
             }
@@ -490,7 +490,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder fireworkPower(int power) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof FireworkMeta)) {
                 return builder;
             }
@@ -503,7 +503,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder fireworkEffect(FireworkEffect effect) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof FireworkMeta)) {
                 return builder;
             }
@@ -516,7 +516,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder storedEnchantment(Enchantment enchantment, int level) {
-        modifyItemMeta(builder -> {
+        edit(builder -> {
             if (!(builder instanceof EnchantmentStorageMeta)) {
                 return builder;
             }
@@ -529,7 +529,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder glint(boolean flag) {
-        modifyItemMeta(meta -> {
+        edit(meta -> {
             meta.setEnchantmentGlintOverride(flag);
 
             return meta;
@@ -539,7 +539,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder hideTooltip(boolean flag) {
-        modifyItemMeta(meta -> {
+        edit(meta -> {
             meta.setHideTooltip(flag);
 
             return meta;
@@ -549,7 +549,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder fireResistant(boolean flag) {
-        modifyItemMeta(meta -> {
+        edit(meta -> {
             meta.setFireResistant(flag);
 
             return meta;
@@ -571,7 +571,7 @@ public class ItemStackBuilder {
     public static ItemStackBuilder from(ItemStack itemStack) {
         final ItemStackBuilder itemStackBuilder = new ItemStackBuilder(itemStack.getType());
 
-        itemStackBuilder.modifyItemMeta(meta -> itemStack.getItemMeta());
+        itemStackBuilder.edit(meta -> itemStack.getItemMeta());
 
         return itemStackBuilder;
     }

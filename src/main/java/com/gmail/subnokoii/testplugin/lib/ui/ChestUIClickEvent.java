@@ -75,7 +75,7 @@ public class ChestUIClickEvent {
                     for (final ChestUIBuilder.Button button : ui.getAllButtons()) {
                         if (button == null) continue;
 
-                        if (button.matchId(itemStack)) {
+                        if (button.match(itemStack)) {
                             button.click(player);
                             ui.set(event.getSlot(), (ignored) -> button);
                             event.setCancelled(true);
