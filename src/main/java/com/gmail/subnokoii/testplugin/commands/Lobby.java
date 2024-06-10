@@ -24,7 +24,7 @@ public class Lobby implements CommandExecutor, TabCompleter {
                 return false;
             }
 
-            BungeeCordUtils.transfer((Player) commandSender, "lobby");
+            BungeeCordUtils.transfer((Player) commandSender, BungeeCordUtils.ServerType.LOBBY);
         }
         else {
             if (!commandSender.isOp()) {
@@ -39,7 +39,7 @@ public class Lobby implements CommandExecutor, TabCompleter {
                 return false;
             }
 
-            BungeeCordUtils.transfer(player, "lobby");
+            BungeeCordUtils.transfer(player, BungeeCordUtils.ServerType.LOBBY);
         }
 
         commandSender.sendMessage("lobbyサーバーへの接続を試行中...");

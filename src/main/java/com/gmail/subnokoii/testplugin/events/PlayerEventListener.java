@@ -26,7 +26,6 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.BoundingBox;
 
 import java.util.HashMap;
 import java.util.ListIterator;
@@ -211,7 +210,7 @@ public class PlayerEventListener implements Listener {
                     rotation.pitch(0);
                     rotation.add(new RotationBuilder(90, Math.floor(Math.random() * 180) + 1 - 90));
                     boundingBox.rotate(rotation);
-                    boundingBox.displayOutline();
+                    boundingBox.showOutline();
 
                     for (Entity entity : boundingBox.getIntersection()) {
                         if (entity instanceof Damageable) {

@@ -11,6 +11,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class TiltedBoundingBox {
     private final double width;
@@ -23,7 +24,13 @@ public final class TiltedBoundingBox {
 
     private World world = Bukkit.getWorlds().get(0);
 
-    private Vector3Builder center = new Vector3Builder();
+    private final Vector3Builder center = new Vector3Builder();
+
+    public TiltedBoundingBox() {
+        width = 1d;
+        height = 1d;
+        depth = 1d;
+    }
 
     public TiltedBoundingBox(double width, double height, double depth) {
         this.width = width;
@@ -37,7 +44,9 @@ public final class TiltedBoundingBox {
         }
 
         this.world = world;
-        this.center = location;
+        center.x(location.x());
+        center.y(location.y());
+        center.z(location.z());
     }
 
     public void rotate(RotationBuilder rotation) {
@@ -174,7 +183,7 @@ public final class TiltedBoundingBox {
         return false;
     }
 
-    public void displayOutline() {
+    private void outline(Consumer<Vector3Builder> consumer) {
         final Vector3Builder.LocalAxes axes = rotation.getDirection3d().getLocalAxes();
         final Vector3Builder x = axes.getX().length(width / 2);
         final Vector3Builder y = axes.getY().length(height / 2);
@@ -190,19 +199,30 @@ public final class TiltedBoundingBox {
         final Vector3Builder $111 = center.copy().add(x).add(y).add(z);
 
         for (int i = 0; i < 10; i++) {
-            world.spawnParticle(Particle.DUST, $000.lerp($100, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $000.lerp($010, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $000.lerp($001, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $101.lerp($100, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $101.lerp($111, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $101.lerp($001, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $110.lerp($010, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $110.lerp($100, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $110.lerp($111, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $011.lerp($010, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $011.lerp($001, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
-            world.spawnParticle(Particle.DUST, $011.lerp($111, i / 10f).withWorld(world), 1, 0.0, 0.0, 0.0 ,0.01, new Particle.DustOptions(Color.GREEN, 0.5f));
+            consumer.accept($000.lerp($100, i / 10f));
+            consumer.accept($000.lerp($010, i / 10f));
+            consumer.accept($000.lerp($001, i / 10f));
+            consumer.accept($101.lerp($100, i / 10f));
+            consumer.accept($101.lerp($111, i / 10f));
+            consumer.accept($101.lerp($001, i / 10f));
+            consumer.accept($110.lerp($010, i / 10f));
+            consumer.accept($110.lerp($100, i / 10f));
+            consumer.accept($110.lerp($111, i / 10f));
+            consumer.accept($011.lerp($010, i / 10f));
+            consumer.accept($011.lerp($001, i / 10f));
+            consumer.accept($011.lerp($111, i / 10f));
         }
+    }
+
+    public void showOutline() {
+        outline(v -> world.spawnParticle(
+            Particle.DUST,
+            v.withWorld(world),
+            1,
+            0.0, 0.0, 0.0,
+            0.01,
+            new Particle.DustOptions(Color.GREEN, 0.5f)
+        ));
     }
 
     public Entity[] getIntersection() {

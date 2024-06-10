@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public class BungeeCordUtils {
     private BungeeCordUtils() {}
@@ -33,7 +34,7 @@ public class BungeeCordUtils {
             .customName("Game", NamedTextColor.AQUA)
             .lore("ゲームサーバーに移動", Color.GRAY)
             .onClick(response -> {
-                transfer(player, "game");
+                transfer(player, ServerType.GAME);
                 player.sendMessage("gameサーバーへの接続を試行中...");
                 response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                 response.close();
@@ -45,7 +46,7 @@ public class BungeeCordUtils {
             .lore("ロビーサーバーに移動", Color.GRAY)
             .glint(true)
             .onClick(response -> {
-                transfer(player, "lobby");
+                transfer(player, ServerType.LOBBY);
                 player.sendMessage("lobbyサーバーへの接続を試行中...");
                 response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                 response.close();
@@ -58,7 +59,7 @@ public class BungeeCordUtils {
                 .lore("開発サーバーに移動", Color.GRAY)
                 .glint(true)
                 .onClick(response -> {
-                    transfer(player, "develop");
+                    transfer(player, ServerType.DEVELOPMENT);
                     player.sendMessage("developサーバーへの接続を試行中...");
                     response.playSound(Sound.BLOCK_STONE_BUTTON_CLICK_ON, 10, 2);
                     response.close();
@@ -87,14 +88,38 @@ public class BungeeCordUtils {
         .open(player);
     }
 
-    public static void transfer(Player player, String targetServer) {
+    public static void transfer(Player player, ServerType serverType) {
         final ByteArrayDataOutput output = ByteStreams.newDataOutput();
         output.writeUTF("Connect");
-        output.writeUTF(targetServer);
+        output.writeUTF(serverType.name);
         final byte[] data = output.toByteArray();
 
         player.sendPluginMessage(TestPlugin.getInstance(), "BungeeCord", data);
 
-        TestPlugin.log(TestPlugin.LoggingTarget.PLUGIN, player.getName() + "からBungeeCordチャンネルにプラグインメッセージが送信されました: [\"Connect\", \"" + targetServer + "\"]");
+        TestPlugin.log(TestPlugin.LoggingTarget.PLUGIN, player.getName() + "からBungeeCordチャンネルにプラグインメッセージが送信されました: [\"Connect\", \"" + serverType.name + "\"]");
+    }
+
+    public enum ServerType {
+        LOBBY("lobby"),
+
+        GAME("game"),
+
+        DEVELOPMENT("develop");
+
+        private final String name;
+
+        ServerType(String name) {
+            this.name = name;
+        }
+
+        public static @Nullable ServerType from(String name) {
+            for (final ServerType value : ServerType.values()) {
+                if (value.name.equals(name)) {
+                    return value;
+                }
+            }
+
+            return null;
+        }
     }
 }

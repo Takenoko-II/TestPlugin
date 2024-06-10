@@ -77,7 +77,11 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                     for (final Entity target : targets) {
                         if (!(target instanceof Player)) continue;
 
-                        BungeeCordUtils.transfer((Player) target, parameters[0]);
+                        final BungeeCordUtils.ServerType serverType = BungeeCordUtils.ServerType.from(parameters[0]);
+
+                        if (serverType == null) return;
+
+                        BungeeCordUtils.transfer((Player) target, serverType);
                     }
 
                     break;
