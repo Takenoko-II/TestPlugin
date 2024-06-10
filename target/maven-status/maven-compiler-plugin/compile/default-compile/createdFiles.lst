@@ -31,6 +31,7 @@ com\gmail\subnokoii\testplugin\events\PlayerEventListener.class
 com\gmail\subnokoii\testplugin\TestPlugin.class
 com\gmail\subnokoii\testplugin\lib\vector\DimensionSizeMismatchException.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorBuilder.class
+com\gmail\subnokoii\testplugin\BungeeCordUtils$ServerType.class
 com\gmail\subnokoii\testplugin\commands\Lobby.class
 com\gmail\subnokoii\testplugin\lib\vector\VectorBuilder$DimensionSize.class
 com\gmail\subnokoii\testplugin\lib\datacontainer\BlockDataContainerManager.class
