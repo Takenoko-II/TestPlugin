@@ -2,22 +2,23 @@ package com.gmail.subnokoii.testplugin;
 
 import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.*;
-import com.gmail.subnokoii.testplugin.lib.datacontainer.EntityDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
 
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
@@ -52,7 +53,9 @@ public final class TestPlugin extends JavaPlugin {
         // BungeeCordに接続
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-        getComponentLogger().info(TestPlugin.database().toJson());
+        TestPlugin.database().set("foo:bar", 0);
+
+        TestPlugin.log(LoggingTarget.SERVER, TestPlugin.database().toJson());
     }
 
     @Override
@@ -87,6 +90,41 @@ public final class TestPlugin extends JavaPlugin {
 
                 TextFileUtils.create(LOG_FILE_PATH);
                 TextFileUtils.write(LOG_FILE_PATH, "[" + formatter.format(timestamp) + "] " + text);
+
+                break;
+            }
+            case ALL: {
+                log(LoggingTarget.SERVER, messages);
+                log(LoggingTarget.PLUGIN, messages);
+                break;
+            }
+            default: {
+                throw new IllegalArgumentException("ログターゲットが無効です");
+            }
+        }
+    }
+
+    /**
+     * ログにメッセージを書き込みます。
+     * @param messages メッセージ(複数可)
+     */
+    public static void log(LoggingTarget target, TextComponent... messages) {
+        final TextComponent separator = Component.text(", ").color(NamedTextColor.WHITE);
+        final Optional<TextComponent> text = Arrays.stream(messages).reduce((a, b) -> a.append(separator).append(b));
+
+        if (text.isEmpty()) return;
+
+        switch (target) {
+            case SERVER: {
+                getInstance().getComponentLogger().info(text.get());
+                break;
+            }
+            case PLUGIN: {
+                final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+
+                TextFileUtils.create(LOG_FILE_PATH);
+                TextFileUtils.write(LOG_FILE_PATH, "[" + formatter.format(timestamp) + "] " + text.get().content());
 
                 break;
             }

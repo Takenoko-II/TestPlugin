@@ -27,10 +27,10 @@ public final class FileDataContainerManager extends DataContainerManager {
         final byte[] data = BinaryFileUtils.read(filePath);
 
         if (data == null) {
-            setPersistentDataContainer(DataContainerManager.newContainer());
+            setPersistentDataContainer(DataContainerManager.container());
         }
         else if (data.length == 0) {
-            setPersistentDataContainer(DataContainerManager.newContainer());
+            setPersistentDataContainer(DataContainerManager.container());
         }
     }
 
@@ -41,7 +41,7 @@ public final class FileDataContainerManager extends DataContainerManager {
 
         if (data == null) return null;
 
-        final PersistentDataContainer empty = DataContainerManager.newContainer();
+        final PersistentDataContainer empty = DataContainerManager.container();
 
         try {
             empty.readFromBytes(data);
@@ -72,7 +72,7 @@ public final class FileDataContainerManager extends DataContainerManager {
      * @return 指定のデータ型あるいはnull
      */
     @Override
-    public <P, C> @Nullable C get(String path, PersistentDataType<P, C> type) {
+    <P, C> @Nullable C get(String path, PersistentDataType<P, C> type) {
         final PersistentDataContainer container = getPersistentDataContainer();
 
         if (container == null) return null;
@@ -91,7 +91,7 @@ public final class FileDataContainerManager extends DataContainerManager {
         PersistentDataContainer container = getPersistentDataContainer();
 
         if (container == null) {
-            container = DataContainerManager.newContainer();
+            container = DataContainerManager.container();
         }
 
         new DataContainerCompound(container).set(path, value);
@@ -111,7 +111,7 @@ public final class FileDataContainerManager extends DataContainerManager {
         PersistentDataContainer container = getPersistentDataContainer();
 
         if (container == null) {
-            container = DataContainerManager.newContainer();
+            container = DataContainerManager.container();
         }
 
         new DataContainerCompound(container).delete(path);
@@ -151,6 +151,7 @@ public final class FileDataContainerManager extends DataContainerManager {
 
     /**
      * データをJSONに変換します。
+     *
      * @return JSON化されたPersistentDataContainer
      */
     @Override
@@ -160,5 +161,14 @@ public final class FileDataContainerManager extends DataContainerManager {
         if (container == null) return Component.text("{\n}").color(NamedTextColor.WHITE);
 
         return new DataContainerCompound(container).toJson();
+    }
+
+    /**
+     * すべてのキーを取得します。
+     * @return キー文字列の配列
+     */
+    @Override
+    public String[] getAllKeys() {
+        return new DataContainerCompound(getPersistentDataContainer()).getAllKeys();
     }
 }

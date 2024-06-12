@@ -2,6 +2,8 @@ package com.gmail.subnokoii.testplugin.events;
 
 import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.DataContainerCompound;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.DataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
@@ -26,6 +28,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.RayTraceResult;
 
 import java.util.HashMap;
 import java.util.ListIterator;
@@ -198,6 +201,20 @@ public class PlayerEventListener implements Listener {
                     BungeeCordUtils.openServerSelector(player);
                     break;
                 }
+                case "magic": {
+                    final Runnable runner = () -> {
+                        final Vector3Builder.LocalAxes localAxes = RotationBuilder.from(player).getDirection3d().getLocalAxes();
+                        final Vector3Builder x = localAxes.getX().length(Math.floor(Math.random() * 10) + 1 - 5);
+                        final Vector3Builder y = localAxes.getY().length(Math.floor(Math.random() * 5 + 1 - 2.5));
+
+                        magicCircle(player, x.copy().add(y), (float) (Math.floor(Math.random() * 4) + 2));
+                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 10f, 0.8f);
+                    };
+
+                    ScheduleUtils.runTimeoutByGameTick(runner, 0);
+
+                    break;
+                }
                 case "boundingBox": {
                     final TiltedBoundingBox boundingBox = new TiltedBoundingBox(2, 1, 3);
                     boundingBox.put(
@@ -340,30 +357,11 @@ public class PlayerEventListener implements Listener {
                     player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 5f, 1f);
                     break;
                 }
-                case "magic": {
-                    final Runnable runner = () -> {
-                        final Vector3Builder.LocalAxes localAxes = RotationBuilder.from(player).getDirection3d().getLocalAxes();
-                        final Vector3Builder x = localAxes.getX().length(Math.floor(Math.random() * 10) + 1 - 5);
-                        final Vector3Builder y = localAxes.getY().length(Math.floor(Math.random() * 5 + 1 - 2.5));
-
-                        magicCircle(player, x.copy().add(y), (float) (Math.floor(Math.random() * 3) + 1));
-                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 10f, 0.8f);
-                    };
-
-                    ScheduleUtils.runTimeoutByGameTick(runner, 0);
-                    ScheduleUtils.runTimeoutByGameTick(runner, 6);
-                    ScheduleUtils.runTimeoutByGameTick(runner, 12);
-                    ScheduleUtils.runTimeoutByGameTick(runner, 18);
-                    ScheduleUtils.runTimeoutByGameTick(runner, 24);
-                    ScheduleUtils.runTimeoutByGameTick(runner, 30);
-
-                    break;
-                }
             }
         }
     }
 
-    private void magicCircle(Player player, Vector3Builder offset, float size) {
+    private static void magicCircle(Player player, Vector3Builder offset, float size) {
         final Vector3Builder center = Vector3Builder.from(player.getEyeLocation())
         .add(RotationBuilder.from(player).getDirection3d().length(2))
         .add(offset);
@@ -410,6 +408,16 @@ public class PlayerEventListener implements Listener {
         line.setScale(30);
         line.setParticleDecoration(new Shape.DustDecoration().setColor(Color.fromRGB(0xFF0000)));
         line.draw(world, center);
+
+        final RayTraceResult rayTraceResult = world.rayTraceEntities(center.withWorld(world), direction.getDirection3d().toBukkitVector(), 30);
+
+        if (rayTraceResult != null) {
+            final Entity entity = rayTraceResult.getHitEntity();
+
+            if (entity instanceof Damageable) {
+                ((Damageable) entity).damage(2, player);
+            }
+        }
 
         final Shape.ParticleDecoration flame = new Shape.ParticleDecoration(Particle.FLAME);
         flame.getOffset().add(new Vector3Builder(0.5, 0.5, 0.5));

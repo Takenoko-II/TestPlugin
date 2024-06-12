@@ -25,6 +25,7 @@ com\gmail\subnokoii\testplugin\lib\other\ScheduleUtils$3.class
 com\gmail\subnokoii\testplugin\lib\event\TestPluginEvent$EventRegistrar.class
 com\gmail\subnokoii\testplugin\lib\event\data\CustomItemUseEvent.class
 com\gmail\subnokoii\testplugin\TestPlugin$LoggingTarget.class
+com\gmail\subnokoii\testplugin\lib\datacontainer\InvalidContainerKeyException.class
 com\gmail\subnokoii\testplugin\lib\event\TestPluginEvent.class
 com\gmail\subnokoii\testplugin\lib\event\data\DataPackMessageReceiveEvent.class
 com\gmail\subnokoii\testplugin\events\PlayerEventListener.class

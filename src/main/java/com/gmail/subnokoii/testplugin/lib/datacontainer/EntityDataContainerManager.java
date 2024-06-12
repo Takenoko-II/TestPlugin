@@ -27,7 +27,7 @@ public final class EntityDataContainerManager extends DataContainerManager {
      * @return 指定のデータ型あるいはnull
      */
     @Override
-    public @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
+    @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
         return new DataContainerCompound(entity.getPersistentDataContainer()).get(path, type);
     }
 
@@ -79,10 +79,20 @@ public final class EntityDataContainerManager extends DataContainerManager {
 
     /**
      * データをJSONに変換します。
+     *
      * @return JSON化されたPersistentDataContainer
      */
     @Override
     public TextComponent toJson() {
         return new DataContainerCompound(entity.getPersistentDataContainer()).toJson();
+    }
+
+    /**
+     * すべてのキーを取得します。
+     * @return キー文字列の配列
+     */
+    @Override
+    public String[] getAllKeys() {
+        return new DataContainerCompound(entity.getPersistentDataContainer()).getAllKeys();
     }
 }

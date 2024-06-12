@@ -1,6 +1,5 @@
 package com.gmail.subnokoii.testplugin.lib.datacontainer;
 
-import com.gmail.subnokoii.testplugin.TestPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -11,6 +10,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class DataContainerManager {
@@ -20,7 +20,7 @@ public abstract class DataContainerManager {
      * @param type データ型
      * @return 指定のデータ型の値あるいはnull
      */
-    public abstract @Nullable <P, C> C get(String path, PersistentDataType<P, C> type);
+    abstract @Nullable <P, C> C get(String path, PersistentDataType<P, C> type);
 
     /**
      * 指定パスにカスタムデータをセットします。
@@ -273,18 +273,33 @@ public abstract class DataContainerManager {
 
     /**
      * データをJSONに変換します。
+     *
      * @return JSON化されたPersistentDataContainer
      */
-    public abstract Component toJson();
+    public abstract TextComponent toJson();
+
+    /**
+     * すべてのキーを取得します。
+     * @return キー文字列の配列
+     */
+    public abstract  String[] getAllKeys();
+
+    /**
+     * 特定の名前空間のキーを取得します。
+     * @return キー文字列の配列
+     */
+    public String[] getKeys(String namespace) {
+        return Arrays.stream(getAllKeys()).filter(t -> t.startsWith(namespace + ":")).toArray(String[]::new);
+    }
 
     private static TextComponent stringify(Object value, int indentation) {
         if (value instanceof PersistentDataContainer) {
-            final String[] keys = ((PersistentDataContainer) value).getKeys().stream().map(NamespacedKey::asString).toArray(String[]::new);
+            final String[] keys = new DataContainerCompound((PersistentDataContainer) value).getAllKeys();
 
             TextComponent component = Component.text("{").color(NamedTextColor.WHITE);
 
             for (int i = 0; i < keys.length; i++) {
-                final String key = keys[i].replace(TestPlugin.getInstance().getName().toLowerCase() + ":", "");
+                final String key = keys[i];
 
                 boolean foundTypeFlag = false;
 
@@ -405,22 +420,22 @@ public abstract class DataContainerManager {
      * PersistentDataContainerを新たに作成します。
      * @return 新しい空のPersistentDataContainer
      */
-    public static PersistentDataContainer newContainer() {
+    static PersistentDataContainer container() {
         return Bukkit.getWorlds().get(0).getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
     }
 
     /**
-     * DataContainerAccessorを空のデータを用いて新たに作成します。
-     * @return 空のアクセサ
+     * 空のコンパウンドを新たに作成します。
+     * @return 空のコンパウンド
      */
-    public static DataContainerCompound newCompound() {
-        return new DataContainerCompound(newContainer());
+    public static DataContainerCompound compound() {
+        return new DataContainerCompound(container());
     }
 
     /**
      * ほぼ全ての基本データ型のリスト
      */
-    public static final PersistentDataType<?, ?>[] PERSISTENT_DATA_TYPES = new PersistentDataType[]{
+    static final PersistentDataType<?, ?>[] PERSISTENT_DATA_TYPES = new PersistentDataType[]{
         PersistentDataType.BYTE,
         PersistentDataType.BOOLEAN,
         PersistentDataType.SHORT,

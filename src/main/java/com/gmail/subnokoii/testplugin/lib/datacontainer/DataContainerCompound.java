@@ -11,10 +11,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
-public final class DataContainerCompound {
+public class DataContainerCompound {
     private final PersistentDataContainer container;
 
-    public DataContainerCompound(PersistentDataContainer container) {
+    DataContainerCompound(PersistentDataContainer container) {
         if (container == null) {
             throw new IllegalArgumentException("PersistentDataContainerが必要ですがnullが渡されました");
         }
@@ -26,8 +26,22 @@ public final class DataContainerCompound {
         return new ArrayList<>(Arrays.asList(path.split("\\.")));
     }
 
+    private NamespacedKey parseKey(String key) {
+        if (!key.matches("^[a-z0-9/._-]+:[a-z0-9/._-]+$") && !key.matches("^[a-z0-9/._-]+$")) {
+            throw new InvalidContainerKeyException(key);
+        }
+
+        if (!key.contains(":")) {
+            return new NamespacedKey(TestPlugin.getInstance(), key);
+        }
+
+        final String[] array = key.split(":", 2);
+
+        return new NamespacedKey(array[0], array[1]);
+    }
+
     private PersistentDataContainer access(List<String> keys, PersistentDataContainer container, BiConsumer<PersistentDataContainer, NamespacedKey> consumer) {
-        final NamespacedKey key = new NamespacedKey(TestPlugin.getInstance(), keys.get(0));
+        final NamespacedKey key = parseKey(keys.get(0));
         keys.remove(0);
 
         if (!keys.isEmpty()) {
@@ -38,11 +52,11 @@ public final class DataContainerCompound {
 
                 if (subContainer == null) {
                     // Never happens
-                    subContainer = DataContainerManager.newContainer();
+                    subContainer = DataContainerManager.container();
                 }
             }
             else {
-                subContainer = DataContainerManager.newContainer();
+                subContainer = DataContainerManager.container();
             }
 
             container.set(key, PersistentDataType.TAG_CONTAINER, access(keys, subContainer, consumer));
@@ -54,13 +68,13 @@ public final class DataContainerCompound {
         return container;
     }
 
-    public @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
+    @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
         final String[] keys = path.split("\\.");
 
         PersistentDataContainer container = this.container;
 
         for (int i = 0; i < keys.length; i++) {
-            final NamespacedKey namespacedKey = new NamespacedKey(TestPlugin.getInstance(), keys[i]);
+            final NamespacedKey namespacedKey = parseKey(keys[i]);
 
             if (container == null) {
                 return null;
@@ -434,5 +448,26 @@ public final class DataContainerCompound {
      */
     public TextComponent toJson() {
         return DataContainerManager.stringify(container);
+    }
+
+    /**
+     * すべてのキーを取得します。
+     * @return キー文字列の配列
+     */
+    public String[] getAllKeys() {
+        try {
+            return container.getKeys().stream().map(NamespacedKey::asString).toArray(String[]::new);
+        }
+        catch (RuntimeException e) {
+            throw new InvalidContainerKeyException();
+        }
+    }
+
+    /**
+     * 特定の名前空間のキーを取得します。
+     * @return キー文字列の配列
+     */
+    public String[] getKeys(String namespace) {
+        return Arrays.stream(getAllKeys()).filter(t -> t.startsWith(namespace + ":")).toArray(String[]::new);
     }
 }

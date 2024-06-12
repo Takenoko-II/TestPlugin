@@ -5,6 +5,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,7 @@ public final class BlockDataContainerManager extends DataContainerManager {
      * @return 指定のデータ型あるいはnull
      */
     @Override
-    public @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
+    @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
         if (!(block.getState() instanceof TileState)) {
             return null;
         }
@@ -112,6 +113,7 @@ public final class BlockDataContainerManager extends DataContainerManager {
 
     /**
      * データをJSONに変換します。
+     *
      * @return JSON化されたPersistentDataContainer
      */
     @Override
@@ -123,5 +125,20 @@ public final class BlockDataContainerManager extends DataContainerManager {
         final TileState tileState = (TileState) block.getState();
 
         return new DataContainerCompound(tileState.getPersistentDataContainer()).toJson();
+    }
+
+    /**
+     * すべてのキーを取得します。
+     * @return キー文字列の配列
+     */
+    @Override
+    public String[] getAllKeys() {
+        if (!(block.getState() instanceof TileState)) {
+            return new String[0];
+        }
+
+        final TileState tileState = (TileState) block.getState();
+
+        return new DataContainerCompound(tileState.getPersistentDataContainer()).getAllKeys();
     }
 }

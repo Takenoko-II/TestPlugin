@@ -30,7 +30,7 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
      * @return 指定のデータ型あるいはnull
      */
     @Override
-    public @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
+    @Nullable <P, C> C get(String path, PersistentDataType<P, C> type) {
         final ItemMeta meta = itemStack.getItemMeta();
 
         if (meta == null) return null;
@@ -106,6 +106,7 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
 
     /**
      * データをJSONに変換します。
+     *
      * @return JSON化されたPersistentDataContainer
      */
     @Override
@@ -115,5 +116,17 @@ public final class ItemStackDataContainerManager extends DataContainerManager {
         if (meta == null) return Component.text("{\n}").color(NamedTextColor.WHITE);
 
         return new DataContainerCompound(meta.getPersistentDataContainer()).toJson();
+    }
+
+    /**
+     * すべてのキーを取得します。
+     * @return キー文字列の配列
+     */
+    public String[] getAllKeys() {
+        final ItemMeta meta = itemStack.getItemMeta();
+
+        if (meta == null) return new String[0];
+
+        return new DataContainerCompound(meta.getPersistentDataContainer()).getAllKeys();
     }
 }

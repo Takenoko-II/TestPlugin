@@ -78,6 +78,8 @@ public class TestPluginEvent implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         final ItemStack itemStack = event.getItem();
 
+        lastInteractedTimestamp.put(event.getPlayer(), System.currentTimeMillis());
+
         if (event.getAction().isRightClick()) {
             lastRightClickedTimestamp.put(event.getPlayer(), System.currentTimeMillis());
 
@@ -133,23 +135,29 @@ public class TestPluginEvent implements Listener {
         if (!(damagingEntity instanceof Player)) return;
 
         final Entity entity = event.getEntity();
+        final Player player = (Player) damagingEntity;
+
         final EntityDamageEvent.DamageCause cause = event.getCause();
         final long currentTime = System.currentTimeMillis();
         final long lastDamageByEntityTime = Objects.requireNonNullElse(lastDamageByEntityTimestamp.get(entity), 0L);
 
         lastDamageByEntityTimestamp.put(entity, currentTime);
-        lastAttackedTimestamp.put((Player) damagingEntity, currentTime);
+        lastAttackedTimestamp.put(player, currentTime);
 
         if (currentTime - lastDamageByEntityTime < 50L) return;
 
         if (cause.equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) && !event.getDamageSource().isIndirect()) {
             leftClick(event);
 
-            final ItemStack itemStack = ((Player) damagingEntity).getEquipment().getItemInMainHand();
+            final ItemStack itemStack = player.getEquipment().getItemInMainHand();
 
             final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
 
             if (tag == null) return;
+
+            final long lastInteract = Objects.requireNonNullElse(lastInteractedTimestamp.get(player), 0L);
+
+            if (currentTime - lastInteract < 50L) return;
 
             customItemUseEventListeners.forEach(listener -> {
                 listener.accept(new CustomItemUseEvent(event));
@@ -211,6 +219,8 @@ public class TestPluginEvent implements Listener {
     private final Set<Consumer<CustomItemUseEvent>> customItemUseEventListeners = new HashSet<>();
 
     private final Set<Consumer<DataPackMessageReceiveEvent>> dataPackMessageReceiveEventListeners = new HashSet<>();
+
+    private final Map<Player, Long> lastInteractedTimestamp = new HashMap<>();
 
     private final Map<Player, Long> lastRightClickedTimestamp = new HashMap<>();
 
