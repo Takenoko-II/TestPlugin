@@ -4,6 +4,8 @@ import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.ComponentItemStackBuilder;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.MaxStackSizeComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -132,7 +134,7 @@ public class Test implements CommandExecutor, TabCompleter {
                 }
 
                 final Player player = (Player) sender;
-                final ItemStackBuilder itemStackBuilder = new ItemStackBuilder();
+                ItemStackBuilder itemStackBuilder = new ItemStackBuilder();
 
                 if (args.length == 2) {
                     switch (args[1]) {
@@ -148,6 +150,15 @@ public class Test implements CommandExecutor, TabCompleter {
                             .type(Material.BOW)
                             .customName("Instant Shoot Bow", NamedTextColor.GOLD)
                             .dataContainer("custom_item_tag", "instant_shoot_bow");
+                            break;
+                        }
+                        case "test": {
+                            final ComponentItemStackBuilder componentBuilder = new ComponentItemStackBuilder(Material.APPLE);
+                            componentBuilder.get(ComponentItemStackBuilder.ComponentType.MAX_STACK_SIZE).setMaxStackSize(3);
+                            componentBuilder.itemName().setItemName(Component.text("hoge"));
+                            componentBuilder.enchantmentGlintOverride().setGlintOverride(true);
+
+                            itemStackBuilder = componentBuilder.toItemStackBuilder();
                             break;
                         }
                         default: {
