@@ -1,13 +1,12 @@
 package com.gmail.subnokoii.testplugin.lib.itemstack.components;
 
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public final class MaxDamageComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    public MaxDamageComponent(ItemMeta itemMeta) {
+    private MaxDamageComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -44,7 +43,7 @@ public final class MaxDamageComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip(boolean flag) {
+    public boolean getShowInTooltip() {
         return false;
     }
 

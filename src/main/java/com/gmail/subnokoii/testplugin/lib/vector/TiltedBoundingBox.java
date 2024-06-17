@@ -20,7 +20,7 @@ public final class TiltedBoundingBox {
 
     private final double depth;
 
-    private final RotationBuilder rotation = new RotationBuilder();
+    private final EulerQuaternionBuilder rotation = new EulerQuaternionBuilder();
 
     private World world = Bukkit.getWorlds().get(0);
 
@@ -50,11 +50,11 @@ public final class TiltedBoundingBox {
     }
 
     public void rotate(RotationBuilder rotation) {
-        this.rotation.add(rotation);
+        this.rotation.add(EulerQuaternionBuilder.from(rotation));
     }
 
     public boolean isInside(Vector3Builder vector3) {
-        final Vector3Builder.LocalAxes axes = rotation.getDirection3d().getLocalAxes();
+        final EulerQuaternionBuilder.LocalAxesQ axes = rotation.getLocalAxesQ();
         final Vector3Builder x = axes.getX().length(width / 2);
         final Vector3Builder y = axes.getY().length(height / 2);
         final Vector3Builder z = axes.getZ().length(depth / 2);
@@ -81,7 +81,7 @@ public final class TiltedBoundingBox {
     }
 
     private boolean getIsIntersectingBySeparatingAxisTheorem(BoundingBox box) {
-        final Vector3Builder.LocalAxes axes = rotation.getDirection3d().getLocalAxes();
+        final EulerQuaternionBuilder.LocalAxesQ axes = rotation.getLocalAxesQ();
         final Vector3Builder x = axes.getX().length(width / 2);
         final Vector3Builder y = axes.getY().length(height / 2);
         final Vector3Builder z = axes.getZ().length(depth / 2);
@@ -160,7 +160,7 @@ public final class TiltedBoundingBox {
     }
 
     private boolean isIntersectingBox(BoundingBox box, int rayCount) {
-        final Vector3Builder.LocalAxes axes = rotation.getDirection3d().getLocalAxes();
+        final EulerQuaternionBuilder.LocalAxesQ axes = rotation.getLocalAxesQ();
         final Vector3Builder x = axes.getX().length(width / 2);
         final Vector3Builder y = axes.getY().length(height / 2);
         final Vector3Builder z = axes.getZ().length(depth / 2);
@@ -184,7 +184,7 @@ public final class TiltedBoundingBox {
     }
 
     private void outline(Consumer<Vector3Builder> consumer) {
-        final Vector3Builder.LocalAxes axes = rotation.getDirection3d().getLocalAxes();
+        final EulerQuaternionBuilder.LocalAxesQ axes = rotation.getLocalAxesQ();
         final Vector3Builder x = axes.getX().length(width / 2);
         final Vector3Builder y = axes.getY().length(height / 2);
         final Vector3Builder z = axes.getZ().length(depth / 2);

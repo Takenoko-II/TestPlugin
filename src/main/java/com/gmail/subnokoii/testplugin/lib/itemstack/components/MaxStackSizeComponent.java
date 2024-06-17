@@ -5,7 +5,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public final class MaxStackSizeComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    public MaxStackSizeComponent(ItemMeta itemMeta) {
+    private MaxStackSizeComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -32,7 +32,7 @@ public final class MaxStackSizeComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip(boolean flag) {
+    public boolean getShowInTooltip() {
         return false;
     }
 

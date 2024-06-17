@@ -8,8 +8,12 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionType;
 
@@ -99,7 +103,7 @@ public class ChestUIBuilder {
     }
 
     public static final class Button {
-        private final ItemStackBuilder itemStackBuilder = new ItemStackBuilder(Material.APPLE);
+        private ItemStackBuilder itemStackBuilder = new ItemStackBuilder(Material.APPLE);
 
         private Consumer<ChestUIClickEvent> listener = response -> {};
 
@@ -242,6 +246,24 @@ public class ChestUIBuilder {
             return this;
         }
 
+        public Button hideFlag(ItemFlag flag) {
+            itemStackBuilder.hideFlag(flag);
+
+            return this;
+        }
+
+        public Button attributeModifier(Attribute attribute, EquipmentSlot slot, double amount, AttributeModifier.Operation operation) {
+            itemStackBuilder.attributeModifier(attribute, slot, amount, operation, UUID.randomUUID());
+
+            return this;
+        }
+
+        public Button unbreakable() {
+            itemStackBuilder.unBreakable(true);
+
+            return this;
+        }
+
         public Button dataContainer(String path, Object value) {
             itemStackBuilder.dataContainer(path, value);
 
@@ -250,6 +272,17 @@ public class ChestUIBuilder {
 
         public Button onClick(Consumer<ChestUIClickEvent> listener) {
             this.listener = listener;
+
+            return this;
+        }
+
+        public Button from(ItemStackBuilder itemStackBuilder) {
+            final String id = new ItemStackDataContainerManager(this.itemStackBuilder.build()).getString("id");
+
+            this.itemStackBuilder = itemStackBuilder;
+
+            if (id == null) itemStackBuilder.dataContainer("id", UUID.randomUUID().toString());
+            else itemStackBuilder.dataContainer("id", id);
 
             return this;
         }

@@ -23,10 +23,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class TestPluginEvent implements Listener {
-    private static TestPluginEvent instance;
+public class CustomEvents implements Listener {
+    private static CustomEvents instance;
 
-    public static TestPluginEvent get() {
+    private static CustomEvents listener() {
         if (instance == null) {
             throw new RuntimeException("init()が実行されるよりも前にインスタンスを取得することはできません");
         }
@@ -36,37 +36,29 @@ public class TestPluginEvent implements Listener {
 
     public static void init() {
         if (instance == null) {
-            instance = new TestPluginEvent();
+            instance = new CustomEvents();
             Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.getInstance());
         }
     }
 
-    public static final class EventRegistrar {
+    public static final class Registrar {
         public void onLeftClick(Consumer<PlayerClickEvent> listener) {
-            TestPluginEvent.get().playerLeftClickEventListeners.add(listener);
+            CustomEvents.listener().playerLeftClickEventListeners.add(listener);
         }
 
         public void onRightClick(Consumer<PlayerClickEvent> listener) {
-            TestPluginEvent.get().playerRightClickEventListeners.add(listener);
+            CustomEvents.listener().playerRightClickEventListeners.add(listener);
         }
 
         public void onCustomItemUse(Consumer<CustomItemUseEvent> listener) {
-            TestPluginEvent.get().customItemUseEventListeners.add(listener);
+            CustomEvents.listener().customItemUseEventListeners.add(listener);
         }
 
         public void onDataPackMessageReceive(Consumer<DataPackMessageReceiveEvent> listener) {
-            TestPluginEvent.get().dataPackMessageReceiveEventListeners.add(listener);
+            CustomEvents.listener().dataPackMessageReceiveEventListeners.add(listener);
         }
 
-        private EventRegistrar() {}
-
-        private static EventRegistrar registrar;
-
-        public static EventRegistrar get() {
-            if (registrar == null) registrar = new EventRegistrar();
-
-            return registrar;
-        }
+        public Registrar() {}
     }
 
     @EventHandler

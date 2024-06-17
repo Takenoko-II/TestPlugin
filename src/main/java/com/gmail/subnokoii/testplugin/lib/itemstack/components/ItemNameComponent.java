@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 public final class ItemNameComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    public ItemNameComponent(ItemMeta itemMeta) {
+    private ItemNameComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -37,7 +37,7 @@ public final class ItemNameComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip(boolean flag) {
+    public boolean getShowInTooltip() {
         return false;
     }
 

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 public final class RepairCostComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    public RepairCostComponent(ItemMeta itemMeta) {
+    private RepairCostComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -44,7 +44,7 @@ public final class RepairCostComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip(boolean flag) {
+    public boolean getShowInTooltip() {
         return false;
     }
 

@@ -6,7 +6,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public final class DamageComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    public DamageComponent(ItemMeta itemMeta) {
+    private DamageComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -43,7 +43,7 @@ public final class DamageComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip(boolean flag) {
+    public boolean getShowInTooltip() {
         return false;
     }
 

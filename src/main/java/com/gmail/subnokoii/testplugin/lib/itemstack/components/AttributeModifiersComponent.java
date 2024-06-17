@@ -14,7 +14,7 @@ import java.util.UUID;
 public final class AttributeModifiersComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    public AttributeModifiersComponent(ItemMeta itemMeta) {
+    private AttributeModifiersComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -67,13 +67,14 @@ public final class AttributeModifiersComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip(boolean flag) {
-        return itemMeta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES);
+    public boolean getShowInTooltip() {
+        return !itemMeta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES);
     }
 
     @Override
     public void setShowInTooltip(boolean flag) {
-        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        if (flag) itemMeta.removeItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        else itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
     }
 
     public static final String COMPONENT_ID = "minecraft:attribute_modifiers";

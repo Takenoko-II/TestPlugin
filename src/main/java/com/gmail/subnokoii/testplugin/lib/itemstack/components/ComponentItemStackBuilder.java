@@ -4,9 +4,7 @@ import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +20,7 @@ public final class ComponentItemStackBuilder {
     /**
      * アイテムタイプから新しくアイテムを作成します。
      * @param type アイテムタイプ
+     * @throws IllegalArgumentException ItemMetaが取得できないアイテムタイプが渡されたとき
      */
     public ComponentItemStackBuilder(Material type) {
         itemStack = new ItemStack(type);
@@ -35,6 +34,7 @@ public final class ComponentItemStackBuilder {
     /**
      * アイテムスタックから新しくアイテムを作成します。
      * @param itemStack アイテムスタック
+     * @throws IllegalArgumentException 引数がnullのとき
      */
     public ComponentItemStackBuilder(ItemStack itemStack) {
         this.itemStack = itemStack.clone();
@@ -59,25 +59,8 @@ public final class ComponentItemStackBuilder {
      * @param type コンポーネントタイプ
      * @return 対応するコンポーネント
      */
-    public <T extends ItemStackComponent> T get(ComponentType<T> type) {
-        return type.getComponentInstance(itemMeta);
-    }
-
-    /**
-     * 指定の種類のコンポーネントが存在するかを取得します。
-     * @param type コンポーネントタイプ
-     * @return 存在すれば真
-     */
-    public boolean has(ComponentType<?> type) {
-        return type.getComponentInstance(itemMeta).getEnabled();
-    }
-
-    /**
-     * 指定の種類のコンポーネントを削除します。
-     * @param type コンポーネントタイプ
-     */
-    public void delete(ComponentType<?> type) {
-        type.getComponentInstance(itemMeta).disable();
+    public <T extends ItemStackComponent> T get(ItemStackComponent.ComponentType<T> type) {
+        return type.getComponent(itemMeta);
     }
 
     /**
@@ -87,8 +70,8 @@ public final class ComponentItemStackBuilder {
     public ItemStackComponent[] getAll() {
         final List<ItemStackComponent> components = new ArrayList<>();
 
-        for (final ComponentType<?> type : ComponentType.getAll()) {
-            final ItemStackComponent component = type.getComponentInstance(itemMeta);
+        for (final ItemStackComponent.ComponentType<?> type : ItemStackComponent.ComponentType.values()) {
+            final ItemStackComponent component = type.getComponent(itemMeta);
 
             if (component.getEnabled()) {
                 components.add(component);
@@ -103,8 +86,8 @@ public final class ComponentItemStackBuilder {
      * @return コンポーネントを一つでも持っていれば真
      */
     public boolean hasAny() {
-        for (final ComponentType<?> type : ComponentType.getAll()) {
-            if (has(type)) return true;
+        for (final ItemStackComponent.ComponentType<?> type : ItemStackComponent.ComponentType.values()) {
+            if (type.getComponent(itemMeta).getEnabled()) return true;
         }
 
         return false;
@@ -114,114 +97,76 @@ public final class ComponentItemStackBuilder {
      * 全コンポーネントを削除します。
      */
     public void deleteAll() {
-        for (final ComponentType<?> type : ComponentType.getAll()) {
-            type.getComponentInstance(itemMeta).disable();
+        for (final ItemStackComponent.ComponentType<?> type : ItemStackComponent.ComponentType.values()) {
+            type.getComponent(itemMeta).disable();
         }
     }
 
     public UnbreakableComponent unbreakable() {
-        return new UnbreakableComponent(itemMeta);
+        return get(ItemStackComponent.ComponentType.UNBREAKABLE);
     }
 
     public MaxStackSizeComponent maxStackSize() {
-        return new MaxStackSizeComponent(itemMeta);
+        return get(ItemStackComponent.ComponentType.MAX_STACK_SIZE);
     }
 
     public EnchantmentGlintOverrideComponent enchantmentGlintOverride() {
-        return new EnchantmentGlintOverrideComponent(itemMeta);
+        return get(ItemStackComponent.ComponentType.ENCHANT_GLINT_OVERRIDE);
     }
 
     public CustomNameComponent customName() {
-        return new CustomNameComponent(itemMeta);
+        return get(ItemStackComponent.ComponentType.CUSTOM_NAME);
     }
 
     public LoreComponent lore() {
-        return new LoreComponent(itemMeta);
+        return get(ItemStackComponent.ComponentType.LORE);
     }
 
     public AttributeModifiersComponent attributeModifiers() {
-        return new AttributeModifiersComponent(itemMeta);
+        return get(ItemStackComponent.ComponentType.ATTRIBUTE_MODIFIERS);
     }
 
     public RepairCostComponent repairCost() {
-        return new RepairCostComponent(itemMeta);
+        return get(ItemStackComponent.ComponentType.REPAIR_COST);
     }
 
     public ItemNameComponent itemName() {
-        return new ItemNameComponent(itemMeta);
+        return get(ItemStackComponent.ComponentType.ITEM_NAME);
     }
 
     public MaxDamageComponent maxDamage() {
-        return new MaxDamageComponent(itemMeta);
+        return get(ItemStackComponent.ComponentType.MAX_DAMAGE);
     }
 
-    /**
-     * コンポーネントタイプを表現するクラス
-     * @param <T> コンポーネントクラス
-     */
-    public static final class ComponentType<T extends ItemStackComponent> {
-        private final Class<T> clazz;
+    public EnchantmentsComponent enchantments() {
+        return get(ItemStackComponent.ComponentType.ENCHANTMENTS);
+    }
 
-        private static final List<ComponentType<?>> types = new ArrayList<>();
+    public StoredEnchantmentsComponent storedEnchantments() {
+        return get(ItemStackComponent.ComponentType.STORED_ENCHANTMENTS);
+    }
 
-        private ComponentType(Class<T> type) {
-            this.clazz = type;
-            ComponentType.types.add(this);
-        }
+    public PotionContentsComponent potionContents() {
+        return get(ItemStackComponent.ComponentType.POTION_CONTENTS);
+    }
 
-        private T getComponentInstance(ItemMeta itemMeta) {
-            try {
-                return clazz.getConstructor(ItemMeta.class).newInstance(itemMeta);
-            }
-            catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new InvalidComponentTypeException(e.toString());
-            }
-        }
+    public CustomModelDataComponent customModelData() {
+        return get(ItemStackComponent.ComponentType.CUSTOM_MODEL_DATA);
+    }
 
-        /**
-         * 全種類のコンポーネントタイプを取得します。
-         * @return コンポーネントタイプの配列
-         */
-        public static ComponentType<?>[] getAll() {
-            return types.toArray(ComponentType[]::new);
-        }
+    public TrimComponent trim() {
+        return get(ItemStackComponent.ComponentType.TRIM);
+    }
 
-        /**
-         * コンポーネントのIDを基にコンポーネントタイプを取得します。
-         * @param id コンポーネントID
-         * @return 対応するコンポーネントタイプ、存在しなければnull
-         */
-        public static @Nullable ComponentType<?> get(String id) {
-            for (final ComponentType<?> type : types) {
-                try {
-                    final String componentId = (String) type.clazz.getField("COMPONENT_ID").get(null);
+    public DyedColorComponent dyedColor() {
+        return get(ItemStackComponent.ComponentType.DYED_COLOR);
+    }
 
-                    if (componentId.equals(id)) {
-                        return type;
-                    }
-                }
-                catch (NoSuchFieldException | IllegalAccessException ignored) {}
-            }
+    public ProfileComponent profile() {
+        return get(ItemStackComponent.ComponentType.PROFILE);
+    }
 
-            return null;
-        }
-
-        public static final ComponentType<UnbreakableComponent> UNBREAKABLE = new ComponentType<>(UnbreakableComponent.class);
-
-        public static final ComponentType<CustomNameComponent> CUSTOM_NAME = new ComponentType<>(CustomNameComponent.class);
-
-        public static final ComponentType<ItemNameComponent> ITEM_NAME = new ComponentType<>(ItemNameComponent.class);
-
-        public static final ComponentType<LoreComponent> LORE = new ComponentType<>(LoreComponent.class);
-
-        public static final ComponentType<MaxStackSizeComponent> MAX_STACK_SIZE = new ComponentType<>(MaxStackSizeComponent.class);
-
-        public static final ComponentType<RepairCostComponent> REPAIR_COST = new ComponentType<>(RepairCostComponent.class);
-
-        public static final ComponentType<EnchantmentGlintOverrideComponent> ENCHANT_GLINT_OVERRIDE = new ComponentType<>(EnchantmentGlintOverrideComponent.class);
-
-        public static final ComponentType<AttributeModifiersComponent> ATTRIBUTE_MODIFIERS = new ComponentType<>(AttributeModifiersComponent.class);
-
-        public static final ComponentType<MaxDamageComponent> MAX_DAMAGE = new ComponentType<>(MaxDamageComponent.class);
+    public RecipesComponent recipes() {
+        return get(ItemStackComponent.ComponentType.RECIPES);
     }
 }

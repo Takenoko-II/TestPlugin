@@ -6,7 +6,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public final class UnbreakableComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    public UnbreakableComponent(ItemMeta itemMeta) {
+    private UnbreakableComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -32,12 +32,13 @@ public final class UnbreakableComponent implements ItemStackComponent {
         itemMeta.setUnbreakable(flag);
     }
 
-    public boolean getShowInTooltip(boolean flag) {
-        return itemMeta.hasItemFlag(ItemFlag.HIDE_UNBREAKABLE);
+    public boolean getShowInTooltip() {
+        return !itemMeta.hasItemFlag(ItemFlag.HIDE_UNBREAKABLE);
     }
 
     public void setShowInTooltip(boolean flag) {
-        itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        if (flag) itemMeta.removeItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        else itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
     }
 
     public static final String COMPONENT_ID = "minecraft:unbreakable";

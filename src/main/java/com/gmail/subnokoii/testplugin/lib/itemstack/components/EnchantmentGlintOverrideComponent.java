@@ -6,7 +6,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public final class EnchantmentGlintOverrideComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    public EnchantmentGlintOverrideComponent(ItemMeta itemMeta) {
+    private EnchantmentGlintOverrideComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -33,7 +33,7 @@ public final class EnchantmentGlintOverrideComponent implements ItemStackCompone
     }
 
     @Override
-    public boolean getShowInTooltip(boolean flag) {
+    public boolean getShowInTooltip() {
         return false;
     }
 

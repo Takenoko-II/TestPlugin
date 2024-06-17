@@ -2,6 +2,7 @@ package com.gmail.subnokoii.testplugin.lib.itemstack.components;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.Objects;
 public final class LoreComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    public LoreComponent(ItemMeta itemMeta) {
+    private LoreComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -30,32 +31,39 @@ public final class LoreComponent implements ItemStackComponent {
         itemMeta.lore(null);
     }
 
-    public TextComponent[] getLore() {
+    public Component[] getLore() {
         final List<Component> list = Objects.requireNonNullElse(itemMeta.lore(), new ArrayList<>());
 
-        return (TextComponent[]) list.toArray(Component[]::new);
+        return list.toArray(Component[]::new);
     }
 
-    public void setLore(TextComponent[] array) {
+    public void setLore(Component[] array) {
         itemMeta.lore(List.of(array));
     }
 
-    public void addLore(int index, TextComponent component) {
-        final List<TextComponent> components = Arrays.asList(getLore());
+    public void addLore(int index, Component component) {
+        final List<Component> components = new ArrayList<>(Arrays.asList(getLore()));
         components.add(index, component);
 
         itemMeta.lore(components);
     }
 
+    public void addLore(Component component) {
+        final List<Component> components = new ArrayList<>(Arrays.asList(getLore()));
+        components.add(component);
+
+        itemMeta.lore(components);
+    }
+
     public void removeLore(int index) {
-        final List<TextComponent> components = Arrays.asList(getLore());
+        final List<Component> components = Arrays.asList(getLore());
         components.remove(index);
 
         itemMeta.lore(components);
     }
 
     @Override
-    public boolean getShowInTooltip(boolean flag) {
+    public boolean getShowInTooltip() {
         return false;
     }
 

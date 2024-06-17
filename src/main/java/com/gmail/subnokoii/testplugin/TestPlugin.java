@@ -3,16 +3,22 @@ package com.gmail.subnokoii.testplugin;
 import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.*;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.FileDataContainerManager;
-import com.gmail.subnokoii.testplugin.lib.event.TestPluginEvent;
+import com.gmail.subnokoii.testplugin.lib.event.CustomEvents;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.ComponentItemStackBuilder;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.ItemStackComponent;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.PotionContentsComponent;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
 import org.bukkit.command.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -36,7 +42,7 @@ public final class TestPlugin extends JavaPlugin {
         TestPlugin.log(LoggingTarget.ALL, "TestPluginが起動しました");
 
         // イベントリスナー登録
-        TestPluginEvent.init();
+        CustomEvents.init();
         PlayerEventListener.init();
         EntityEventListener.init();
         ChestUIClickEvent.Listener.init();
@@ -180,8 +186,8 @@ public final class TestPlugin extends JavaPlugin {
      * TestPluginが管理する独自イベントを登録します。
      * @return TestPluginEvent.EventRegisterer
      */
-    public static TestPluginEvent.EventRegistrar events() {
-        return TestPluginEvent.EventRegistrar.get();
+    public static CustomEvents.Registrar events() {
+        return new CustomEvents.Registrar();
     }
 
     /**

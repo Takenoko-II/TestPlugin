@@ -14,6 +14,7 @@ import org.bukkit.potion.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
 
@@ -143,7 +144,7 @@ public class ItemStackBuilder {
         edit(builder -> {
             final TextComponent component = createUnItalicText(text).decorate(decoration);
 
-            final List<TextComponent> list = new ArrayList<>();
+            final List<Component> list = Objects.requireNonNullElse(builder.lore(), new ArrayList<>());
             list.add(component);
             builder.lore(list);
             return builder;
@@ -156,7 +157,7 @@ public class ItemStackBuilder {
         edit(builder -> {
             final TextComponent component = createUnItalicText(text).color(TextColor.color(color.asRGB()));
 
-            final List<TextComponent> list = new ArrayList<>();
+            final List<Component> list = Objects.requireNonNullElse(builder.lore(), new ArrayList<>());
             list.add(component);
             builder.lore(list);
             return builder;
@@ -169,7 +170,7 @@ public class ItemStackBuilder {
         edit(builder -> {
             final TextComponent component = createUnItalicText(text).decorate(decoration).color(TextColor.color(color.asRGB()));
 
-            final List<TextComponent> list = new ArrayList<>();
+            final List<Component> list = Objects.requireNonNullElse(builder.lore(), new ArrayList<>());
             list.add(component);
             builder.lore(list);
             return builder;

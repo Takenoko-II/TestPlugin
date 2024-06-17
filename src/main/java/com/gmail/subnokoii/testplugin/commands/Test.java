@@ -5,10 +5,14 @@ import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.itemstack.components.ComponentItemStackBuilder;
-import com.gmail.subnokoii.testplugin.lib.itemstack.components.MaxStackSizeComponent;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.ItemStackComponent;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.LoreComponent;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.PotionContentsComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,6 +20,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -152,15 +157,6 @@ public class Test implements CommandExecutor, TabCompleter {
                             .dataContainer("custom_item_tag", "instant_shoot_bow");
                             break;
                         }
-                        case "test": {
-                            final ComponentItemStackBuilder componentBuilder = new ComponentItemStackBuilder(Material.APPLE);
-                            componentBuilder.get(ComponentItemStackBuilder.ComponentType.MAX_STACK_SIZE).setMaxStackSize(3);
-                            componentBuilder.itemName().setItemName(Component.text("hoge"));
-                            componentBuilder.enchantmentGlintOverride().setGlintOverride(true);
-
-                            itemStackBuilder = componentBuilder.toItemStackBuilder();
-                            break;
-                        }
                         default: {
                             player.sendMessage(Component.text("無効な引数です").color(TextColor.color(252, 64, 72)));
                             return false;
@@ -206,7 +202,7 @@ public class Test implements CommandExecutor, TabCompleter {
                 return List.of("plugin_name", "api_version", "ip", "port", "current_tick", "max_players", "log_archive_size", "bukkit_version");
             }
             else if (args[0].equals("get_experimental_item")) {
-                return List.of("grappling_hook", "instant_shoot_bow");
+                return List.of("grappling_hook", "instant_shoot_bow", "potion");
             }
         }
 

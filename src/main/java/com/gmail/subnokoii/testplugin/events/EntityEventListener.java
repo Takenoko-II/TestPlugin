@@ -4,11 +4,14 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
+import com.gmail.subnokoii.testplugin.lib.event.CustomEvents;
+import com.gmail.subnokoii.testplugin.lib.vector.EulerQuaternionBuilder;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
@@ -82,6 +85,30 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                         if (serverType == null) return;
 
                         BungeeCordUtils.transfer((Player) target, serverType);
+                    }
+
+                    break;
+                }
+                case "rotate_display": {
+                    if (parameters.length != 3) return;
+
+                    float yaw, pitch, roll;
+
+                    try {
+                        yaw = Float.parseFloat(parameters[0]);
+                        pitch = Float.parseFloat(parameters[1]);
+                        roll = Float.parseFloat(parameters[2]);
+                    }
+                    catch (IllegalArgumentException e) {
+                        return;
+                    }
+
+                    for (final Entity target : targets) {
+                        if (!(target instanceof Display)) continue;
+
+                        final Display display = (Display) target;
+
+                        new EulerQuaternionBuilder(yaw, pitch, roll).toDisplayLeftRotation(display);
                     }
 
                     break;
@@ -213,6 +240,40 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
         if (Objects.equals(grapplingHookExists.get(player), true)) {
             grapplingHookExists.put(player, false);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        final Entity damagingEntity = event.getDamager();
+
+        if (!(damagingEntity instanceof Player)) return;
+
+        final Player player = (Player) damagingEntity;
+
+        final Entity hurtEntity = event.getEntity();
+
+        if (!(hurtEntity instanceof Damageable)) return;
+
+        final Damageable damageableEntity = (Damageable) hurtEntity;
+
+        final ItemStack itemStack = player.getEquipment().getItemInMainHand();
+
+        final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
+
+        if (tag == null) return;
+
+        if (tag.equals("sword_of_overwrite")) {
+            damageableEntity.getWorld().spawnEntity(damageableEntity.getLocation(), EntityType.LIGHTNING_BOLT);
+            damageableEntity.getWorld().spawnParticle(
+                Particle.DUST_COLOR_TRANSITION,
+                damageableEntity.getLocation(),
+                25,
+                0.5d, 1.0d, 0.5d,
+                0,
+                new Particle.DustTransition(Color.RED, Color.BLACK, 2)
+            );
+            damageableEntity.setHealth(0);
         }
     }
 

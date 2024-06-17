@@ -3,6 +3,7 @@ package com.gmail.subnokoii.testplugin.commands;
 import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -133,10 +134,22 @@ public class Log implements CommandExecutor, TabCompleter {
         else if (args.length == 3) {
             if (args[1].equals("read")) {
                 if (args[0].equals("plugin")) {
-                    return List.of(String.valueOf(TextFileUtils.read("plugins/TestPlugin-1.0-SNAPSHOT.log").size()));
+                    final List<String> list = TextFileUtils.read("plugins/TestPlugin-1.0-SNAPSHOT.log");
+
+                    if (list == null) {
+                        return List.of();
+                    }
+
+                    return List.of(String.valueOf(list.size()));
                 }
                 else if (args[0].equals("server")) {
-                    return List.of(String.valueOf(TextFileUtils.read("logs/latest.log").size()));
+                    final List<String> list = TextFileUtils.read("logs/latest.log");
+
+                    if (list == null) {
+                        return List.of();
+                    }
+
+                    return List.of(String.valueOf(list.size()));
                 }
             }
             else if (args[0].equals("server") && args[1].equals("clear")) {

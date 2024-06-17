@@ -1,13 +1,12 @@
 package com.gmail.subnokoii.testplugin.lib.itemstack.components;
 
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
-public final class CustomNameComponent implements ItemStackComponent {
+public final class CustomModelDataComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
 
-    private CustomNameComponent(ItemMeta itemMeta) {
+    private CustomModelDataComponent(ItemMeta itemMeta) {
         if (itemMeta == null) {
             throw new IllegalArgumentException();
         }
@@ -17,23 +16,23 @@ public final class CustomNameComponent implements ItemStackComponent {
 
     @Override
     public boolean getEnabled() {
-        return itemMeta.hasDisplayName();
+        return itemMeta.hasCustomModelData();
     }
 
-    @Override
-    public void disable() {
-        itemMeta.displayName(null);
-    }
-
-    public @Nullable TextComponent getCustomName() {
-        if (getEnabled()) {
-            return (TextComponent) itemMeta.displayName();
+    public @Nullable Integer getData() {
+        if (itemMeta.hasCustomModelData()) {
+            return itemMeta.getCustomModelData();
         }
         else return null;
     }
 
-    public void setCustomName(TextComponent component) {
-        itemMeta.displayName(component);
+    public void setCustomModelData(int data) {
+        itemMeta.setCustomModelData(data);
+    }
+
+    @Override
+    public void disable() {
+        itemMeta.setCustomModelData(null);
     }
 
     @Override
@@ -46,5 +45,5 @@ public final class CustomNameComponent implements ItemStackComponent {
         throw new InvalidComponentTypeException();
     }
 
-    public static final String COMPONENT_ID = "minecraft:custom_name";
+    public static final String COMPONENT_ID = "minecraft:custom_model_data";
 }

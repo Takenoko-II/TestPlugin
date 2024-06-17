@@ -10,10 +10,7 @@ import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerMa
 import com.gmail.subnokoii.testplugin.lib.other.ScheduleUtils;
 import com.gmail.subnokoii.testplugin.lib.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii.testplugin.lib.other.DisplayEditor;
-import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
-import com.gmail.subnokoii.testplugin.lib.vector.TiltedBoundingBox;
-import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
-import com.gmail.subnokoii.testplugin.lib.vector.Shape;
+import com.gmail.subnokoii.testplugin.lib.vector.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.Color;
@@ -85,20 +82,23 @@ public class PlayerEventListener implements Listener {
             if (new ItemStackDataContainerManager(itemStack).equals("custom_item_tag", "slash")) {
                 final Vector3Builder.LocalAxes axes = RotationBuilder.from(player).getDirection3d().getLocalAxes();
 
+                final Vector3Builder displayPos = Vector3Builder.from(player)
+                .add(0, 1.3, 0)
+                .add(axes.getZ().scale(1.75));
+
                 final Display display = DisplayEditor.spawnItemDisplay(
-                    Vector3Builder.from(player)
-                    .add(0, 1.3, 0)
-                    .add(axes.getZ().scale(1.75))
-                    .withWorld(player.getWorld()),
-                    new ItemStackBuilder(Material.KNOWLEDGE_BOOK)
-                    .customModelData(24792)
-                    .build()
+                    displayPos.withWorld(player.getWorld()),
+                    new ItemStackBuilder(Material.KNOWLEDGE_BOOK).customModelData(24792).build()
                 )
                 .setScale(new Vector3Builder(5, 3, 0.1))
-                .rotate(axes.getZ(), (float) Math.random() * 180 - 90)
-                .rotate(axes.getX(), player.getPitch())
-                .rotate(new Vector3Builder(0, 1, 0), -(player.getYaw() + 90))
                 .getEntity();
+
+                final EulerQuaternionBuilder euler = new EulerQuaternionBuilder()
+                 .rotateYaw(player.getYaw())
+                 .rotatePitch(player.getPitch())
+                 .rotateRoll((float) (Math.random() * 180 - 90));
+
+                 euler.toDisplayLeftRotation(display);
 
                 player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 3f, 1.2f);
 
