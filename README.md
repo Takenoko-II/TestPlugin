@@ -48,6 +48,20 @@
 { message: string }
 ```
 
+#### plugin_api:math/set_rotation/by_ternion
+実行者(ディスプレイエンティティ)の向きをyaw, pitch, rollの3つの角度を用いて設定します
+<br>引数:
+```
+{ yaw: float, pitch: float, roll: float }
+```
+
+#### plugin_api:math/set_rotation/by_roll
+実行者(ディスプレイエンティティ)の向きを実行方向, rollの2つを用いて設定します
+<br>引数:
+```
+{ roll: float }
+```
+
 ### 3. プラグイン製カスタムアイテムタグ
 
 右クリック／左クリックの検知はプラグイン用データパック使わなくてもコマンドからできるようにしてあります
@@ -140,3 +154,11 @@ OP持ってるなら/lobbyに続けてプレイヤー名を入力すると指定
 プラグインのjarファイルは[これ](target/TestPlugin-1.0-SNAPSHOT.jar)です
 <br>`鯖フォルダ/plugins/`に入れてもらえれば使えます
 <br>頻繁にプッシュしてるので最新のjar欲しくなったらここからどうぞ
+
+### 7. 今後の予定(めも)
+
+- PublicBukkitValues内のキーに必須の名前空間「`testplugin`」を「`plugin_api`」に変更
+- データパックにイベントの受け取りをサポート
+- EulerQuaternionBuilder#getNormal3d()を実装
+- TiltedBoundingBoxをロール角に対応
+- TiltedBoundingBoxをSeparating Axis Theoremによる衝突判定に変更
