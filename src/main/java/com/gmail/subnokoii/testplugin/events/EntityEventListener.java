@@ -14,8 +14,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.loot.LootTables;
+import org.bukkit.loot.Lootable;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -247,9 +250,9 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         final Entity damagingEntity = event.getDamager();
 
-        if (!(damagingEntity instanceof Player)) return;
+        if (!(damagingEntity instanceof LivingEntity)) return;
 
-        final Player player = (Player) damagingEntity;
+        final LivingEntity livingEntity = (LivingEntity) damagingEntity;
 
         final Entity hurtEntity = event.getEntity();
 
@@ -257,22 +260,48 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
         final Damageable damageableEntity = (Damageable) hurtEntity;
 
-        final ItemStack itemStack = player.getEquipment().getItemInMainHand();
+        final ItemStack itemStack = livingEntity.getEquipment().getItemInMainHand();
 
         final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
 
         if (tag == null) return;
 
         if (tag.equals("sword_of_overwrite")) {
-            damageableEntity.getWorld().spawnEntity(damageableEntity.getLocation(), EntityType.LIGHTNING_BOLT);
+            final Vector3Builder offset = Vector3Builder.from(damageableEntity.getBoundingBox());
+
             damageableEntity.getWorld().spawnParticle(
                 Particle.DUST_COLOR_TRANSITION,
-                damageableEntity.getLocation(),
-                25,
-                0.5d, 1.0d, 0.5d,
+                damageableEntity.getLocation().add(0, offset.y(), 0),
+                60,
+                offset.x() + 0.3, offset.y() + 0.3, offset.z() + 0.3,
                 0,
-                new Particle.DustTransition(Color.RED, Color.BLACK, 2)
+                new Particle.DustTransition(Color.RED, Color.ORANGE, 3)
             );
+
+            damageableEntity.getWorld().spawnParticle(
+                Particle.FLAME,
+                damageableEntity.getLocation().add(0, offset.y(), 0),
+                40,
+                offset.x(), offset.y(), offset.z(),
+                0.1
+            );
+
+            damageableEntity.getWorld().playSound(
+                damageableEntity.getLocation().add(0, offset.y(), 0),
+                Sound.ENTITY_BLAZE_SHOOT,
+                5f, 1f
+            );
+
+            damageableEntity.getWorld().playSound(
+                damageableEntity.getLocation().add(0, offset.y(), 0),
+                Sound.ENTITY_ZOMBIE_VILLAGER_CURE,
+                5f, 2f
+            );
+
+            if (damageableEntity instanceof Lootable) {
+                ((Lootable) hurtEntity).setLootTable(LootTables.EMPTY.getLootTable());
+            }
+
             damageableEntity.setHealth(0);
         }
     }

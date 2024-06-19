@@ -5,6 +5,7 @@ import com.gmail.subnokoii.testplugin.events.*;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.event.CustomEvents;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.ComponentItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIClickEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;

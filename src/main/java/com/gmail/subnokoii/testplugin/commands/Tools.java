@@ -2,6 +2,7 @@ package com.gmail.subnokoii.testplugin.commands;
 
 import com.gmail.subnokoii.testplugin.lib.itemstack.components.ComponentItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.itemstack.components.PotionContentsComponent;
+import com.gmail.subnokoii.testplugin.lib.itemstack.components.AttributeModifiersComponent.Modifier;
 import com.gmail.subnokoii.testplugin.lib.ui.ChestUIBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -10,14 +11,11 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,18 +36,14 @@ public class Tools implements CommandExecutor, TabCompleter {
             .customName("Quick Teleporter", NamedTextColor.LIGHT_PURPLE)
             .maxCount(1)
             .dataContainer("custom_item_tag", "quick_teleporter")
-            .onClick(event -> {
-                event.getPlayer().getInventory().addItem(event.getClickedItemStack());
-            });
+            .onClick(event -> event.getPlayer().getInventory().addItem(event.getClickedItemStack()));
         })
         .add(button -> {
             return button.type(Material.LINGERING_POTION)
             .customName("Data Getter", NamedTextColor.GREEN)
             .potionColor(Color.fromRGB(0x2FFF90))
             .dataContainer("custom_item_tag", "data_getter")
-            .onClick(event -> {
-                event.getPlayer().getInventory().addItem(event.getClickedItemStack());
-            });
+            .onClick(event -> event.getPlayer().getInventory().addItem(event.getClickedItemStack()));
         })
         .add(button -> {
             return button.type(Material.CLOCK)
@@ -57,9 +51,7 @@ public class Tools implements CommandExecutor, TabCompleter {
             .customName("Tick Progress Canceler", NamedTextColor.GOLD)
             .glint(true)
             .dataContainer("custom_item_tag", "tick_progress_canceler")
-            .onClick(event -> {
-                event.getPlayer().getInventory().addItem(event.getClickedItemStack());
-            });
+            .onClick(event -> event.getPlayer().getInventory().addItem(event.getClickedItemStack()));
         })
         .add(button -> {
             final ComponentItemStackBuilder potion = new ComponentItemStackBuilder(Material.SPLASH_POTION);
@@ -82,22 +74,22 @@ public class Tools implements CommandExecutor, TabCompleter {
             .onClick(event -> event.getPlayer().getInventory().addItem(event.getClickedItemStack()));
         })
         .add(button -> {
-            return button.type(Material.GOLDEN_SWORD)
-            .customName("Sword of Overwrite", NamedTextColor.RED)
-            .glint(true)
-            .dataContainer("custom_item_tag", "sword_of_overwrite")
-            .lore("")
-            .lore("利き手に持ったとき：", Color.fromRGB(NamedTextColor.GRAY.value()))
-            .lore(" - 攻撃力", Color.fromRGB(NamedTextColor.DARK_GREEN.value()))
-            .lore(" 1.6 攻撃速度", Color.fromRGB(NamedTextColor.DARK_GREEN.value()))
-            .attributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, EquipmentSlot.HAND, 1, AttributeModifier.Operation.ADD_NUMBER)
-            .attributeModifier(Attribute.GENERIC_ATTACK_SPEED, EquipmentSlot.HAND, -2.5, AttributeModifier.Operation.ADD_NUMBER)
-            .hideFlag(ItemFlag.HIDE_ATTRIBUTES)
-            .hideFlag(ItemFlag.HIDE_UNBREAKABLE)
-            .unbreakable()
-            .onClick(event -> {
-                event.getPlayer().getInventory().addItem(event.getClickedItemStack());
-            });
+            final ComponentItemStackBuilder sword = new ComponentItemStackBuilder(Material.GOLDEN_SWORD);
+            final Modifier attackDamage = new Modifier(Attribute.GENERIC_ATTACK_DAMAGE).setValue(0.1d);
+            final Modifier attackSpeed = new Modifier(Attribute.GENERIC_ATTACK_SPEED).setValue(-2.5d);
+
+            sword.attributeModifiers().setModifiers(new Modifier[]{attackDamage, attackSpeed});
+            sword.attributeModifiers().setShowInTooltip(false);
+            sword.unbreakable().setUnbreakable(true);
+            sword.unbreakable().setShowInTooltip(false);
+            sword.itemName().setItemName(Component.text("Sword of Overwrite").color(NamedTextColor.GOLD));
+            sword.lore().addLore(Component.text(""));
+            sword.lore().addLore(Component.text("利き手に持ったとき：").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.GRAY));
+            sword.lore().addLore(Component.text(" - 攻撃力").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GREEN));
+            sword.lore().addLore(Component.text(" 1.6 攻撃速度").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GREEN));
+
+            return button.from(sword.toItemStackBuilder().dataContainer("custom_item_tag", "sword_of_overwrite"))
+            .onClick(event -> event.getPlayer().getInventory().addItem(event.getClickedItemStack()));
         });
 
         tools.open((Player) sender);

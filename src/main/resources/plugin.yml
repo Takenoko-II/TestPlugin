@@ -13,6 +13,7 @@ commands:
     description: 'ログを管理します'
   tools:
     description: 'プラグイン製のツールを取り出すためのUIを表示します'
+    usage: '/<command>'
   test:
     description: 'デバッグ用コマンドのため機能が頻繁に追加・削除・変更されます'
   database:

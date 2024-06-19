@@ -5,6 +5,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
@@ -608,6 +609,10 @@ public class Vector3Builder implements VectorBuilder {
     public static Vector3Builder from(Block block, BlockFace blockFace) {
         return Vector3Builder.from(block.getLocation())
         .add(new Vector3Builder(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ()));
+    }
+
+    public static Vector3Builder from(BoundingBox box) {
+        return new Vector3Builder(box.getWidthX() / 2, box.getHeight() / 2, box.getWidthZ() / 2);
     }
 
     /**

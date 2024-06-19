@@ -54,7 +54,7 @@ public class TickEventListener extends BukkitRunnable {
 
                     final BoundingBox box = entity.getBoundingBox();
 
-                    player.spawnParticle(Particle.DUST, location, 10, box.getWidthX() / 2, box.getHeight(), box.getWidthZ() / 2, 0.000000001d, dustOptions);
+                    player.spawnParticle(Particle.DUST, location.add(0, box.getHeight() / 2, 0), 20, box.getWidthX() / 2, box.getHeight() / 2, box.getWidthZ() / 2, 0.000000001d, dustOptions);
                 }
                 else if (block != null) {
                     final Location location = block.getLocation();
