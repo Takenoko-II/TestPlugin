@@ -6,6 +6,8 @@ import com.gmail.subnokoii.testplugin.TestPlugin;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.event.CustomEvents;
 import com.gmail.subnokoii.testplugin.lib.vector.EulerQuaternionBuilder;
+import com.gmail.subnokoii.testplugin.lib.vector.RotationBuilder;
+import com.gmail.subnokoii.testplugin.lib.vector.TiltedBoundingBox;
 import com.gmail.subnokoii.testplugin.lib.vector.Vector3Builder;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -149,6 +151,39 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                             event.returnValue(Math.cbrt(x));
                             break;
                         }
+                    }
+
+                    break;
+                }
+                case "spawn_bounding_box": {
+                    if (parameters.length < 3) return;
+
+                    double width, height, depth;
+                    boolean showOutline = false;
+
+                    try {
+                        width = Double.parseDouble(parameters[0]);
+                        height = Double.parseDouble(parameters[1]);
+                        depth = Double.parseDouble(parameters[2]);
+                        if (parameters.length == 4) {
+                            showOutline = Boolean.parseBoolean(parameters[3]);
+                        }
+                    }
+                    catch (IllegalArgumentException e) {
+                        return;
+                    }
+
+                    final TiltedBoundingBox box = new TiltedBoundingBox(width, height, depth);
+                    final Entity center = targets[0];
+                    box.put(center.getWorld(), Vector3Builder.from(center.getLocation()));
+                    box.rotate(new RotationBuilder(center.getYaw(), center.getPitch()));
+
+                    if (showOutline) {
+                        box.showOutline();
+                    }
+
+                    for (final Entity entity : box.getIntersection()) {
+                        entity.addScoreboardTag("plugin_api.box_intersection");
                     }
 
                     break;
