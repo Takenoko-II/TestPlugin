@@ -443,6 +443,18 @@ public class PlayerEventListener implements Listener {
     }
 
     @EventHandler
+    public void onPortal(PlayerPortalEvent event) {
+        final World.Environment from = event.getFrom().getWorld().getEnvironment();
+        final World.Environment to = event.getTo().getWorld().getEnvironment();
+
+        if (from.equals(World.Environment.NORMAL) && to.equals(World.Environment.NETHER)) {
+            event.setCancelled(true);
+            BungeeCordUtils.transfer(event.getPlayer(), BungeeCordUtils.ServerType.GAME);
+            event.getPlayer().sendMessage("gameサーバーへの接続を試行中...");
+        }
+    }
+
+    @EventHandler
     public void onShot(EntityShootBowEvent event) {
         final Entity entity = event.getEntity();
         final Entity projectile = event.getProjectile();
