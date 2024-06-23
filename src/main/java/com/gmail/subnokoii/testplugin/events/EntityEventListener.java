@@ -156,18 +156,15 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                     break;
                 }
                 case "spawn_bounding_box": {
-                    if (parameters.length < 3) return;
+                    if (parameters.length < 4) return;
 
                     double width, height, depth;
-                    boolean showOutline = false;
+                    boolean showOutline = parameters[3].equals("true") || parameters[3].equals("1") || parameters[3].equals("1b");
 
                     try {
                         width = Double.parseDouble(parameters[0]);
                         height = Double.parseDouble(parameters[1]);
                         depth = Double.parseDouble(parameters[2]);
-                        if (parameters.length == 4) {
-                            showOutline = Boolean.parseBoolean(parameters[3]);
-                        }
                     }
                     catch (IllegalArgumentException e) {
                         return;
