@@ -1,7 +1,7 @@
 package com.gmail.subnokoii78.testplugin;
 
-import com.gmail.subnokoii78.testplugin.util.itemstack.ItemStackBuilder;
-import com.gmail.subnokoii78.testplugin.util.ui.ChestUIBuilder;
+import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
+import com.gmail.subnokoii78.util.ui.ChestUIBuilder;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.kyori.adventure.text.format.NamedTextColor;

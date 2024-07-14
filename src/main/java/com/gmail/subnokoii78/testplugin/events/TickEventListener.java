@@ -1,7 +1,7 @@
 package com.gmail.subnokoii78.testplugin.events;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.testplugin.util.datacontainer.ItemStackDataContainerManager;
+import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;

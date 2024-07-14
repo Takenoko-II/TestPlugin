@@ -1,8 +1,8 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.testplugin.util.datacontainer.DataContainerManager;
-import com.gmail.subnokoii78.testplugin.util.datacontainer.InvalidContainerKeyException;
+import com.gmail.subnokoii78.util.datacontainer.DataContainerManager;
+import com.gmail.subnokoii78.util.datacontainer.InvalidContainerKeyException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
