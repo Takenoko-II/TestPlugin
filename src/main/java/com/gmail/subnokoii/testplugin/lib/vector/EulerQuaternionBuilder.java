@@ -1,5 +1,6 @@
 package com.gmail.subnokoii.testplugin.lib.vector;
 
+import com.gmail.subnokoii.testplugin.TestPlugin;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Transformation;
@@ -41,6 +42,7 @@ public final class EulerQuaternionBuilder {
         quaternion.z = 0;
         quaternion.w = 1;
 
+        TestPlugin.log(TestPlugin.LoggingTarget.SERVER, yaw + ", " + pitch + ", " + roll);
         rotateQuaternion(axes.getZ(), roll);
         rotateQuaternion(axes.getX(), pitch);
         rotateQuaternion(new Vector3Builder(0, 1, 0), -(yaw + 90));
@@ -116,34 +118,56 @@ public final class EulerQuaternionBuilder {
         return new EulerQuaternionBuilder(entity.getYaw(), entity.getPitch(), 0);
     }
 
-    public static final class LocalAxesQ {
-        private final EulerQuaternionBuilder quaternion;
+    public static final class LocalAxesQ extends Vector3Builder.LocalAxes {
+        private final double[][] matrix;
 
         private LocalAxesQ(EulerQuaternionBuilder eulerQuaternionBuilder) {
-            quaternion = eulerQuaternionBuilder;
+            super(eulerQuaternionBuilder.getRotation2d().getDirection3d());
+
+            final double radian = eulerQuaternionBuilder.roll * Math.PI / 180;
+            final double sin = Math.sin(radian);
+            final double cos = Math.cos(radian);
+            final Vector3Builder axis = super.getZ();
+            final double x = axis.x();
+            final double y = axis.y();
+            final double z = axis.z();
+
+            this.matrix = new double[][]{
+                new double[]{
+                    cos + x * x * (1 - cos),
+                    x * y * (1 - cos) - z * sin,
+                    x * z * (1 - cos) + y * sin
+                },
+                new double[]{
+                    y * x * (1 - cos) + z * sin,
+                    cos + y * y * (1 - cos),
+                    y * z * (1 - cos) - x * sin
+                },
+                new double[]{
+                    z * x * (1 - cos) - y * sin,
+                    z * y * (1 - cos) + x * sin,
+                    cos + z * z * (1 - cos)
+                }
+            };
         }
 
-        /**
-         * @deprecated
-         */
+        private Vector3Builder rotate(Vector3Builder vector3) {
+            final double x = matrix[0][0] * vector3.x() + matrix[0][1] * vector3.y() + matrix[0][2] * vector3.z();
+            final double y = matrix[1][0] * vector3.x() + matrix[1][1] * vector3.y() + matrix[1][2] * vector3.z();
+            final double z = matrix[2][0] * vector3.x() + matrix[2][1] * vector3.y() + matrix[2][2] * vector3.z();
+            return new Vector3Builder(x, y, z);
+        }
+
         public Vector3Builder getX() {
-            return new RotationBuilder(quaternion.yaw, quaternion.pitch)
-            .getDirection3d()
-            .getLocalAxes()
-            .getX()
-            .getRotation2d()
-            .pitch(-quaternion.roll)
-            .getDirection3d();
+            return rotate(super.getX());
         }
 
         public Vector3Builder getY() {
-            return new RotationBuilder(quaternion.yaw, quaternion.pitch)
-            .getDirection3d().getLocalAxes().getY();
+            return rotate(super.getY());
         }
 
         public Vector3Builder getZ() {
-            return new RotationBuilder(quaternion.yaw, quaternion.pitch)
-            .getDirection3d();
+            return super.getZ();
         }
     }
 }

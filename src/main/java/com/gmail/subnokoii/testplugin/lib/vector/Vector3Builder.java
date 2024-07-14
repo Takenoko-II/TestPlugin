@@ -635,7 +635,7 @@ public class Vector3Builder implements VectorBuilder {
         return a.copy().calc(b, Math::max);
     }
 
-    public static final class LocalAxes {
+    public static class LocalAxes {
         private final Vector3Builder x;
 
         private final Vector3Builder y;

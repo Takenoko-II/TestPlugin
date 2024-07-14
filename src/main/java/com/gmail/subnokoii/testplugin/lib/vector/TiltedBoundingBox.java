@@ -49,8 +49,8 @@ public final class TiltedBoundingBox {
         center.z(location.z());
     }
 
-    public void rotate(RotationBuilder rotation) {
-        this.rotation.add(EulerQuaternionBuilder.from(rotation));
+    public void rotate(EulerQuaternionBuilder rotation) {
+        this.rotation.add(rotation);
     }
 
     public boolean isInside(Vector3Builder vector3) {

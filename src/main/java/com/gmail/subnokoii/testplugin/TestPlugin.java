@@ -2,6 +2,7 @@ package com.gmail.subnokoii.testplugin;
 
 import com.gmail.subnokoii.testplugin.commands.*;
 import com.gmail.subnokoii.testplugin.events.*;
+import com.gmail.subnokoii.testplugin.lib.datacontainer.DataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.event.CustomEvents;
 import com.gmail.subnokoii.testplugin.lib.file.TextFileUtils;
@@ -56,6 +57,8 @@ public final class TestPlugin extends JavaPlugin {
         TestPlugin.database().set("foo:bar", 0);
 
         TestPlugin.log(LoggingTarget.SERVER, TestPlugin.database().toJson());
+
+        DataContainerManager.stringify(new Object());
     }
 
     @Override

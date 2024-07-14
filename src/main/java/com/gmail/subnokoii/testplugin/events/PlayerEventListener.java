@@ -2,8 +2,6 @@ package com.gmail.subnokoii.testplugin.events;
 
 import com.gmail.subnokoii.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii.testplugin.TestPlugin;
-import com.gmail.subnokoii.testplugin.lib.datacontainer.DataContainerCompound;
-import com.gmail.subnokoii.testplugin.lib.datacontainer.DataContainerManager;
 import com.gmail.subnokoii.testplugin.lib.event.data.PlayerClickEvent;
 import com.gmail.subnokoii.testplugin.lib.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii.testplugin.lib.datacontainer.ItemStackDataContainerManager;
@@ -226,7 +224,7 @@ public class PlayerEventListener implements Listener {
                     final RotationBuilder rotation = RotationBuilder.from(player);
                     rotation.pitch(0);
                     rotation.add(new RotationBuilder(90, Math.floor(Math.random() * 180) + 1 - 90));
-                    boundingBox.rotate(rotation);
+                    boundingBox.rotate(EulerQuaternionBuilder.from(rotation));
                     boundingBox.showOutline();
 
                     for (Entity entity : boundingBox.getIntersection()) {

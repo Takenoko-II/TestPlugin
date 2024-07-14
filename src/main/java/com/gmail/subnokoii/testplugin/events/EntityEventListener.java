@@ -156,15 +156,16 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                     break;
                 }
                 case "spawn_bounding_box": {
-                    if (parameters.length < 4) return;
+                    if (parameters.length < 5) return;
 
-                    double width, height, depth;
+                    double width, height, depth, roll;
                     boolean showOutline = parameters[3].equals("true") || parameters[3].equals("1") || parameters[3].equals("1b");
 
                     try {
                         width = Double.parseDouble(parameters[0]);
                         height = Double.parseDouble(parameters[1]);
                         depth = Double.parseDouble(parameters[2]);
+                        roll = Double.parseDouble(parameters[4]);
                     }
                     catch (IllegalArgumentException e) {
                         return;
@@ -172,8 +173,10 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
                     final TiltedBoundingBox box = new TiltedBoundingBox(width, height, depth);
                     final Entity center = targets[0];
+                    final EulerQuaternionBuilder rotation = EulerQuaternionBuilder.from(RotationBuilder.from(center));
+                    rotation.rotateRoll((float) roll);
                     box.put(center.getWorld(), Vector3Builder.from(center.getLocation()));
-                    box.rotate(new RotationBuilder(center.getYaw(), center.getPitch()));
+                    box.rotate(rotation);
 
                     if (showOutline) {
                         box.showOutline();
