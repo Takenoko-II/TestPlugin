@@ -62,6 +62,21 @@
 { roll: float }
 ```
 
+#### plugin_api:math/bounding_box
+実行座標と実行方向を参照してその場で当たり判定を作成します
+<br>引数:
+```
+{ width: double, height: double, depth: double, show_outline: boolean }
+```
+
+#### plugin_api:math/bounding_box_with_roll
+関数`plugin_api:math/bounding_box`の上位互換です
+<br>roll引数によって向きをディスプレイエンティティ並の自由度で操作できます
+<br>引数:
+```
+{ width: double, height: double, depth: double, show_outline: boolean, roll: float }
+```
+
 ### 3. プラグイン製カスタムアイテムタグ
 
 右クリック／左クリックの検知はプラグイン用データパック使わなくてもコマンドからできるようにしてあります
@@ -138,13 +153,17 @@ OP持ってるなら/lobbyに続けてプレイヤー名を入力すると指定
 データベース確認用
 <br>割愛
 
-### 5. プラグイン製スコアオブジェクト
+### 5. プラグイン製エンティティタグ・スコアオブジェクト
 
 随時追加します
 
-#### plugin_api.on_left_click
+#### plugin_api.on_left_click (/scoreboard)
 
 アイテムを持っている／持っていないに関わらず1回左クリックすると1増えます
+
+### plugin_api.disable_left_click (/tag)
+
+このタグを持つプレイヤーの左クリックによるワールドへの干渉を封じます(ブロック破壊除く)
 
 ### 6. ソースコード・プラグイン導入
 

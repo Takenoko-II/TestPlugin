@@ -64,6 +64,10 @@ public class PlayerEventListener implements Listener {
             final Player player = event.getPlayer();
             final ItemStack itemStack = event.getItemStack();
 
+            if (player.getScoreboardTags().contains("plugin_api.disable_left_click")) {
+                event.cancel();
+            }
+
             ScoreboardUtils
             .getOrCreateObjective("plugin_api.on_left_click")
             .addScore(player, 1);

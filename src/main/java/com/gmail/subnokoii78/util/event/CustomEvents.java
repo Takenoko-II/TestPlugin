@@ -7,6 +7,7 @@ import com.gmail.subnokoii78.util.event.data.DataPackMessageReceiveEvent;
 import com.gmail.subnokoii78.util.event.data.PlayerClickEvent;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
 import com.gmail.subnokoii78.util.other.ScheduleUtils;
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -120,14 +121,13 @@ public class CustomEvents implements Listener {
         }
     }
 
-    @EventHandler
+    // @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         final Entity damagingEntity = event.getDamager();
 
-        if (!(damagingEntity instanceof Player)) return;
+        if (!(damagingEntity instanceof Player player)) return;
 
         final Entity entity = event.getEntity();
-        final Player player = (Player) damagingEntity;
 
         final EntityDamageEvent.DamageCause cause = event.getCause();
         final long currentTime = System.currentTimeMillis();
@@ -155,6 +155,23 @@ public class CustomEvents implements Listener {
                 listener.accept(new CustomItemUseEvent(event));
             });
         }
+    }
+
+    @EventHandler
+    public void onPrePlayerAttack(PrePlayerAttackEntityEvent event) {
+        final Player player = event.getPlayer();
+
+        leftClick(event);
+
+        final ItemStack itemStack = player.getEquipment().getItemInMainHand();
+
+        final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
+
+        if (tag == null) return;
+
+        customItemUseEventListeners.forEach(listener -> {
+            listener.accept(new CustomItemUseEvent(event));
+        });
     }
 
     @EventHandler
@@ -199,6 +216,12 @@ public class CustomEvents implements Listener {
     }
 
     private void leftClick(EntityDamageByEntityEvent event) {
+        playerLeftClickEventListeners.forEach(listener -> {
+            listener.accept(new PlayerClickEvent(event));
+        });
+    }
+
+    private void leftClick(PrePlayerAttackEntityEvent event) {
         playerLeftClickEventListeners.forEach(listener -> {
             listener.accept(new PlayerClickEvent(event));
         });

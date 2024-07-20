@@ -1,6 +1,7 @@
 package com.gmail.subnokoii78.util.event.data;
 
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -11,6 +12,8 @@ public class CustomItemUseEvent {
     private PlayerInteractEvent playerInteractEvent;
 
     private EntityDamageByEntityEvent entityDamageByEntityEvent;
+
+    private PrePlayerAttackEntityEvent prePlayerAttackEntityEvent;
 
     private final Player player;
 
@@ -50,6 +53,14 @@ public class CustomItemUseEvent {
         }
     }
 
+    public CustomItemUseEvent(PrePlayerAttackEntityEvent event) {
+        prePlayerAttackEntityEvent = event;
+        player = event.getPlayer();
+        itemStack = player.getEquipment().getItemInMainHand();
+        tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
+        isLeftClick = true;
+    }
+
     public Player getPlayer() {
         return player;
     }
@@ -76,6 +87,9 @@ public class CustomItemUseEvent {
         }
         else if (playerInteractEvent != null) {
             playerInteractEvent.setCancelled(true);
+        }
+        else if (prePlayerAttackEntityEvent != null) {
+            prePlayerAttackEntityEvent.setCancelled(true);
         }
         else {
             throw new RuntimeException();
