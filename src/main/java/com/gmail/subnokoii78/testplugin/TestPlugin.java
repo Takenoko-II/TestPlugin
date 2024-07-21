@@ -4,7 +4,6 @@ import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.events.EntityEventListener;
 import com.gmail.subnokoii78.testplugin.events.PlayerEventListener;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
-import com.gmail.subnokoii78.util.datacontainer.DataContainerManager;
 import com.gmail.subnokoii78.util.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii78.util.event.CustomEvents;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
@@ -55,12 +54,6 @@ public final class TestPlugin extends JavaPlugin {
 
         // BungeeCordに接続
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-
-        TestPlugin.database().set("foo:bar", 0);
-
-        TestPlugin.log(LoggingTarget.SERVER, TestPlugin.database().toJson());
-
-        DataContainerManager.stringify(new Object());
     }
 
     @Override

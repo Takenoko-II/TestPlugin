@@ -161,7 +161,7 @@ OP持ってるなら/lobbyに続けてプレイヤー名を入力すると指定
 
 アイテムを持っている／持っていないに関わらず1回左クリックすると1増えます
 
-### plugin_api.disable_left_click (/tag)
+#### plugin_api.disable_left_click (/tag)
 
 このタグを持つプレイヤーの左クリックによるワールドへの干渉を封じます(ブロック破壊除く)
 
@@ -174,10 +174,14 @@ OP持ってるなら/lobbyに続けてプレイヤー名を入力すると指定
 <br>`鯖フォルダ/plugins/`に入れてもらえれば使えます
 <br>頻繁にプッシュしてるので最新のjar欲しくなったらここからどうぞ
 
+#### 過去バージョンのプラグイン
+
+現行バージョン以前のプラグインの最終jarファイルは以下に置いておきます
+<br>これらのバージョンにおけるプラグインは二度と更新されることはありません
+
+- [1.20.6](archives/TestPlugin-1.20.6.jar)
+
 ### 7. 今後の予定(めも)
 
 - PublicBukkitValues内のキーに必須の名前空間「`testplugin`」を「`plugin_api`」に変更
-- データパックにイベントの受け取りをサポート
-- EulerQuaternionBuilder#getNormal3d()を実装
-- TiltedBoundingBoxをロール角に対応
 - TiltedBoundingBoxをSeparating Axis Theoremによる衝突判定に変更
