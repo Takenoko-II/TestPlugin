@@ -6,6 +6,7 @@ import org.bukkit.World;
 
 import java.util.function.Consumer;
 
+@Deprecated
 public final class Shape {
     private final ShapeType type;
 

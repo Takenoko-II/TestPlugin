@@ -8,7 +8,7 @@ import java.util.function.UnaryOperator;
 public final class EntireAxisRotationHandler implements VectorBuilder {
     private final Quaternionf quaternion = new Quaternionf(0f, 0f, 0f, 1f);
 
-    private float yaw = 0, pitch = 0, roll = 0;
+    private float yaw, pitch, roll;
 
     public EntireAxisRotationHandler(float yaw, float pitch, float roll) {
         this.yaw = yaw;
@@ -17,7 +17,12 @@ public final class EntireAxisRotationHandler implements VectorBuilder {
         update();
     }
 
-    public EntireAxisRotationHandler() {}
+    public EntireAxisRotationHandler() {
+        this.yaw = 0;
+        this.pitch = 0;
+        this.roll = 0;
+        update();
+    }
 
     @Override
     public double getComponent(int index) {
@@ -136,6 +141,33 @@ public final class EntireAxisRotationHandler implements VectorBuilder {
         rotateQuaternion(axes.getZ(), roll);
         rotateQuaternion(axes.getX(), pitch);
         rotateQuaternion(new Vector3Builder(0, 1, 0), -(yaw + 90));
+    }
+
+    public float yaw() {
+        return yaw;
+    }
+
+    public float pitch() {
+        return pitch;
+    }
+
+    public float roll() {
+        return roll;
+    }
+
+    public void yaw(float yaw) {
+        this.yaw = yaw;
+        update();
+    }
+
+    public void pitch(float pitch) {
+        this.pitch = pitch;
+        update();
+    }
+
+    public void roll(float roll) {
+        this.roll = roll;
+        update();
     }
 
     public EntireAxisRotationHandler add(EntireAxisRotationHandler rotation) {
