@@ -7,7 +7,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public class ChestUIClickEvent {
     private final Player player;
@@ -85,6 +88,31 @@ public class ChestUIClickEvent {
                     }
 
                     break;
+                }
+            }
+        }
+
+        @EventHandler
+        public void onMove(InventoryMoveItemEvent event) {
+            final Inventory src = event.getSource();
+            final Inventory dest = event.getDestination();
+            final ItemStack itemStack = event.getItem();
+
+            for (final ChestUIBuilder ui : ChestUIBuilder.getAll()) {
+                if (ui.getInventory().equals(dest)) {
+                    event.setCancelled(true);
+                    break;
+                }
+                else if (ui.getInventory().equals(src) && dest instanceof PlayerInventory playerInventory) {
+                    if (playerInventory.getItemInOffHand().equals(itemStack)) {
+                        for (final ChestUIBuilder.Button button : ui.getAllButtons()) {
+                            if (button.match(itemStack)) {
+                                event.setCancelled(true);
+                                break;
+                            }
+                        }
+                        break;
+                    }
                 }
             }
         }

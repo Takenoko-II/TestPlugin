@@ -170,6 +170,9 @@ public final class JSONParser {
             if (previous != '\\' && current == '"') {
                 break;
             }
+            else if (previous == '\\' && current == '"') {
+                str.delete(str.length() - 1, str.length());
+            }
 
             str.append(current);
 
