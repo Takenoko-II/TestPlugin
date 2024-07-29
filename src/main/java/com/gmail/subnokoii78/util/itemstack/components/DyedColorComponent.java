@@ -6,9 +6,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class DyedColorComponent implements ItemStackComponent {
+public final class DyedColorComponent implements TooltipShowable {
     private final ItemMeta itemMeta;
 
     private DyedColorComponent(ItemMeta itemMeta) {
@@ -20,7 +21,7 @@ public final class DyedColorComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return hasColor();
     }
 
@@ -75,5 +76,8 @@ public final class DyedColorComponent implements ItemStackComponent {
         else throw new RuntimeException("このエラー出るってことはこの世界がおかしい(？)");
     }
 
-    public static final String COMPONENT_ID = "minecraft:dyed_color";
+    @Override
+    public @NotNull String getComponentId() {
+        return "minecraft:dyed_color";
+    }
 }

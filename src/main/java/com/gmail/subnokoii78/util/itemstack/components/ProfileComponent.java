@@ -3,6 +3,7 @@ package com.gmail.subnokoii78.util.itemstack.components;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.NotNull;
 
 public final class ProfileComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
@@ -16,7 +17,7 @@ public final class ProfileComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return hasOwner();
     }
 
@@ -48,14 +49,7 @@ public final class ProfileComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip() {
-        return false;
+    public @NotNull String getComponentId() {
+        return "minecraft:profile";
     }
-
-    @Override
-    public void setShowInTooltip(boolean flag) {
-        throw new InvalidComponentTypeException();
-    }
-
-    public static final String COMPONENT_ID = "minecraft:profile";
 }

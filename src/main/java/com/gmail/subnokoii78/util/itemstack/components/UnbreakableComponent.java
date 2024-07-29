@@ -2,8 +2,9 @@ package com.gmail.subnokoii78.util.itemstack.components;
 
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
-public final class UnbreakableComponent implements ItemStackComponent {
+public final class UnbreakableComponent implements TooltipShowable {
     private final ItemMeta itemMeta;
 
     private UnbreakableComponent(ItemMeta itemMeta) {
@@ -15,7 +16,7 @@ public final class UnbreakableComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return getUnbreakable();
     }
 
@@ -32,14 +33,19 @@ public final class UnbreakableComponent implements ItemStackComponent {
         itemMeta.setUnbreakable(flag);
     }
 
+    @Override
     public boolean getShowInTooltip() {
         return !itemMeta.hasItemFlag(ItemFlag.HIDE_UNBREAKABLE);
     }
 
+    @Override
     public void setShowInTooltip(boolean flag) {
         if (flag) itemMeta.removeItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         else itemMeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
     }
 
-    public static final String COMPONENT_ID = "minecraft:unbreakable";
+    @Override
+    public @NotNull String getComponentId() {
+        return "minecraft:unbreakable";
+    }
 }

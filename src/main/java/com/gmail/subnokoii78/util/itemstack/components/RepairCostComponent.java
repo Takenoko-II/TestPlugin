@@ -2,6 +2,7 @@ package com.gmail.subnokoii78.util.itemstack.components;
 
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.Repairable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class RepairCostComponent implements ItemStackComponent {
@@ -16,7 +17,7 @@ public final class RepairCostComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         if (itemMeta instanceof Repairable) {
             return ((Repairable) itemMeta).hasRepairCost();
         }
@@ -44,14 +45,7 @@ public final class RepairCostComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip() {
-        return false;
+    public @NotNull String getComponentId() {
+        return "minecraft:repairable";
     }
-
-    @Override
-    public void setShowInTooltip(boolean flag) {
-        throw new InvalidComponentTypeException();
-    }
-
-    public static final String COMPONENT_ID = "minecraft:repairable";
 }

@@ -5,10 +5,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public final class StoredEnchantmentsComponent implements ItemStackComponent {
+public final class StoredEnchantmentsComponent implements TooltipShowable {
     private final ItemMeta itemMeta;
 
     private StoredEnchantmentsComponent(ItemMeta itemMeta) {
@@ -20,7 +21,7 @@ public final class StoredEnchantmentsComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         if (itemMeta instanceof EnchantmentStorageMeta) {
             return ((EnchantmentStorageMeta) itemMeta).hasStoredEnchants();
         }
@@ -66,5 +67,8 @@ public final class StoredEnchantmentsComponent implements ItemStackComponent {
         else itemMeta.addItemFlags(ItemFlag.HIDE_STORED_ENCHANTS);
     }
 
-    public static final String COMPONENT_ID = "minecraft:stored_enchantments";
+    @Override
+    public @NotNull String getComponentId() {
+        return "minecraft:stored_enchantments";
+    }
 }

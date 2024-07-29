@@ -2,6 +2,7 @@ package com.gmail.subnokoii78.util.itemstack.components;
 
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 public final class MaxDamageComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
@@ -15,7 +16,7 @@ public final class MaxDamageComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         if (itemMeta instanceof Damageable) {
             return ((Damageable) itemMeta).hasMaxDamage();
         }
@@ -43,12 +44,7 @@ public final class MaxDamageComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip() {
-        return false;
-    }
-
-    @Override
-    public void setShowInTooltip(boolean flag) {
-        throw new InvalidComponentTypeException();
+    public @NotNull String getComponentId() {
+        return "minecraft:max_damage";
     }
 }

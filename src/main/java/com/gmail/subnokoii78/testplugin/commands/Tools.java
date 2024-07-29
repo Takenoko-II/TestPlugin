@@ -1,9 +1,9 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
+import com.gmail.subnokoii78.util.itemstack.TypedAttributeModifier;
 import com.gmail.subnokoii78.util.itemstack.components.ComponentItemStackBuilder;
 import com.gmail.subnokoii78.util.itemstack.components.PotionContentsComponent;
 import com.gmail.subnokoii78.util.ui.ChestUIBuilder;
-import com.gmail.subnokoii78.util.itemstack.components.AttributeModifiersComponent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -75,10 +75,10 @@ public class Tools implements CommandExecutor, TabCompleter {
         })
         .add(button -> {
             final ComponentItemStackBuilder sword = new ComponentItemStackBuilder(Material.GOLDEN_SWORD);
-            final AttributeModifiersComponent.Modifier attackDamage = new AttributeModifiersComponent.Modifier(Attribute.GENERIC_ATTACK_DAMAGE).setValue(0.1d);
-            final AttributeModifiersComponent.Modifier attackSpeed = new AttributeModifiersComponent.Modifier(Attribute.GENERIC_ATTACK_SPEED).setValue(-2.5d);
+            final TypedAttributeModifier attackDamage = new TypedAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE).setValue(0.1d);
+            final TypedAttributeModifier attackSpeed = new TypedAttributeModifier(Attribute.GENERIC_ATTACK_SPEED).setValue(-2.5d);
 
-            sword.attributeModifiers().setModifiers(new AttributeModifiersComponent.Modifier[]{attackDamage, attackSpeed});
+            sword.attributeModifiers().setModifiers(new TypedAttributeModifier[]{attackDamage, attackSpeed});
             sword.attributeModifiers().setShowInTooltip(false);
             sword.unbreakable().setUnbreakable(true);
             sword.unbreakable().setShowInTooltip(false);

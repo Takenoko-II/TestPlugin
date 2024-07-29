@@ -2,6 +2,7 @@ package com.gmail.subnokoii78.util.itemstack.components;
 
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class ItemNameComponent implements ItemStackComponent {
@@ -16,7 +17,7 @@ public final class ItemNameComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return itemMeta.hasItemName();
     }
 
@@ -26,7 +27,7 @@ public final class ItemNameComponent implements ItemStackComponent {
     }
 
     public @Nullable TextComponent getItemName() {
-        if (getEnabled()) {
+        if (isEnabled()) {
             return (TextComponent) itemMeta.itemName();
         }
         else return null;
@@ -37,14 +38,7 @@ public final class ItemNameComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip() {
-        return false;
+    public @NotNull String getComponentId() {
+        return "minecraft:item_name";
     }
-
-    @Override
-    public void setShowInTooltip(boolean flag) {
-        throw new InvalidComponentTypeException();
-    }
-
-    public static final String COMPONENT_ID = "minecraft:item_name";
 }

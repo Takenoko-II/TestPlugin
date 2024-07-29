@@ -4,9 +4,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ColorableArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class TrimComponent implements ItemStackComponent {
+public final class TrimComponent implements TooltipShowable {
     private final ItemMeta itemMeta;
 
     private TrimComponent(ItemMeta itemMeta) {
@@ -18,7 +19,7 @@ public final class TrimComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return hasTrim();
     }
 
@@ -64,5 +65,8 @@ public final class TrimComponent implements ItemStackComponent {
         else itemMeta.addItemFlags(ItemFlag.HIDE_ARMOR_TRIM);
     }
 
-    public static final String COMPONENT_ID = "minecraft:trim";
+    @Override
+    public @NotNull String getComponentId() {
+        return "minecraft:trim";
+    }
 }

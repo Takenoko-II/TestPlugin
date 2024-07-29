@@ -2,6 +2,7 @@ package com.gmail.subnokoii78.util.itemstack.components;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ public final class LoreComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return itemMeta.hasLore();
     }
 
@@ -61,14 +62,7 @@ public final class LoreComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getShowInTooltip() {
-        return false;
+    public @NotNull String getComponentId() {
+        return "minecraft:lore";
     }
-
-    @Override
-    public void setShowInTooltip(boolean flag) {
-        throw new InvalidComponentTypeException();
-    }
-
-    public static final String COMPONENT_ID = "minecraft:lore";
 }

@@ -3,10 +3,11 @@ package com.gmail.subnokoii78.util.itemstack.components;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public final class EnchantmentsComponent implements ItemStackComponent {
+public final class EnchantmentsComponent implements TooltipShowable {
     private final ItemMeta itemMeta;
 
     private EnchantmentsComponent(ItemMeta itemMeta) {
@@ -18,7 +19,7 @@ public final class EnchantmentsComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return itemMeta.hasEnchants();
     }
 
@@ -54,5 +55,8 @@ public final class EnchantmentsComponent implements ItemStackComponent {
         else itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
     }
 
-    public static final String COMPONENT_ID = "minecraft:enchantments";
+    @Override
+    public @NotNull String getComponentId() {
+        return "minecraft:enchantments";
+    }
 }

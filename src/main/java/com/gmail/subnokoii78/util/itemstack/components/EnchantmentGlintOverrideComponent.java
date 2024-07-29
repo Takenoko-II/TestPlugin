@@ -1,6 +1,7 @@
 package com.gmail.subnokoii78.util.itemstack.components;
 
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 public final class EnchantmentGlintOverrideComponent implements ItemStackComponent {
     private final ItemMeta itemMeta;
@@ -14,7 +15,7 @@ public final class EnchantmentGlintOverrideComponent implements ItemStackCompone
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return getGlintOverride();
     }
 
@@ -32,14 +33,7 @@ public final class EnchantmentGlintOverrideComponent implements ItemStackCompone
     }
 
     @Override
-    public boolean getShowInTooltip() {
-        return false;
+    public @NotNull String getComponentId() {
+        return "minecraft:enchantment_glint_override";
     }
-
-    @Override
-    public void setShowInTooltip(boolean flag) {
-        throw new InvalidComponentTypeException();
-    }
-
-    public static final String COMPONENT_ID = "minecraft:enchantment_glint_override";
 }

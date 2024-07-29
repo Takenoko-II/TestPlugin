@@ -59,8 +59,8 @@ public final class ComponentItemStackBuilder {
      * @param type コンポーネントタイプ
      * @return 対応するコンポーネント
      */
-    public <T extends ItemStackComponent> T get(ItemStackComponent.ComponentType<T> type) {
-        return type.getComponent(itemMeta);
+    public <T extends ItemStackComponent> T get(ItemStackComponentType<T> type) {
+        return type.getComponentOf(itemMeta);
     }
 
     /**
@@ -70,10 +70,10 @@ public final class ComponentItemStackBuilder {
     public ItemStackComponent[] getAll() {
         final List<ItemStackComponent> components = new ArrayList<>();
 
-        for (final ItemStackComponent.ComponentType<?> type : ItemStackComponent.ComponentType.values()) {
-            final ItemStackComponent component = type.getComponent(itemMeta);
+        for (final ItemStackComponentType<?> type : ItemStackComponentType.values()) {
+            final ItemStackComponent component = type.getComponentOf(itemMeta);
 
-            if (component.getEnabled()) {
+            if (component.isEnabled()) {
                 components.add(component);
             }
         }
@@ -86,8 +86,8 @@ public final class ComponentItemStackBuilder {
      * @return コンポーネントを一つでも持っていれば真
      */
     public boolean hasAny() {
-        for (final ItemStackComponent.ComponentType<?> type : ItemStackComponent.ComponentType.values()) {
-            if (type.getComponent(itemMeta).getEnabled()) return true;
+        for (final ItemStackComponentType<?> type : ItemStackComponentType.values()) {
+            if (type.getComponentOf(itemMeta).isEnabled()) return true;
         }
 
         return false;
@@ -97,76 +97,76 @@ public final class ComponentItemStackBuilder {
      * 全コンポーネントを削除します。
      */
     public void deleteAll() {
-        for (final ItemStackComponent.ComponentType<?> type : ItemStackComponent.ComponentType.values()) {
-            type.getComponent(itemMeta).disable();
+        for (final ItemStackComponentType<?> type : ItemStackComponentType.values()) {
+            type.getComponentOf(itemMeta).disable();
         }
     }
 
     public UnbreakableComponent unbreakable() {
-        return get(ItemStackComponent.ComponentType.UNBREAKABLE);
+        return get(ItemStackComponentType.UNBREAKABLE);
     }
 
     public MaxStackSizeComponent maxStackSize() {
-        return get(ItemStackComponent.ComponentType.MAX_STACK_SIZE);
+        return get(ItemStackComponentType.MAX_STACK_SIZE);
     }
 
     public EnchantmentGlintOverrideComponent enchantmentGlintOverride() {
-        return get(ItemStackComponent.ComponentType.ENCHANT_GLINT_OVERRIDE);
+        return get(ItemStackComponentType.ENCHANT_GLINT_OVERRIDE);
     }
 
     public CustomNameComponent customName() {
-        return get(ItemStackComponent.ComponentType.CUSTOM_NAME);
+        return get(ItemStackComponentType.CUSTOM_NAME);
     }
 
     public LoreComponent lore() {
-        return get(ItemStackComponent.ComponentType.LORE);
+        return get(ItemStackComponentType.LORE);
     }
 
     public AttributeModifiersComponent attributeModifiers() {
-        return get(ItemStackComponent.ComponentType.ATTRIBUTE_MODIFIERS);
+        return get(ItemStackComponentType.ATTRIBUTE_MODIFIERS);
     }
 
     public RepairCostComponent repairCost() {
-        return get(ItemStackComponent.ComponentType.REPAIR_COST);
+        return get(ItemStackComponentType.REPAIR_COST);
     }
 
     public ItemNameComponent itemName() {
-        return get(ItemStackComponent.ComponentType.ITEM_NAME);
+        return get(ItemStackComponentType.ITEM_NAME);
     }
 
     public MaxDamageComponent maxDamage() {
-        return get(ItemStackComponent.ComponentType.MAX_DAMAGE);
+        return get(ItemStackComponentType.MAX_DAMAGE);
     }
 
     public EnchantmentsComponent enchantments() {
-        return get(ItemStackComponent.ComponentType.ENCHANTMENTS);
+        return get(ItemStackComponentType.ENCHANTMENTS);
     }
 
     public StoredEnchantmentsComponent storedEnchantments() {
-        return get(ItemStackComponent.ComponentType.STORED_ENCHANTMENTS);
+        return get(ItemStackComponentType.STORED_ENCHANTMENTS);
     }
 
     public PotionContentsComponent potionContents() {
-        return get(ItemStackComponent.ComponentType.POTION_CONTENTS);
+        return get(ItemStackComponentType.POTION_CONTENTS);
     }
 
     public CustomModelDataComponent customModelData() {
-        return get(ItemStackComponent.ComponentType.CUSTOM_MODEL_DATA);
+        return get(ItemStackComponentType.CUSTOM_MODEL_DATA);
     }
 
     public TrimComponent trim() {
-        return get(ItemStackComponent.ComponentType.TRIM);
+        return get(ItemStackComponentType.TRIM);
     }
 
     public DyedColorComponent dyedColor() {
-        return get(ItemStackComponent.ComponentType.DYED_COLOR);
+        return get(ItemStackComponentType.DYED_COLOR);
     }
 
     public ProfileComponent profile() {
-        return get(ItemStackComponent.ComponentType.PROFILE);
+        return get(ItemStackComponentType.PROFILE);
     }
 
     public RecipesComponent recipes() {
-        return get(ItemStackComponent.ComponentType.RECIPES);
+        return get(ItemStackComponentType.RECIPES);
     }
 }

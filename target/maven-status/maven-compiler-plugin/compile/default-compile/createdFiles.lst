@@ -28,7 +28,6 @@ com\gmail\subnokoii78\util\shape\Heptagram.class
 com\gmail\subnokoii78\util\vector\EntireAxisRotationHandler$LocalAxesE.class
 com\gmail\subnokoii78\util\datacontainer\DataContainerCompound.class
 com\gmail\subnokoii78\util\vector\TiltedBoundingBox.class
-com\gmail\subnokoii78\util\itemstack\components\ItemStackComponent$ComponentType.class
 com\gmail\subnokoii78\util\other\ScheduleUtils$3.class
 com\gmail\subnokoii78\util\vector\Shape.class
 com\gmail\subnokoii78\testplugin\commands\Foo.class
@@ -37,6 +36,7 @@ com\gmail\subnokoii78\util\vector\Shape$ShapeType.class
 com\gmail\subnokoii78\util\itemstack\components\AttributeModifiersComponent.class
 com\gmail\subnokoii78\testplugin\commands\ManageDatabase.class
 com\gmail\subnokoii78\testplugin\commands\Tools.class
+com\gmail\subnokoii78\util\itemstack\TypedAttributeModifier.class
 com\gmail\subnokoii78\util\event\data\DataPackMessageReceiveEvent.class
 com\gmail\subnokoii78\util\itemstack\components\RecipesComponent.class
 com\gmail\subnokoii78\testplugin\BungeeCordUtils$ServerType.class
@@ -59,6 +59,7 @@ com\gmail\subnokoii78\testplugin\TestPlugin$LoggingTarget.class
 com\gmail\subnokoii78\util\ui\ChestUIBuilder$Button.class
 com\gmail\subnokoii78\util\itemstack\components\ComponentItemStackBuilder.class
 com\gmail\subnokoii78\util\vector\Shape$DustTransitionDecoration.class
+com\gmail\subnokoii78\util\itemstack\components\ItemStackComponentType.class
 com\gmail\subnokoii78\util\itemstack\components\PotionContentsComponent$PotionContent.class
 com\gmail\subnokoii78\util\itemstack\components\CustomModelDataComponent.class
 com\gmail\subnokoii78\util\file\BinaryFileUtils.class
@@ -102,4 +103,4 @@ com\gmail\subnokoii78\util\vector\Shape$DustDecoration.class
 com\gmail\subnokoii78\util\ui\ChestUIClickEvent.class
 com\gmail\subnokoii78\util\shape\DustSpawner.class
 com\gmail\subnokoii78\util\itemstack\components\DamageComponent.class
-com\gmail\subnokoii78\util\itemstack\components\AttributeModifiersComponent$Modifier.class
+com\gmail\subnokoii78\util\itemstack\components\TooltipShowable.class

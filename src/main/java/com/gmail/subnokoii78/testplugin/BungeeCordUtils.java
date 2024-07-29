@@ -1,10 +1,13 @@
 package com.gmail.subnokoii78.testplugin;
 
 import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
+import com.gmail.subnokoii78.util.itemstack.components.ComponentItemStackBuilder;
 import com.gmail.subnokoii78.util.ui.ChestUIBuilder;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,13 +21,14 @@ public class BungeeCordUtils {
 
     public static ItemStack getServerSelector() {
         return new ItemStackBuilder(Material.COMPASS)
-        .customName("Server Selector", NamedTextColor.GREEN)
-        .lore("Right Click to Open", Color.GRAY)
-        .glint(true)
-        .maxCount(1)
-        .dataContainer("locked", true)
-        .dataContainer("custom_item_tag", "server_selector")
-        .build();
+            .customName("Server Selector", NamedTextColor.GREEN)
+            .lore("Right Click to Open", Color.GRAY)
+            .glint(true)
+            .maxCount(1)
+            .dataContainer("locked", true)
+            .dataContainer("custom_item_tag", "server_selector")
+            .build();
+
     }
 
     public static void openServerSelector(Player player) {

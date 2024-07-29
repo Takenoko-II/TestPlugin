@@ -7,9 +7,10 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class PotionContentsComponent implements ItemStackComponent {
+public final class PotionContentsComponent implements TooltipShowable {
     private final ItemMeta itemMeta;
 
     private PotionContentsComponent(ItemMeta itemMeta) {
@@ -21,7 +22,7 @@ public final class PotionContentsComponent implements ItemStackComponent {
     }
 
     @Override
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         if (itemMeta instanceof PotionMeta) {
             return ((PotionMeta) itemMeta).hasCustomEffects();
         }
@@ -111,6 +112,11 @@ public final class PotionContentsComponent implements ItemStackComponent {
         else itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
     }
 
+    @Override
+    public @NotNull String getComponentId() {
+        return "minecraft:potion_contents";
+    }
+
     public static final class PotionContent {
         private final PotionEffectType type;
 
@@ -173,6 +179,4 @@ public final class PotionContentsComponent implements ItemStackComponent {
             .setShowParticles(effect.hasParticles());
         }
     }
-
-    public static final String COMPONENT_ID = "minecraft:potion_contents";
 }
