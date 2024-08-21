@@ -33,7 +33,7 @@ public class DisplayEditor {
     }
 
     public DisplayEditor rotate(Vector3Builder axis, float degree) {
-        final Vector3Builder normalized = axis.copy().normalized();
+        final Vector3Builder normalized = axis.copy().normalize();
 
         transformation(t -> {
             t.getLeftRotation().rotateAxis(

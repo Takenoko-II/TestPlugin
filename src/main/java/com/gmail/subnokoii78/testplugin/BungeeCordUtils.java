@@ -2,6 +2,7 @@ package com.gmail.subnokoii78.testplugin;
 
 import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii78.util.itemstack.components.ComponentItemStackBuilder;
+import com.gmail.subnokoii78.util.itemstack.components.ItemStackComponentType;
 import com.gmail.subnokoii78.util.ui.ChestUIBuilder;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -28,7 +29,6 @@ public class BungeeCordUtils {
             .dataContainer("locked", true)
             .dataContainer("custom_item_tag", "server_selector")
             .build();
-
     }
 
     public static void openServerSelector(Player player) {

@@ -2,6 +2,7 @@ package com.gmail.subnokoii78.util.file.json;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public final class JSONValueType<T> {
     private final Function<Object, T> getter;
@@ -21,6 +22,8 @@ public final class JSONValueType<T> {
             case String v -> JSONValueType.STRING;
             case Map<?, ?> v -> JSONValueType.OBJECT;
             case List<?> v -> JSONValueType.ARRAY;
+            case Set<?> v -> JSONValueType.ARRAY;
+            case Stream<?> v -> JSONValueType.ARRAY;
             case boolean[] v -> JSONValueType.ARRAY;
             case byte[] v -> JSONValueType.ARRAY;
             case short[] v -> JSONValueType.ARRAY;
@@ -58,6 +61,8 @@ public final class JSONValueType<T> {
 
     public static final JSONValueType<JSONArray> ARRAY = new JSONValueType<>(value -> {
         if (value instanceof List<?> v) return new JSONArray((List<Object>) v);
+        else if (value instanceof Set<?> v) return new JSONArray((List<Object>) v.stream().toList());
+        else if (value instanceof Stream<?> v) return new JSONArray((List<Object>) v.toList());
         else if (value instanceof boolean[] v) {
             List<Object> l = new ArrayList<>();
             for (boolean b : v) l.add(b);

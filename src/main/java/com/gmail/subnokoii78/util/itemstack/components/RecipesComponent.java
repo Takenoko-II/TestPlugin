@@ -9,15 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public final class RecipesComponent implements ItemStackComponent {
-    private final ItemMeta itemMeta;
-
-    private RecipesComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class RecipesComponent extends ItemStackComponent {
+    private RecipesComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

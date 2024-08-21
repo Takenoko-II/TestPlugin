@@ -1,6 +1,6 @@
 package com.gmail.subnokoii78.util.shape;
 
-import com.gmail.subnokoii78.util.vector.EntireAxisRotationHandler;
+import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@ public final class ShapeTemplate {
         return this;
     }
 
-    public ShapeTemplate rotation(@NotNull EntireAxisRotationHandler rotation) {
+    public ShapeTemplate rotation(@NotNull TripleAxisRotationBuilder rotation) {
         base.rotation.yaw(rotation.yaw());
         base.rotation.pitch(rotation.pitch());
         base.rotation.roll(rotation.roll());

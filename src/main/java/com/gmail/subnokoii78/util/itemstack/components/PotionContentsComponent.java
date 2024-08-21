@@ -1,24 +1,18 @@
 package com.gmail.subnokoii78.util.itemstack.components;
 
+import com.gmail.subnokoii78.util.itemstack.PotionContent;
 import org.bukkit.Color;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class PotionContentsComponent implements TooltipShowable {
-    private final ItemMeta itemMeta;
-
-    private PotionContentsComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class PotionContentsComponent extends TooltipShowable {
+    private PotionContentsComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override
@@ -33,11 +27,11 @@ public final class PotionContentsComponent implements TooltipShowable {
         if (itemMeta instanceof PotionMeta) {
             if (((PotionMeta) itemMeta).hasCustomEffects()) {
                 return ((PotionMeta) itemMeta).getCustomEffects()
-                .stream().map(PotionContent::from).toArray(PotionContent[]::new);
+                .stream().map(PotionContent::fromBukkit).toArray(PotionContent[]::new);
             }
             else if (((PotionMeta) itemMeta).getBasePotionType() != null) {
                 return ((PotionMeta) itemMeta).getBasePotionType().getPotionEffects()
-                .stream().map(PotionContent::from).toArray(PotionContent[]::new);
+                .stream().map(PotionContent::fromBukkit).toArray(PotionContent[]::new);
             }
             else return new PotionContent[0];
         }
@@ -53,7 +47,7 @@ public final class PotionContentsComponent implements TooltipShowable {
 
     public void addContent(PotionContent effect) {
         if (itemMeta instanceof PotionMeta) {
-            ((PotionMeta) itemMeta).addCustomEffect(effect.toPotionEffect(), false);
+            ((PotionMeta) itemMeta).addCustomEffect(effect.toBukkit(), false);
         }
     }
 
@@ -117,66 +111,4 @@ public final class PotionContentsComponent implements TooltipShowable {
         return "minecraft:potion_contents";
     }
 
-    public static final class PotionContent {
-        private final PotionEffectType type;
-
-        private int amplifier = 0;
-
-        private int duration = 600;
-
-        private boolean showParticles = true;
-
-        public PotionContent(PotionEffectType type) {
-            if (type == null) {
-                throw new IllegalArgumentException();
-            }
-
-            this.type = type;
-        }
-
-        public PotionEffectType getType() {
-            return type;
-        }
-
-        public int getAmplifier() {
-            return amplifier;
-        }
-
-        public int getDuration() {
-            return duration;
-        }
-
-        public boolean getShowParticles() {
-            return showParticles;
-        }
-
-        public PotionContent setAmplifier(int amplifier) {
-            this.amplifier = amplifier;
-
-            return this;
-        }
-
-        public PotionContent setDuration(int duration) {
-            this.duration = duration;
-
-            return this;
-        }
-
-        public PotionContent setShowParticles(boolean showParticles) {
-            this.showParticles = showParticles;
-
-            return this;
-        }
-
-        private PotionEffect toPotionEffect() {
-            return new PotionEffect(type, duration, amplifier, false, showParticles);
-        }
-
-        private static PotionContent from(PotionEffect effect) {
-            return new PotionContent(effect.getType())
-            .setAmplifier(effect.getAmplifier())
-            .setDuration(effect.getDuration())
-            .setShowParticles(effect.hasParticles());
-        }
-    }
 }

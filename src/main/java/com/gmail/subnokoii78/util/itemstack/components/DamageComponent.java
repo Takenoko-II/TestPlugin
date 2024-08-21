@@ -4,15 +4,9 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-public final class DamageComponent implements ItemStackComponent {
-    private final ItemMeta itemMeta;
-
-    private DamageComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class DamageComponent extends ItemStackComponent {
+    private DamageComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

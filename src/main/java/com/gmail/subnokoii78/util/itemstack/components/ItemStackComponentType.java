@@ -10,7 +10,6 @@ import java.util.Set;
 
 /**
  * コンポーネントタイプを表現するクラス
- *
  * @param <T> コンポーネントクラス
  */
 public final class ItemStackComponentType<T extends ItemStackComponent> {
@@ -26,14 +25,14 @@ public final class ItemStackComponentType<T extends ItemStackComponent> {
         }
     }
 
-    T getComponentOf(ItemMeta itemMeta) {
+    T getInstance(ItemMeta itemMeta) {
         try {
             final Constructor<T> constructor = clazz.getDeclaredConstructor(ItemMeta.class);
             constructor.setAccessible(true);
             return constructor.newInstance(itemMeta);
         }
         catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new InvalidComponentTypeException(e.getMessage());
+            throw new InvalidComponentTypeException("コンポーネントの取得に失敗しました", e);
         }
     }
 
@@ -79,4 +78,6 @@ public final class ItemStackComponentType<T extends ItemStackComponent> {
     public static final ItemStackComponentType<ProfileComponent> PROFILE = new ItemStackComponentType<>(ProfileComponent.class);
 
     public static final ItemStackComponentType<RecipesComponent> RECIPES = new ItemStackComponentType<>(RecipesComponent.class);
+
+    public static final ItemStackComponentType<FoodComponent> FOOD = new ItemStackComponentType<>(FoodComponent.class);
 }

@@ -13,7 +13,7 @@ public class PerfectCircle extends ShapeBase {
 
     protected Vector3Builder getPointOnAngle(float angle) {
         double rad = (angle + rotation.roll()) * Math.PI / 180;
-        var axes = rotation.getLocalAxesE();
+        var axes = rotation.getLocalAxisProviderE();
         return axes.getX().scale(Math.cos(rad))
             .add(axes.getY().scale(Math.sin(rad)));
     }

@@ -4,15 +4,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class CustomModelDataComponent implements ItemStackComponent {
-    private final ItemMeta itemMeta;
-
-    private CustomModelDataComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class CustomModelDataComponent extends ItemStackComponent {
+    private CustomModelDataComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

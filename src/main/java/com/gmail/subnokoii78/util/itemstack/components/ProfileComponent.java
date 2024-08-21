@@ -5,15 +5,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
-public final class ProfileComponent implements ItemStackComponent {
-    private final ItemMeta itemMeta;
-
-    private ProfileComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class ProfileComponent extends ItemStackComponent {
+    private ProfileComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

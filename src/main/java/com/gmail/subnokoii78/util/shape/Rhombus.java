@@ -1,17 +1,17 @@
 package com.gmail.subnokoii78.util.shape;
 
-import com.gmail.subnokoii78.util.vector.EntireAxisRotationHandler;
+import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
 
 public class Rhombus extends ShapeBase {
     @Override
     public void draw() {
-        final Vector3Builder.LocalAxes axes = rotation.getLocalAxesE();
+        final Vector3Builder.LocalAxisProvider axes = rotation.getLocalAxisProviderE();
 
         var left = axes.getX();
-        var right = axes.getX().inverted();
+        var right = axes.getX().invert();
         var up = axes.getY();
-        var down = axes.getY().inverted();
+        var down = axes.getY().invert();
 
         lineFromTo(down, left);
         lineFromTo(left, up);
@@ -23,8 +23,8 @@ public class Rhombus extends ShapeBase {
         final StraightLine line = new StraightLine();
         line.put(world, from);
         line.onDot(this::dot);
-        line.rotate(EntireAxisRotationHandler.from(from.getDirectionTo(to).getRotation2d()));
-        line.setScale((float) from.getDistanceBetween(to));
+        line.rotate(TripleAxisRotationBuilder.from(from.getDirectionTo(to).getRotation2d()));
+        line.setScale((float) from.getDistanceTo(to));
         line.draw();
     }
 }

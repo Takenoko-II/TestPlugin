@@ -4,15 +4,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-public final class UnbreakableComponent implements TooltipShowable {
-    private final ItemMeta itemMeta;
-
-    private UnbreakableComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class UnbreakableComponent extends TooltipShowable {
+    private UnbreakableComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

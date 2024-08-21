@@ -1,6 +1,6 @@
 package com.gmail.subnokoii78.util.shape;
 
-import com.gmail.subnokoii78.util.vector.EntireAxisRotationHandler;
+import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -16,7 +16,7 @@ public abstract class ShapeBase {
 
     protected final Vector3Builder center = new Vector3Builder();
 
-    protected final EntireAxisRotationHandler rotation = new EntireAxisRotationHandler();
+    protected final TripleAxisRotationBuilder rotation = new TripleAxisRotationBuilder();
 
     private ParticleSpawner<?> particle;
 
@@ -43,7 +43,7 @@ public abstract class ShapeBase {
         this.center.z(center.z());
     }
 
-    public final void rotate(@NotNull EntireAxisRotationHandler rotation) {
+    public final void rotate(@NotNull TripleAxisRotationBuilder rotation) {
         this.rotation.add(rotation);
     }
 
@@ -72,7 +72,7 @@ public abstract class ShapeBase {
     }
 
     protected final void dot(@NotNull Vector3Builder relativePos) {
-        final Vector3Builder position = center.copy().add(relativePos.copy().scale(scale));
+        final Vector3Builder position = center.copy().add(relativePos.copy().scale((double) scale));
         if (particle != null) particle.place(world, position).spawn();
         consumers.forEach(consumer -> consumer.accept(position));
     }

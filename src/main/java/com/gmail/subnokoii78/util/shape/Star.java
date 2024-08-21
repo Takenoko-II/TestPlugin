@@ -1,8 +1,7 @@
 package com.gmail.subnokoii78.util.shape;
 
-import com.gmail.subnokoii78.util.vector.EntireAxisRotationHandler;
+import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
-import org.bukkit.Particle;
 
 public class Star extends ShapeBase {
     private final int n;
@@ -44,8 +43,8 @@ public class Star extends ShapeBase {
             final StraightLine line = new StraightLine();
             final Vector3Builder direction = current.getDirectionTo(next);
             line.put(world, current);
-            line.rotate(EntireAxisRotationHandler.from(direction.getRotation2d()));
-            line.setScale((float) current.getDistanceBetween(next));
+            line.rotate(TripleAxisRotationBuilder.from(direction.getRotation2d()));
+            line.setScale((float) current.getDistanceTo(next));
             line.setDensity(getDensity());
             line.onDot(this::dot);
             line.draw();

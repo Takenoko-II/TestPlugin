@@ -7,15 +7,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public final class EnchantmentsComponent implements TooltipShowable {
-    private final ItemMeta itemMeta;
-
-    private EnchantmentsComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class EnchantmentsComponent extends TooltipShowable {
+    private EnchantmentsComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

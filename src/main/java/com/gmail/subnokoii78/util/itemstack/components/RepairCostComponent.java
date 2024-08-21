@@ -5,15 +5,9 @@ import org.bukkit.inventory.meta.Repairable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class RepairCostComponent implements ItemStackComponent {
-    private final ItemMeta itemMeta;
-
-    private RepairCostComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class RepairCostComponent extends ItemStackComponent {
+    private RepairCostComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

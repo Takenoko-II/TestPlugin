@@ -9,15 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public final class LoreComponent implements ItemStackComponent {
-    private final ItemMeta itemMeta;
-
-    private LoreComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class LoreComponent extends ItemStackComponent {
+    private LoreComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

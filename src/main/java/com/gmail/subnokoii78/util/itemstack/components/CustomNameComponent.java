@@ -5,15 +5,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class CustomNameComponent implements ItemStackComponent {
-    private final ItemMeta itemMeta;
-
-    private CustomNameComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class CustomNameComponent extends ItemStackComponent {
+    private CustomNameComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

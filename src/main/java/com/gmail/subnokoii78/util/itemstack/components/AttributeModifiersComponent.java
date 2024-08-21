@@ -9,15 +9,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-public final class AttributeModifiersComponent implements TooltipShowable {
-    private final ItemMeta itemMeta;
-
-    private AttributeModifiersComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class AttributeModifiersComponent extends TooltipShowable {
+    private AttributeModifiersComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override
@@ -39,25 +33,25 @@ public final class AttributeModifiersComponent implements TooltipShowable {
             return new TypedAttributeModifier[0];
         }
 
-        return TypedAttributeModifier.from(map);
+        return TypedAttributeModifier.fromBukkit(map);
     }
 
     public void setModifiers(TypedAttributeModifier[] modifiers) {
         final Multimap<Attribute, AttributeModifier> map = ArrayListMultimap.create();
 
         for (final TypedAttributeModifier modifier : modifiers) {
-            map.put(modifier.getType(), modifier.toUnTyped());
+            map.put(modifier.getType(), modifier.toBukkit());
         }
 
         itemMeta.setAttributeModifiers(map);
     }
 
     public void addModifier(TypedAttributeModifier modifier) {
-        itemMeta.addAttributeModifier(modifier.getType(), modifier.toUnTyped());
+        itemMeta.addAttributeModifier(modifier.getType(), modifier.toBukkit());
     }
 
     public void removeModifier(TypedAttributeModifier modifier) {
-        itemMeta.removeAttributeModifier(modifier.getType(), modifier.toUnTyped());
+        itemMeta.removeAttributeModifier(modifier.getType(), modifier.toBukkit());
     }
 
     public void removeModifiers(Attribute type) {

@@ -7,22 +7,19 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
-public class Vector3Builder implements VectorBuilder {
-    private final double[] components;
-
-    private final DimensionSize dimensionSize = new DimensionSize(3);
+public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
+    private double x, y, z;
 
     /**
      * 三次元零ベクトルを作成します。
      */
-    public Vector3Builder() {
-        components = new double[]{0d, 0d, 0d};
-    }
+    public Vector3Builder() {}
 
     /**
      * 三次元ベクトルを作成します。
@@ -31,76 +28,16 @@ public class Vector3Builder implements VectorBuilder {
      * @param z Z成分
      */
     public Vector3Builder(double x, double y, double z) {
-        components = new double[]{x, y, z};
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
-    /**
-     * 三次元ベクトルを作成します。
-     * @param components 全成分
-     */
-    public Vector3Builder(double... components) throws DimensionSizeMismatchException {
-        if (components.length != 3) {
-            throw new DimensionSizeMismatchException();
-        }
-
-        this.components = new double[3];
-        System.arraycopy(components, 0, this.components, 0, components.length);
-    }
-
-    /**
-     * 特定のインデックスの成分の値を返します。
-     * @param index インデックス
-     * @return 成分の値
-     */
     @Override
-    public double getComponent(int index) {
-        if (index > components.length - 1) {
-            throw new DimensionSizeMismatchException();
-        }
-
-        return components[index];
-    }
-
-    /**
-     * 全成分の値を返します。
-     * @return 全成分
-     */
-    @Override
-    public double[] getAllComponents() {
-        return components.clone();
-    }
-
-    /**
-     * 特定のインデックスの成分の値を変更します。
-     * @param index インデックス
-     * @param component 成分の値
-     * @return このベクトル
-     */
-    @Override
-    public Vector3Builder setComponent(int index, double component) {
-        if (index > 2) {
-            throw new DimensionSizeMismatchException();
-        }
-
-        components[index] = component;
-
-        return this;
-    }
-
-    /**
-     * 全成分の値を変更します。
-     * @param components 全成分の値
-     * @return このベクトル
-     */
-    @Override
-    public Vector3Builder setAllComponents(double... components) {
-        if (components.length != 3) {
-            throw new DimensionSizeMismatchException();
-        }
-
-        System.arraycopy(components, 0, this.components, 0, components.length);
-
-        return this;
+    public boolean equals(Vector3Builder other) {
+        return x == other.x
+            && y == other.y
+            && z == other.z;
     }
 
     /**
@@ -108,15 +45,17 @@ public class Vector3Builder implements VectorBuilder {
      * @return X成分の値
      */
     public double x() {
-        return components[0];
+        return x;
     }
 
     /**
      * このベクトルのX成分の値を変更します。
      * @param value 新しい値
+     * @return
      */
-    public void x(double value) {
-        components[0] = value;
+    public Vector3Builder x(double value) {
+        x = value;
+        return this;
     }
 
     /**
@@ -124,15 +63,17 @@ public class Vector3Builder implements VectorBuilder {
      * @return Y成分の値
      */
     public double y() {
-        return components[1];
+        return y;
     }
 
     /**
      * このベクトルのY成分の値を変更します。
      * @param value 新しい値
+     * @return
      */
-    public void y(double value) {
-        components[1] = value;
+    public Vector3Builder y(double value) {
+        y = value;
+        return this;
     }
 
     /**
@@ -140,78 +81,121 @@ public class Vector3Builder implements VectorBuilder {
      * @return Z成分の値
      */
     public double z() {
-        return components[2];
+        return z;
     }
 
     /**
      * このベクトルのZ成分の値を変更します。
+     *
      * @param value 新しい値
+     * @return
      */
-    public void z(double value) {
-        components[2] = value;
+    public Vector3Builder z(double value) {
+        z = value;
+        return this;
     }
 
-    /**
-     * このベクトルの次元の情報を返します。
-     * @return 次元に関する情報
-     */
     @Override
-    public DimensionSize getDimensionSize() {
-        return dimensionSize;
+    public Vector3Builder calculate(UnaryOperator<Double> operator) {
+        this.x = operator.apply(x);
+        this.y = operator.apply(y);
+        this.z = operator.apply(z);
+        return this;
+    }
+
+    @Override
+    public Vector3Builder calculate(Vector3Builder other, BiFunction<Double, Double, Double> operator) {
+        this.x = operator.apply(x, other.x);
+        this.y = operator.apply(y, other.y);
+        this.z = operator.apply(z, other.z);
+        return this;
     }
 
     /**
-     * このベクトルのそれぞれの成分に対して関数を呼び出し、その結果で成分の値を上書きします。
-     * @param operator 関数
+     * このベクトルに別のベクトルを足します。
+     * @param other 別のベクトル
+     * @return このベクトル
+     */
+    public Vector3Builder add(Vector3Builder other) {
+        return calculate(other, Double::sum);
+    }
+
+    /**
+     * このベクトルに別のベクトルを足します。
+     * @param x 別のベクトルのX成分
+     * @param y 別のベクトルのY成分
+     * @param z 別のベクトルのZ成分
+     * @return このベクトル
+     */
+    public Vector3Builder add(double x, double y, double z) {
+        return add(new Vector3Builder(x, y, z));
+    }
+
+    /**
+     * このベクトルから別のベクトルを引きます。
+     * @param other 別のベクトル
+     * @return このベクトル
+     */
+    public Vector3Builder subtract(Vector3Builder other) {
+        return add(other.copy().invert());
+    }
+
+    /**
+     * このベクトルから別のベクトルを引きます。
+     * @param x 別のベクトルのX成分
+     * @param y 別のベクトルのY成分
+     * @param z 別のベクトルのZ成分
+     * @return このベクトル
+     */
+    public Vector3Builder subtract(double x, double y, double z) {
+        return subtract(new Vector3Builder(x, y, z));
+    }
+
+    /**
+     * このベクトルを実数倍します。
+     * @param scalar 倍率
      * @return このベクトル
      */
     @Override
-    public Vector3Builder calc(UnaryOperator<Double> operator) {
-        return (Vector3Builder) VectorBuilder.super.calc(operator);
+    public Vector3Builder scale(@NotNull Double scalar) {
+        return calculate(component -> component * scalar);
     }
 
     /**
-     * 引数に渡されたベクトルとこのベクトルのそれぞれの成分に対して関数を呼び出し、その結果で成分の値を上書きします。
-     * @param operator 関数
+     * このベクトルの向きを逆向きにします。
      * @return このベクトル
      */
-    public Vector3Builder calc(Vector3Builder other, BiFunction<Double, Double, Double> operator) {
-        return (Vector3Builder) VectorBuilder.super.calc(other, operator);
+    public Vector3Builder invert() {
+        return scale(-1d);
     }
 
     /**
      * このベクトルと別のベクトルとの内積を求めます。
-     * @param vector3 別のベクトル
+     * @param other 別のベクトル
      * @return 二つのベクトルの内積
      */
-    public double dot(Vector3Builder vector3) {
-        final double x1 = x();
-        final double y1 = y();
-        final double z1 = z();
-        final double x2 = vector3.x();
-        final double y2 = vector3.y();
-        final double z2 = vector3.z();
+    public double dot(Vector3Builder other) {
+        final double x2 = other.x();
+        final double y2 = other.y();
+        final double z2 = other.z();
 
-        return x1 * x2 + y1 * y2 + z1 * z2;
+        return x * x2 + y * y2 + z * z2;
     }
 
     /**
      * このベクトルと別のベクトルとの外積を求めます。
-     * @param vector3 別のベクトル
+     * @param other 別のベクトル
      * @return 二つのベクトルの外積ベクトル
      */
-    public Vector3Builder cross(Vector3Builder vector3) {
-        final double x1 = x();
-        final double y1 = y();
-        final double z1 = z();
-        final double x2 = vector3.x();
-        final double y2 = vector3.y();
-        final double z2 = vector3.z();
+    public Vector3Builder cross(Vector3Builder other) {
+        final double x2 = other.x();
+        final double y2 = other.y();
+        final double z2 = other.z();
 
         return new Vector3Builder(
-            y1 * z2 - z1 * y2,
-            z1 * x2 - x1 * z2,
-            x1 * y2 - y1 * x2
+            y * z2 - z * y2,
+            z * x2 - x * z2,
+            x * y2 - y * x2
         );
     }
 
@@ -231,16 +215,16 @@ public class Vector3Builder implements VectorBuilder {
     public Vector3Builder length(double length) {
         final double previous = length();
 
-        return calc(component -> component / previous * length);
+        return calculate(component -> component / previous * length);
     }
 
     /**
      * このベクトルと別のベクトルとがなす角の大きさを求めます。
-     * @param vector3 別のベクトル
+     * @param other 別のベクトル
      * @return 二つのベクトルがなす角の大きさ(度)
      */
-    public double getAngleBetween(Vector3Builder vector3) {
-        double p = this.dot(vector3) / (length() * vector3.length());
+    public double getAngleBetween(Vector3Builder other) {
+        final double p = this.dot(other) / (length() * other.length());
 
         return Math.acos(p) * 180 / Math.PI;
     }
@@ -249,89 +233,23 @@ public class Vector3Builder implements VectorBuilder {
      * このベクトルを正規化します。
      * @return このベクトル
      */
-    public Vector3Builder normalized() {
+    public Vector3Builder normalize() {
         return length(1d);
     }
 
     /**
-     * このベクトルに別のベクトルを足します。
-     * @param vector3 別のベクトル
-     * @return このベクトル
-     */
-    public Vector3Builder add(Vector3Builder vector3) {
-        return calc(vector3, Double::sum);
-    }
-
-    /**
-     * このベクトルに別のベクトルを足します。
-     * @param x 別のベクトルのX成分
-     * @param y 別のベクトルのY成分
-     * @param z 別のベクトルのZ成分
-     * @return このベクトル
-     */
-    public Vector3Builder add(double x, double y, double z) {
-        return add(new Vector3Builder(x, y, z));
-    }
-
-    /**
-     * このベクトルから別のベクトルを引きます。
-     * @param vector3 別のベクトル
-     * @return このベクトル
-     */
-    public Vector3Builder subtract(Vector3Builder vector3) {
-        return add(vector3.copy().inverted());
-    }
-
-    /**
-     * このベクトルから別のベクトルを引きます。
-     * @param x 別のベクトルのX成分
-     * @param y 別のベクトルのY成分
-     * @param z 別のベクトルのZ成分
-     * @return このベクトル
-     */
-    public Vector3Builder subtract(double x, double y, double z) {
-        return subtract(new Vector3Builder(x, y, z));
-    }
-
-    /**
-     * このベクトルを実数倍します。
-     * @param scalar 倍率
-     * @return このベクトル
-     */
-    public Vector3Builder scale(double scalar) {
-        return calc(component -> component * scalar);
-    }
-
-    /**
-     * このベクトルの全成分を一つの値で埋めます。
-     * @param value 任意の値
-     * @return このベクトル
-     */
-    public Vector3Builder fill(double value) {
-        return calc((component) -> value);
-    }
-
-    /**
-     * このベクトルの向きを逆向きにします。
-     * @return このベクトル
-     */
-    public Vector3Builder inverted() {
-        return scale(-1d);
-    }
-
-    /**
      * このベクトルから別のベクトルへの方向ベクトルを求めます。
-     * @param vector3 別のベクトル
+     * @param other 別のベクトル
      * @return 方向ベクトル
      */
-    public Vector3Builder getDirectionTo(Vector3Builder vector3) {
-        if (this.equals(vector3)) {
+    public Vector3Builder getDirectionTo(Vector3Builder other) {
+        if (this.equals(other)) {
             throw new IllegalArgumentException("2つのベクトルは完全に一致しています");
         }
 
-        return vector3.copy()
+        return other.copy()
         .subtract(this)
-        .normalized();
+        .normalize();
     }
 
     /**
@@ -339,36 +257,28 @@ public class Vector3Builder implements VectorBuilder {
      * @param other 別のベクトル
      * @return 距離
      */
-    public double getDistanceBetween(Vector3Builder other) {
-        double sumOfSquare = 0d;
-
-        for (int i = 0; i < 3; i++) {
-            final double a = components[i];
-            final double b = other.components[i];
-            sumOfSquare += (a - b) * (a - b);
-        }
-
-        return Math.sqrt(sumOfSquare);
+    public double getDistanceTo(Vector3Builder other) {
+        return Math.sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y) + (z - other.z) * (z - other.z));
     }
 
     /**
      * このベクトルから別のベクトルへの射影を求めます。
-     * @param vector3 別のベクトル
+     * @param other 別のベクトル
      * @return 射影ベクトル
      */
-    public Vector3Builder projection(Vector3Builder vector3) {
-        return vector3.copy().scale(
-            vector3.length() * length() / vector3.length() * vector3.length()
+    public Vector3Builder projection(Vector3Builder other) {
+        return other.copy().scale(
+            other.length() * length() / other.length() * other.length()
         );
     }
 
     /**
      * このベクトルから別のベクトルへの反射影を求めます。
-     * @param vector3 別のベクトル
+     * @param other 別のベクトル
      * @return 反射影ベクトル
      */
-    public Vector3Builder rejection(Vector3Builder vector3) {
-        return subtract(projection(vector3));
+    public Vector3Builder rejection(Vector3Builder other) {
+        return copy().subtract(projection(other));
     }
 
     /**
@@ -378,13 +288,7 @@ public class Vector3Builder implements VectorBuilder {
      * @return 線形補間したベクトル
      */
     public Vector3Builder lerp(Vector3Builder end, float t) {
-        final BiFunction<Double, Double, Double> linear = (Double a, Double b) -> (1 - t) * a + t * b;
-
-        return new Vector3Builder(
-            linear.apply(x(), end.x()),
-            linear.apply(y(), end.y()),
-            linear.apply(z(), end.z())
-        );
+        return copy().calculate(end, (a, b) -> (1 - t) * a + t * b);
     }
 
     /**
@@ -394,11 +298,10 @@ public class Vector3Builder implements VectorBuilder {
      * @return 球面線形補間したベクトル
      */
     public Vector3Builder slerp(Vector3Builder end, float s) {
-        final double angle = this.getAngleBetween(end);
-        final double radian = angle * Math.PI / 180;
+        final double angle = this.getAngleBetween(end) * Math.PI / 180;
 
-        final double p1 = Math.sin(radian * (1 - s)) / Math.sin(radian);
-        final double p2 = Math.sin(radian * s) / Math.sin(radian);
+        final double p1 = Math.sin(angle * (1 - s)) / Math.sin(angle);
+        final double p2 = Math.sin(angle * s) / Math.sin(angle);
 
         final Vector3Builder q1 = this.copy().scale(p1);
         final Vector3Builder q2 = end.copy().scale(p2);
@@ -410,7 +313,8 @@ public class Vector3Builder implements VectorBuilder {
      * このベクトルを指定の形式に従って文字列化します。形式には"$x", "$y", "$z", "$c"が使えます。
      * @return 文字列化されたベクトル
      */
-    public String toString(String format) {
+    @Override
+    public String format(String format) {
         final String x = String.format("%.2f", x());
         final String y = String.format("%.2f", y());
         final String z = String.format("%.2f", z());
@@ -431,7 +335,7 @@ public class Vector3Builder implements VectorBuilder {
      */
     @Override
     public String toString() {
-        return toString("($x, $y, $z)");
+        return format("($x, $y, $z)");
     }
 
     /**
@@ -440,15 +344,15 @@ public class Vector3Builder implements VectorBuilder {
      */
     @Override
     public Vector3Builder copy() {
-        return new Vector3Builder(x(), y(), z());
+        return new Vector3Builder(x, y, z);
     }
 
     /**
      * このベクトルをZ軸と考えたときのX, Y, Zの三軸を取得します。
      * @return ローカル軸
      */
-    public LocalAxes getLocalAxes() {
-        return new LocalAxes(this);
+    public LocalAxisProvider getLocalAxisProvider() {
+        return new LocalAxisProvider(this);
     }
 
     /**
@@ -466,7 +370,7 @@ public class Vector3Builder implements VectorBuilder {
      * @param world ディメンションの情報
      * @return 新しいLocation
      */
-    public Location withRotationAndWorld(DualAxisRotationHandler rotation, World world) {
+    public Location withRotationAndWorld(DualAxisRotationBuilder rotation, World world) {
         return new Location(world, x(), y(), z(), rotation.yaw(), rotation.pitch());
     }
 
@@ -480,26 +384,13 @@ public class Vector3Builder implements VectorBuilder {
     }
 
     /**
-     * このベクトルをjava.util.Vectorに変換します。
-     * @return 変換されたベクトル
-     */
-    public Vector<Double> toVector() {
-        final Vector<Double> vec = new Vector<>();
-        vec.add(x());
-        vec.add(y());
-        vec.add(z());
-
-        return vec;
-    }
-
-    /**
      * このベクトルを回転に変換します。
      * @return 回転
      */
-    public DualAxisRotationHandler getRotation2d() {
-        return new DualAxisRotationHandler(
-            -Math.atan2(x() / length(), z() / length()) * 180d / Math.PI,
-            -Math.asin(y() / length()) * 180d / Math.PI
+    public DualAxisRotationBuilder getRotation2d() {
+        return new DualAxisRotationBuilder(
+            (float) (-Math.atan2(x() / length(), z() / length()) * 180d / Math.PI),
+            (float) (-Math.asin(y() / length()) * 180d / Math.PI)
         );
     }
 
@@ -518,7 +409,7 @@ public class Vector3Builder implements VectorBuilder {
         double distance = Double.POSITIVE_INFINITY;
 
         for (int i = 0; i < points.length; i++) {
-            if (distance > getDistanceBetween(points[i])) {
+            if (distance > getDistanceTo(points[i])) {
                 index = i;
             }
         }
@@ -531,20 +422,7 @@ public class Vector3Builder implements VectorBuilder {
      * @return 変換されたベクトル
      */
     public org.bukkit.util.Vector toBukkitVector() {
-        return new org.bukkit.util.Vector(x(), y(), z());
-    }
-
-    /**
-     * java.util.Vectorをこのクラスに変換します。
-     * @param vector 変換するベクトル
-     * @return 変換されたベクトル
-     */
-    public static Vector3Builder from(Vector<Double> vector) {
-        if (vector.size() != 3) {
-            throw new DimensionSizeMismatchException();
-        }
-
-        return new Vector3Builder(vector.get(0), vector.get(1), vector.get(2));
+        return new org.bukkit.util.Vector(x, y, z);
     }
 
     /**
@@ -575,32 +453,6 @@ public class Vector3Builder implements VectorBuilder {
     }
 
     /**
-     * 長さが3の配列をこのクラスに変換します。
-     * @param array 配列
-     * @return 変換されたベクトル
-     */
-    public static Vector3Builder from(double[] array) {
-        if (array.length != 3) {
-            throw new DimensionSizeMismatchException();
-        }
-
-        return new Vector3Builder(array[0], array[1], array[2]);
-    }
-
-    /**
-     * 長さが3のリストをこのクラスに変換します。
-     * @param list リスト
-     * @return 変換されたベクトル
-     */
-    public static Vector3Builder from(List<Double> list) {
-        if (list.size() != 3) {
-            throw new DimensionSizeMismatchException();
-        }
-
-        return new Vector3Builder(list.get(0), list.get(1), list.get(2));
-    }
-
-    /**
      * 渡されたブロックとブロックの面の情報からこのクラスのインスタンスを作成します。
      * @param block ブロックの情報
      * @param blockFace ブロックの面の情報
@@ -622,7 +474,7 @@ public class Vector3Builder implements VectorBuilder {
      * @return 作成されたベクトル
      */
     public static Vector3Builder min(Vector3Builder a, Vector3Builder b) {
-        return a.copy().calc(b, Math::min);
+        return a.copy().calculate(b, Math::min);
     }
 
     /**
@@ -632,26 +484,18 @@ public class Vector3Builder implements VectorBuilder {
      * @return 作成されたベクトル
      */
     public static Vector3Builder max(Vector3Builder a, Vector3Builder b) {
-        return a.copy().calc(b, Math::max);
+        return a.copy().calculate(b, Math::max);
     }
 
-    public static class LocalAxes {
-        private final Vector3Builder x;
-
-        private final Vector3Builder y;
-
-        private final Vector3Builder z;
+    public static class LocalAxisProvider {
+        private final Vector3Builder forward;
 
         /**
          * 渡されたベクトルをZ軸ベクトルとして、X, Y, Zの三軸を作成します。
          * @param forward Z軸ベクトル
          */
-        public LocalAxes(Vector3Builder forward) {
-            z = forward.copy().normalized();
-
-            x = new Vector3Builder(z.z(), 0, -z.x()).normalized();
-
-            y = z.cross(x);
+        public LocalAxisProvider(Vector3Builder forward) {
+            this.forward = forward;
         }
 
         /**
@@ -659,7 +503,8 @@ public class Vector3Builder implements VectorBuilder {
          * @return X軸ベクトル
          */
         public Vector3Builder getX() {
-            return x.copy();
+            final Vector3Builder z = getZ();
+            return new Vector3Builder(z.z(), 0, -z.x()).normalize();
         }
 
         /**
@@ -667,7 +512,7 @@ public class Vector3Builder implements VectorBuilder {
          * @return Y軸ベクトル
          */
         public Vector3Builder getY() {
-            return y.copy();
+            return getZ().cross(getX());
         }
 
         /**
@@ -675,7 +520,7 @@ public class Vector3Builder implements VectorBuilder {
          * @return Z軸ベクトル
          */
         public Vector3Builder getZ() {
-            return z.copy();
+            return forward.copy().normalize();
         }
     }
 }

@@ -1,8 +1,8 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
+import com.gmail.subnokoii78.util.itemstack.PotionContent;
 import com.gmail.subnokoii78.util.itemstack.TypedAttributeModifier;
 import com.gmail.subnokoii78.util.itemstack.components.ComponentItemStackBuilder;
-import com.gmail.subnokoii78.util.itemstack.components.PotionContentsComponent;
 import com.gmail.subnokoii78.util.ui.ChestUIBuilder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -56,11 +56,11 @@ public class Tools implements CommandExecutor, TabCompleter {
         .add(button -> {
             final ComponentItemStackBuilder potion = new ComponentItemStackBuilder(Material.SPLASH_POTION);
 
-            final PotionContentsComponent.PotionContent damage = new PotionContentsComponent.PotionContent(PotionEffectType.INSTANT_DAMAGE)
-            .setAmplifier(29).setDuration(1).setShowParticles(false);
+            final PotionContent damage = new PotionContent(PotionEffectType.INSTANT_DAMAGE)
+            .amplifier(29).duration(1).showParticles(false);
 
-            final PotionContentsComponent.PotionContent health = new PotionContentsComponent.PotionContent(PotionEffectType.INSTANT_HEALTH)
-            .setAmplifier(29).setDuration(1).setShowParticles(false);
+            final PotionContent health = new PotionContent(PotionEffectType.INSTANT_HEALTH)
+            .amplifier(29).duration(1).showParticles(false);
 
             potion.potionContents().addContent(damage);
             potion.potionContents().addContent(health);
@@ -75,8 +75,8 @@ public class Tools implements CommandExecutor, TabCompleter {
         })
         .add(button -> {
             final ComponentItemStackBuilder sword = new ComponentItemStackBuilder(Material.GOLDEN_SWORD);
-            final TypedAttributeModifier attackDamage = new TypedAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE).setValue(0.1d);
-            final TypedAttributeModifier attackSpeed = new TypedAttributeModifier(Attribute.GENERIC_ATTACK_SPEED).setValue(-2.5d);
+            final TypedAttributeModifier attackDamage = new TypedAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE).amount(0.1d);
+            final TypedAttributeModifier attackSpeed = new TypedAttributeModifier(Attribute.GENERIC_ATTACK_SPEED).amount(-2.5d);
 
             sword.attributeModifiers().setModifiers(new TypedAttributeModifier[]{attackDamage, attackSpeed});
             sword.attributeModifiers().setShowInTooltip(false);

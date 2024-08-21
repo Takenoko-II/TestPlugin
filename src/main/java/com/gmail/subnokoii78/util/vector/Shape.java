@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 public final class Shape {
     private final ShapeType type;
 
-    private final Vector3Builder.LocalAxes axes;
+    private final Vector3Builder.LocalAxisProvider axes;
 
     private float scale = 1f;
 
@@ -20,9 +20,9 @@ public final class Shape {
 
     private ParticleDecoration decoration = new ParticleDecoration(Particle.FLAME);
 
-    public Shape(ShapeType type, DualAxisRotationHandler rotation) {
+    public Shape(ShapeType type, DualAxisRotationBuilder rotation) {
         this.type = type;
-        this.axes = rotation.getDirection3d().getLocalAxes();
+        this.axes = rotation.getDirection3d().getLocalAxisProvider();
     }
 
     public float getScale() {

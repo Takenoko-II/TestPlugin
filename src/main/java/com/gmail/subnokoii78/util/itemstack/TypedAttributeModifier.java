@@ -5,8 +5,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.EquipmentSlotGroup;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -27,11 +25,11 @@ public final class TypedAttributeModifier {
         );
     }
 
-    public double getValue() {
+    public double amount() {
         return modifier.getAmount();
     }
 
-    public TypedAttributeModifier setValue(double value) {
+    public TypedAttributeModifier amount(double value) {
         modifier = new AttributeModifier(
             modifier.getKey(),
             value,
@@ -42,11 +40,11 @@ public final class TypedAttributeModifier {
         return this;
     }
 
-    public AttributeModifier.Operation getOperation() {
+    public AttributeModifier.Operation operation() {
         return modifier.getOperation();
     }
 
-    public TypedAttributeModifier setOperation(@NotNull AttributeModifier.Operation operation) {
+    public TypedAttributeModifier operation(@NotNull AttributeModifier.Operation operation) {
         modifier = new AttributeModifier(
             modifier.getKey(),
             modifier.getAmount(),
@@ -61,11 +59,11 @@ public final class TypedAttributeModifier {
         return type;
     }
 
-    public EquipmentSlotGroup getSlotGroup() {
+    public EquipmentSlotGroup activeSlots() {
         return modifier.getSlotGroup();
     }
 
-    public TypedAttributeModifier setSlotGroup(@NotNull EquipmentSlotGroup slotGroup) {
+    public TypedAttributeModifier activeSlots(@NotNull EquipmentSlotGroup slotGroup) {
         modifier = new AttributeModifier(
             modifier.getKey(),
             modifier.getAmount(),
@@ -76,22 +74,22 @@ public final class TypedAttributeModifier {
         return this;
     }
 
-    public AttributeModifier toUnTyped() {
+    public AttributeModifier toBukkit() {
         return modifier;
     }
 
-    public static TypedAttributeModifier from(AttributeModifier modifier) {
+    public static TypedAttributeModifier fromBukkit(AttributeModifier modifier) {
         return new TypedAttributeModifier(Attribute.valueOf(modifier.getName()))
-            .setValue(modifier.getAmount())
-            .setOperation(modifier.getOperation())
-            .setSlotGroup(modifier.getSlotGroup());
+            .amount(modifier.getAmount())
+            .operation(modifier.getOperation())
+            .activeSlots(modifier.getSlotGroup());
     }
 
-    public static TypedAttributeModifier[] from(Multimap<Attribute, AttributeModifier> modifiers) {
+    public static TypedAttributeModifier[] fromBukkit(Multimap<Attribute, AttributeModifier> modifiers) {
         return modifiers.entries()
             .stream()
             .map(Map.Entry::getValue)
-            .map(TypedAttributeModifier::from)
+            .map(TypedAttributeModifier::fromBukkit)
             .toArray(TypedAttributeModifier[]::new);
     }
 }

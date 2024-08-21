@@ -117,15 +117,6 @@ public class TextFileUtils {
     public static void create(String path) {
         final Path filePath = Path.of(path);
 
-        if (!Files.exists(filePath.getParent())) {
-            try {
-                Files.createFile(filePath.getParent());
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
         if (!Files.exists(filePath)) {
             try {
                 Files.createFile(filePath);

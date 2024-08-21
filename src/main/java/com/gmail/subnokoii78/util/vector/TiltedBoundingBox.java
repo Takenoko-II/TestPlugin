@@ -20,7 +20,7 @@ public final class TiltedBoundingBox {
 
     private final double depth;
 
-    private final EntireAxisRotationHandler rotation = new EntireAxisRotationHandler();
+    private final TripleAxisRotationBuilder rotation = new TripleAxisRotationBuilder();
 
     private World world = Bukkit.getWorlds().get(0);
 
@@ -49,12 +49,12 @@ public final class TiltedBoundingBox {
         center.z(location.z());
     }
 
-    public void rotate(EntireAxisRotationHandler rotation) {
+    public void rotate(TripleAxisRotationBuilder rotation) {
         this.rotation.add(rotation);
     }
 
     public boolean isInside(Vector3Builder vector3) {
-        final EntireAxisRotationHandler.LocalAxesE axes = rotation.getLocalAxesE();
+        final TripleAxisRotationBuilder.LocalAxisProviderE axes = rotation.getLocalAxisProviderE();
         final Vector3Builder x = axes.getX().length(width / 2);
         final Vector3Builder y = axes.getY().length(height / 2);
         final Vector3Builder z = axes.getZ().length(depth / 2);
@@ -81,7 +81,7 @@ public final class TiltedBoundingBox {
     }
 
     private boolean getIsIntersectingBySeparatingAxisTheorem(BoundingBox box) {
-        final EntireAxisRotationHandler.LocalAxesE axes = rotation.getLocalAxesE();
+        final TripleAxisRotationBuilder.LocalAxisProviderE axes = rotation.getLocalAxisProviderE();
         final Vector3Builder x = axes.getX().length(width / 2);
         final Vector3Builder y = axes.getY().length(height / 2);
         final Vector3Builder z = axes.getZ().length(depth / 2);
@@ -143,8 +143,8 @@ public final class TiltedBoundingBox {
                 pointsA.add(cornerA.projection(separator));
             }
 
-            final Vector3Builder vm = separator.copy().inverted().scale(100).selectClosest(pointsA.toArray(Vector3Builder[]::new));
-            final Vector3Builder vM = separator.copy().scale(100).selectClosest(pointsA.toArray(Vector3Builder[]::new));
+            final Vector3Builder vm = separator.copy().invert().scale(100d).selectClosest(pointsA.toArray(Vector3Builder[]::new));
+            final Vector3Builder vM = separator.copy().scale(100d).selectClosest(pointsA.toArray(Vector3Builder[]::new));
 
             for (final Vector3Builder cornerB : cornersB) {
                 final Vector3Builder pointB = cornerB.projection(separator);
@@ -160,7 +160,7 @@ public final class TiltedBoundingBox {
     }
 
     private boolean isIntersectingBox(BoundingBox box, int rayCount) {
-        final EntireAxisRotationHandler.LocalAxesE axes = rotation.getLocalAxesE();
+        final TripleAxisRotationBuilder.LocalAxisProviderE axes = rotation.getLocalAxisProviderE();
         final Vector3Builder x = axes.getX().length(width / 2);
         final Vector3Builder y = axes.getY().length(height / 2);
         final Vector3Builder z = axes.getZ().length(depth / 2);
@@ -175,7 +175,7 @@ public final class TiltedBoundingBox {
 
             final Vector3Builder end = start.copy().add(forward);
 
-            final RayTraceResult result = box.rayTrace(start.toBukkitVector(), start.getDirectionTo(end).toBukkitVector(), start.getDistanceBetween(end));
+            final RayTraceResult result = box.rayTrace(start.toBukkitVector(), start.getDirectionTo(end).toBukkitVector(), start.getDistanceTo(end));
 
             if (result != null) return true;
         }
@@ -184,7 +184,7 @@ public final class TiltedBoundingBox {
     }
 
     private void outline(Consumer<Vector3Builder> consumer) {
-        final EntireAxisRotationHandler.LocalAxesE axes = rotation.getLocalAxesE();
+        final TripleAxisRotationBuilder.LocalAxisProviderE axes = rotation.getLocalAxisProviderE();
         final Vector3Builder x = axes.getX().length(width / 2);
         final Vector3Builder y = axes.getY().length(height / 2);
         final Vector3Builder z = axes.getZ().length(depth / 2);

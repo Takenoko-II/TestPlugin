@@ -3,15 +3,9 @@ package com.gmail.subnokoii78.util.itemstack.components;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-public final class MaxStackSizeComponent implements ItemStackComponent {
-    private final ItemMeta itemMeta;
-
-    private MaxStackSizeComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class MaxStackSizeComponent extends ItemStackComponent {
+    private MaxStackSizeComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

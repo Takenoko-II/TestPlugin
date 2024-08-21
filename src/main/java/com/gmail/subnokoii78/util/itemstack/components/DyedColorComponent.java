@@ -9,15 +9,9 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class DyedColorComponent implements TooltipShowable {
-    private final ItemMeta itemMeta;
-
-    private DyedColorComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class DyedColorComponent extends TooltipShowable {
+    private DyedColorComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

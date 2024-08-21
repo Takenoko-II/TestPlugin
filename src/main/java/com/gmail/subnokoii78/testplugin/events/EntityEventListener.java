@@ -4,8 +4,8 @@ import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
-import com.gmail.subnokoii78.util.vector.EntireAxisRotationHandler;
-import com.gmail.subnokoii78.util.vector.DualAxisRotationHandler;
+import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
+import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
 import org.bukkit.*;
@@ -112,7 +112,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
                         final Transformation transformation = display.getTransformation();
                         transformation.getLeftRotation()
-                            .set(new EntireAxisRotationHandler(yaw, pitch, roll).getQuaternion4d());
+                            .set(new TripleAxisRotationBuilder(yaw, pitch, roll).getQuaternion4d());
                         display.setTransformation(transformation);
                     }
 
@@ -174,8 +174,8 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
                     final TiltedBoundingBox box = new TiltedBoundingBox(width, height, depth);
                     final Entity center = targets[0];
-                    final EntireAxisRotationHandler rotation = EntireAxisRotationHandler.from(DualAxisRotationHandler.from(center));
-                    rotation.add(new EntireAxisRotationHandler(0, 0, roll));
+                    final TripleAxisRotationBuilder rotation = TripleAxisRotationBuilder.from(DualAxisRotationBuilder.from(center));
+                    rotation.add(new TripleAxisRotationBuilder(0, 0, roll));
                     box.put(center.getWorld(), Vector3Builder.from(center.getLocation()));
                     box.rotate(rotation);
 
@@ -248,7 +248,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
             vector.subtract(Vector3Builder.from(player.getLocation()));
             vector.add(new Vector3Builder(0d, 0.25d, 0d));
 
-            vector.calc(component -> {
+            vector.calculate(component -> {
                 final double absolute = Math.abs(component);
                 return component / absolute * Math.cbrt(absolute);
             })

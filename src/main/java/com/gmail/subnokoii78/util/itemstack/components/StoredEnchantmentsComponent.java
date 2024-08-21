@@ -1,23 +1,18 @@
 package com.gmail.subnokoii78.util.itemstack.components;
 
-import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
-public final class StoredEnchantmentsComponent implements TooltipShowable {
-    private final ItemMeta itemMeta;
-
-    private StoredEnchantmentsComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class StoredEnchantmentsComponent extends TooltipShowable {
+    private StoredEnchantmentsComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override
@@ -49,10 +44,17 @@ public final class StoredEnchantmentsComponent implements TooltipShowable {
 
     @Override
     public void disable() {
-        if (itemMeta instanceof EnchantmentStorageMeta) {
-            Registry.ENCHANTMENT.forEach(enchantment -> {
-                ((EnchantmentStorageMeta) itemMeta).removeStoredEnchant(enchantment);
-            });
+        if (itemMeta instanceof EnchantmentStorageMeta enchantmentStorageMeta) {
+            Arrays.stream(Enchantment.class.getFields())
+                .map(field -> {
+                    if (field.canAccess(null)) {
+                        try { return (Enchantment) field.get(null); }
+                        catch (IllegalAccessException e) { throw new RuntimeException("Never Happens"); }
+                    }
+                    else return null;
+                })
+                .filter(Objects::nonNull)
+                .forEach(enchantmentStorageMeta::removeStoredEnchant);
         }
     }
 

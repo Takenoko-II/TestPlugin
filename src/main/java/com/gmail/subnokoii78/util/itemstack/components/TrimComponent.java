@@ -7,15 +7,9 @@ import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class TrimComponent implements TooltipShowable {
-    private final ItemMeta itemMeta;
-
-    private TrimComponent(ItemMeta itemMeta) {
-        if (itemMeta == null) {
-            throw new IllegalArgumentException();
-        }
-
-        this.itemMeta = itemMeta;
+public final class TrimComponent extends TooltipShowable {
+    private TrimComponent(@NotNull ItemMeta itemMeta) {
+        super(itemMeta);
     }
 
     @Override

@@ -8,8 +8,8 @@ import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
 import com.gmail.subnokoii78.util.other.ScheduleUtils;
 import com.gmail.subnokoii78.util.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii78.util.other.DisplayEditor;
-import com.gmail.subnokoii78.util.vector.DualAxisRotationHandler;
-import com.gmail.subnokoii78.util.vector.EntireAxisRotationHandler;
+import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
+import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.Shape;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
 import net.kyori.adventure.text.Component;
@@ -86,14 +86,14 @@ public class PlayerEventListener implements Listener {
             }
 
             if (new ItemStackDataContainerManager(itemStack).equals("custom_item_tag", "slash")) {
-                final Vector3Builder.LocalAxes axes = DualAxisRotationHandler.from(player).getDirection3d().getLocalAxes();
+                final Vector3Builder.LocalAxisProvider axes = DualAxisRotationBuilder.from(player).getDirection3d().getLocalAxisProvider();
 
                 final Vector3Builder displayPos = Vector3Builder.from(player)
                 .add(0, 1.3, 0)
                 .add(axes.getZ().scale(1.75));
 
-                final Quaternionf quaternion = EntireAxisRotationHandler.from(DualAxisRotationHandler.from(player))
-                    .add(new EntireAxisRotationHandler(0, 0, (float) (Math.random() * 180 - 90)))
+                final Quaternionf quaternion = TripleAxisRotationBuilder.from(DualAxisRotationBuilder.from(player))
+                    .add(new TripleAxisRotationBuilder(0, 0, (float) (Math.random() * 180 - 90)))
                     .getQuaternion4d();
 
                 final Display display = DisplayEditor
@@ -145,7 +145,7 @@ public class PlayerEventListener implements Listener {
 
                     if (block == null || face == null) break;
 
-                    final Vector3Builder direction = DualAxisRotationHandler.from(player).getDirection3d();
+                    final Vector3Builder direction = DualAxisRotationBuilder.from(player).getDirection3d();
 
                     final Location destination = Vector3Builder.from(block, face)
                     .subtract(direction.length(0.5d))
@@ -208,7 +208,7 @@ public class PlayerEventListener implements Listener {
                 }
                 case "magic": {
                     final Runnable runner = () -> {
-                        final Vector3Builder.LocalAxes localAxes = DualAxisRotationHandler.from(player).getDirection3d().getLocalAxes();
+                        final Vector3Builder.LocalAxisProvider localAxes = DualAxisRotationBuilder.from(player).getDirection3d().getLocalAxisProvider();
                         final Vector3Builder x = localAxes.getX().length(Math.floor(Math.random() * 10) + 1 - 5);
                         final Vector3Builder y = localAxes.getY().length(Math.floor(Math.random() * 5 + 1 - 2.5));
 
@@ -328,7 +328,7 @@ public class PlayerEventListener implements Listener {
 
                     shootableCountByLeftClick.put(player, count - 1);
 
-                    final Vector3Builder vector = DualAxisRotationHandler.from(player.getLocation())
+                    final Vector3Builder vector = DualAxisRotationBuilder.from(player.getLocation())
                     .getDirection3d();
 
                     final Arrow arrow = player.getWorld().spawnArrow(player.getEyeLocation(), vector.toBukkitVector(), 1.6f, 12f);
@@ -347,29 +347,29 @@ public class PlayerEventListener implements Listener {
 
     private static void magicCircle(Player player, Vector3Builder offset, float size) {
         final Vector3Builder center = Vector3Builder.from(player.getEyeLocation())
-        .add(DualAxisRotationHandler.from(player).getDirection3d().length(2))
+        .add(DualAxisRotationBuilder.from(player).getDirection3d().length(2))
         .add(offset);
 
         final World world = player.getWorld();
 
-        final Shape pointedStar = new Shape(Shape.ShapeType.EIGHT_POINTED_STAR, DualAxisRotationHandler.from(player));
+        final Shape pointedStar = new Shape(Shape.ShapeType.EIGHT_POINTED_STAR, DualAxisRotationBuilder.from(player));
         pointedStar.setScale(size);
         pointedStar.rotate((float) (Math.random() * 360));
         pointedStar.setParticleDecoration(new Shape.DustDecoration().setCount(3));
         pointedStar.draw(world, center);
 
-        final Shape pentagram = new Shape(Shape.ShapeType.PENTAGRAM, DualAxisRotationHandler.from(player));
+        final Shape pentagram = new Shape(Shape.ShapeType.PENTAGRAM, DualAxisRotationBuilder.from(player));
         pentagram.setScale(size / 2);
         pentagram.rotate((float) (Math.random() * 360));
         pentagram.setParticleDecoration(new Shape.DustDecoration().setSize(0.75f).setCount(3));
         pentagram.draw(world, center);
 
-        final Shape circle = new Shape(Shape.ShapeType.PERFECT_CIRCLE, DualAxisRotationHandler.from(player));
+        final Shape circle = new Shape(Shape.ShapeType.PERFECT_CIRCLE, DualAxisRotationBuilder.from(player));
         circle.setScale(size);
         circle.setParticleDecoration(new Shape.DustDecoration().setSize(0.75f));
         circle.draw(world, center);
 
-        final Shape smallCircle = new Shape(Shape.ShapeType.PERFECT_CIRCLE, DualAxisRotationHandler.from(player));
+        final Shape smallCircle = new Shape(Shape.ShapeType.PERFECT_CIRCLE, DualAxisRotationBuilder.from(player));
         smallCircle.setDensity(0.05f);
         smallCircle.setScale(size / 4);
         smallCircle.setParticleDecoration(
@@ -384,9 +384,9 @@ public class PlayerEventListener implements Listener {
         }
 
         final Vector3Builder target = Vector3Builder.from(player.getEyeLocation())
-        .add(DualAxisRotationHandler.from(player).getDirection3d().length(20));
+        .add(DualAxisRotationBuilder.from(player).getDirection3d().length(20));
 
-        final DualAxisRotationHandler direction = center.getDirectionTo(target).getRotation2d();
+        final DualAxisRotationBuilder direction = center.getDirectionTo(target).getRotation2d();
 
         final Shape line = new Shape(Shape.ShapeType.STRAIGHT_LINE, direction);
         line.setScale(30);
