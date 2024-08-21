@@ -1,5 +1,7 @@
 package com.gmail.subnokoii78.util.file;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,14 +15,14 @@ public class TextFileUtils {
      * 指定のパスのテキストファイルを行ごとに読み取ります。
      *
      * @param path サーバーフォルダからの相対パス
-     * @return 行ごとの文字列もしくはnull
+     * @return 行ごとの文字列
      */
-    public static List<String> read(String path) {
+    public static @NotNull List<String> read(String path) {
         try {
             return Files.readAllLines(Path.of(path), StandardCharsets.UTF_8);
         }
         catch (IOException e) {
-            return null;
+            return List.of();
         }
     }
 

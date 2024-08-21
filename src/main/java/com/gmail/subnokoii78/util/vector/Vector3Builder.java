@@ -9,7 +9,6 @@ import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
@@ -111,60 +110,19 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
         return this;
     }
 
-    /**
-     * このベクトルに別のベクトルを足します。
-     * @param other 別のベクトル
-     * @return このベクトル
-     */
     public Vector3Builder add(Vector3Builder other) {
         return calculate(other, Double::sum);
     }
 
-    /**
-     * このベクトルに別のベクトルを足します。
-     * @param x 別のベクトルのX成分
-     * @param y 別のベクトルのY成分
-     * @param z 別のベクトルのZ成分
-     * @return このベクトル
-     */
-    public Vector3Builder add(double x, double y, double z) {
-        return add(new Vector3Builder(x, y, z));
-    }
-
-    /**
-     * このベクトルから別のベクトルを引きます。
-     * @param other 別のベクトル
-     * @return このベクトル
-     */
     public Vector3Builder subtract(Vector3Builder other) {
         return add(other.copy().invert());
     }
 
-    /**
-     * このベクトルから別のベクトルを引きます。
-     * @param x 別のベクトルのX成分
-     * @param y 別のベクトルのY成分
-     * @param z 別のベクトルのZ成分
-     * @return このベクトル
-     */
-    public Vector3Builder subtract(double x, double y, double z) {
-        return subtract(new Vector3Builder(x, y, z));
-    }
-
-    /**
-     * このベクトルを実数倍します。
-     * @param scalar 倍率
-     * @return このベクトル
-     */
     @Override
     public Vector3Builder scale(@NotNull Double scalar) {
         return calculate(component -> component * scalar);
     }
 
-    /**
-     * このベクトルの向きを逆向きにします。
-     * @return このベクトル
-     */
     public Vector3Builder invert() {
         return scale(-1d);
     }
@@ -329,19 +287,11 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
         .replaceAll("\\$c", "");
     }
 
-    /**
-     * このベクトルを文字列化します。
-     * @return 文字列化されたベクトル
-     */
     @Override
     public String toString() {
         return format("($x, $y, $z)");
     }
 
-    /**
-     * このベクトルのコピーを返します。
-     * @return コピーされたベクトル
-     */
     @Override
     public Vector3Builder copy() {
         return new Vector3Builder(x, y, z);

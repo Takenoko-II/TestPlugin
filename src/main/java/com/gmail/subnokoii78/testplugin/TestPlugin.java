@@ -7,11 +7,16 @@ import com.gmail.subnokoii78.util.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii78.util.event.CustomEvents;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
 import com.gmail.subnokoii78.util.ui.ChestUIClickEvent;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -43,7 +48,7 @@ public final class TestPlugin extends JavaPlugin {
         TickEventListener.init();
 
         // コマンド登録
-        setCommandManager("foo", new Foo());
+        // setCommandManager("foo", new Foo());
         setCommandManager("log", new Log());
         setCommandManager("lobby", new Lobby());
         setCommandManager("tools", new Tools());
@@ -52,11 +57,80 @@ public final class TestPlugin extends JavaPlugin {
 
         // BungeeCordに接続
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            event.registrar().register(getFooCommandNode());
+            event.registrar().register(getLoggerCommandNode());
+        });
     }
 
     @Override
     public void onDisable() {
         TestPlugin.log(LoggingTarget.ALL, "TestPluginが停止しました");
+    }
+
+    private Command<CommandSourceStack> getLogReader(int start, int end, boolean fromLast) {
+        return ctx -> {
+            final var log = TextFileUtils.read("logs/latest.log");
+            final var sender = ctx.getSource().getSender();
+            var component = fromLast
+                ? Component.text("ログの終わり" + (end - start + 1) + "行を表示しています")
+                : Component.text("ログの初め" + (end - start + 1) + "行を表示しています");
+
+            final var sub = fromLast
+                ? log.subList(log.size() - (end + 1), log.size() - (start + 1))
+                : log.subList(start, end);
+
+            for (int i = 0; i < sub.size(); i++) {
+                final var line = sub.get(i);
+                if (i % 2 == 0) {
+                    component = component.append(Component.text("\n- ").color(NamedTextColor.BLUE)).append(Component.text(line).color(NamedTextColor.WHITE));
+                }
+                else {
+                    component = component.append(Component.text("\n- ").color(NamedTextColor.BLUE)).append(Component.text(line).color(NamedTextColor.GRAY));
+                }
+            }
+            sender.sendMessage(component);
+            return Command.SINGLE_SUCCESS;
+        };
+    }
+
+    private LiteralCommandNode<CommandSourceStack> getFooCommandNode() {
+        return Commands.literal("foo")
+            .executes(ctx -> {
+                ctx.getSource().getSender().sendMessage(Component.text("foo!"));
+                return Command.SINGLE_SUCCESS;
+            })
+            .build();
+    }
+
+    private LiteralCommandNode<CommandSourceStack> getLoggerCommandNode() {
+        return Commands.literal("serverlogger")
+            .then(
+                Commands.literal("read")
+                    .then(Commands.literal("first").executes(getLogReader(0, 31, false)))
+                    .then(Commands.literal("last").executes(getLogReader(0, 31, true)))
+                    .executes(getLogReader(0, 15, true))
+            )
+            .then(
+                Commands.literal("write")
+                    .then(Commands.argument("message", ArgumentTypes.component())
+                        .executes(ctx -> {
+                            final var message = ctx.getArgument("message", Component.class);
+                            getComponentLogger().info(message);
+                            ctx.getSource().getSender().sendMessage(Component.text("メッセージをログに書き込みました: ").append(message));
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
+            )
+            .then(Commands.literal("clear").executes(ctx -> {
+                Arrays.stream(TextFileUtils.getAll("logs"))
+                    .filter(path -> path.endsWith(".log.gz"))
+                    .forEach(TextFileUtils::delete);
+                ctx.getSource().getSender().sendPlainMessage("ログのアーカイブを全て削除しました");
+                return Command.SINGLE_SUCCESS;
+            }))
+            .build();
     }
 
     /**

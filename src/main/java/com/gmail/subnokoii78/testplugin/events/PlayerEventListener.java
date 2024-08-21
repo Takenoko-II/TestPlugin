@@ -89,7 +89,7 @@ public class PlayerEventListener implements Listener {
                 final Vector3Builder.LocalAxisProvider axes = DualAxisRotationBuilder.from(player).getDirection3d().getLocalAxisProvider();
 
                 final Vector3Builder displayPos = Vector3Builder.from(player)
-                .add(0, 1.3, 0)
+                .add(new Vector3Builder(0, 1.3, 0))
                 .add(axes.getZ().scale(1.75));
 
                 final Quaternionf quaternion = TripleAxisRotationBuilder.from(DualAxisRotationBuilder.from(player))
