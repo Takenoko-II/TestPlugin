@@ -22,7 +22,7 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
     }
 
     @Override
-    public boolean equals(TripleAxisRotationBuilder other) {
+    public boolean equals(@NotNull TripleAxisRotationBuilder other) {
         return yaw == other.yaw
             && pitch == other.pitch
             && roll == other.roll;
@@ -61,7 +61,7 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
      * @return このベクトル
      */
     @Override
-    public TripleAxisRotationBuilder calculate(UnaryOperator<Float> operator) {
+    public @NotNull TripleAxisRotationBuilder calculate(@NotNull UnaryOperator<Float> operator) {
         yaw = operator.apply(yaw);
         pitch = operator.apply(pitch);
         roll = operator.apply(roll);
@@ -74,32 +74,32 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
      * @return このベクトル
      */
     @Override
-    public TripleAxisRotationBuilder calculate(TripleAxisRotationBuilder other, BiFunction<Float, Float, Float> operator) {
+    public @NotNull TripleAxisRotationBuilder calculate(@NotNull TripleAxisRotationBuilder other, @NotNull BiFunction<Float, Float, Float> operator) {
         yaw = operator.apply(yaw, other.yaw);
         pitch = operator.apply(pitch, other.pitch);
         roll = operator.apply(roll, other.roll);
         return this;
     }
 
-    public TripleAxisRotationBuilder add(TripleAxisRotationBuilder other) {
+    public @NotNull TripleAxisRotationBuilder add(@NotNull TripleAxisRotationBuilder other) {
         calculate(other, Float::sum);
         return this;
     }
 
-    public TripleAxisRotationBuilder subtract(TripleAxisRotationBuilder other) {
+    public @NotNull TripleAxisRotationBuilder subtract(@NotNull TripleAxisRotationBuilder other) {
         return add(other.copy().invert());
     }
 
-    public TripleAxisRotationBuilder scale(@NotNull Float scalar) {
+    public @NotNull TripleAxisRotationBuilder scale(@NotNull Float scalar) {
         return calculate(component -> component * scalar);
     }
 
-    public TripleAxisRotationBuilder invert() {
+    public @NotNull TripleAxisRotationBuilder invert() {
         return scale(-1f);
     }
 
     @Override
-    public String format(String format) {
+    public @NotNull String format(@NotNull String format) {
         final String yaw = String.format("%.2f", this.yaw);
         final String pitch = String.format("%.2f", this.pitch);
         final String roll = String.format("%.2f", this.roll);
@@ -115,12 +115,12 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return format("($x, $y, $z)");
     }
 
     @Override
-    public TripleAxisRotationBuilder copy() {
+    public @NotNull TripleAxisRotationBuilder copy() {
         return new TripleAxisRotationBuilder(yaw, pitch, roll);
     }
 
@@ -187,15 +187,15 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
             return new Vector3Builder(x, y, z);
         }
 
-        public Vector3Builder getX() {
+        public @NotNull Vector3Builder getX() {
             return rotate(super.getX());
         }
 
-        public Vector3Builder getY() {
+        public @NotNull Vector3Builder getY() {
             return rotate(super.getY());
         }
 
-        public Vector3Builder getZ() {
+        public @NotNull Vector3Builder getZ() {
             return super.getZ();
         }
     }

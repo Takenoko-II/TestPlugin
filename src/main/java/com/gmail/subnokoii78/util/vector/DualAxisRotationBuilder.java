@@ -8,6 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
+/**
+ * ヨー角・ピッチ角による回転を表現するクラス
+ */
 public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBuilder, Float> {
     private float yaw, pitch;
 
@@ -27,13 +30,13 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
     }
 
     @Override
-    public boolean equals(DualAxisRotationBuilder other) {
+    public boolean equals(@NotNull DualAxisRotationBuilder other) {
         return yaw == other.yaw
             && pitch == other.pitch;
     }
 
     /**
-     * この回転のX成分の値を返します。
+     * この回転のX成分(横回転)の値を返します。
      * @return X成分の値
      */
     public float yaw() {
@@ -41,16 +44,17 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
     }
 
     /**
-     * この回転のX成分の値を変更します。
+     * この回転のX成分(横回転)の値を変更します。
      * @param value 新しい値
+     * @return this
      */
-    public DualAxisRotationBuilder yaw(float value) {
+    public @NotNull DualAxisRotationBuilder yaw(float value) {
         yaw = value;
         return this;
     }
 
     /**
-     * この回転のY成分の値を返します。
+     * この回転のY成分(縦回転)の値を返します。
      * @return Y成分の値
      */
     public float pitch() {
@@ -58,10 +62,11 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
     }
 
     /**
-     * この回転のY成分の値を変更します。
+     * この回転のY成分(縦回転)の値を変更します。
      * @param value 新しい値
+     * @return this
      */
-    public DualAxisRotationBuilder pitch(float value) {
+    public @NotNull DualAxisRotationBuilder pitch(float value) {
         pitch = value;
         return this;
     }
@@ -69,10 +74,10 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
     /**
      * この回転のそれぞれの成分に対して関数を呼び出し、その結果で成分の値を上書きします。
      * @param operator 関数
-     * @return この回転
+     * @return this
      */
     @Override
-    public DualAxisRotationBuilder calculate(UnaryOperator<Float> operator) {
+    public @NotNull DualAxisRotationBuilder calculate(@NotNull UnaryOperator<Float> operator) {
         yaw = operator.apply(yaw);
         pitch = operator.apply(pitch);
         return this;
@@ -81,41 +86,41 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
     /**
      * 引数に渡された回転とこの回転のそれぞれの成分に対して関数を呼び出し、その結果で成分の値を上書きします。
      * @param operator 関数
-     * @return この回転
+     * @return this
      */
-    public DualAxisRotationBuilder calculate(DualAxisRotationBuilder other, BiFunction<Float, Float, Float> operator) {
+    public @NotNull DualAxisRotationBuilder calculate(@NotNull DualAxisRotationBuilder other, @NotNull BiFunction<Float, Float, Float> operator) {
         yaw = operator.apply(yaw, other.yaw);
         pitch = operator.apply(pitch, other.pitch);
         return this;
     }
 
-    public DualAxisRotationBuilder add(DualAxisRotationBuilder addend) {
+    public @NotNull DualAxisRotationBuilder add(@NotNull DualAxisRotationBuilder addend) {
         return calculate(addend, Float::sum);
     }
 
-    public DualAxisRotationBuilder subtract(DualAxisRotationBuilder subtrahend) {
+    public @NotNull DualAxisRotationBuilder subtract(@NotNull DualAxisRotationBuilder subtrahend) {
         return add(subtrahend.copy().invert());
     }
 
     /**
      * この回転を実数倍します。
      * @param scalar 倍率
-     * @return この回転
+     * @return this
      */
     @Override
-    public DualAxisRotationBuilder scale(@NotNull Float scalar) {
+    public @NotNull DualAxisRotationBuilder scale(@NotNull Float scalar) {
         return calculate(component -> component * scalar);
     }
 
     /**
      * この回転を逆向きにします。
-     * @return この回転
+     * @return this
      */
-    public DualAxisRotationBuilder invert() {
+    public @NotNull DualAxisRotationBuilder invert() {
         return scale(-1f);
     }
 
-    public String format(String format) {
+    public @NotNull String format(@NotNull String format) {
         final String yawStr = String.format("%.2f", yaw());
         final String pitchStr = String.format("%.2f", pitch());
 
@@ -128,12 +133,12 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return format("($x, $y)");
     }
 
     @Override
-    public DualAxisRotationBuilder copy() {
+    public @NotNull DualAxisRotationBuilder copy() {
         return new DualAxisRotationBuilder(yaw, pitch);
     }
 

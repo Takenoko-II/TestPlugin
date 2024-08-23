@@ -19,6 +19,7 @@ import org.bukkit.loot.LootTables;
 import org.bukkit.loot.Lootable;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 
@@ -303,7 +304,12 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
         if (tag == null) return;
 
         if (tag.equals("sword_of_overwrite")) {
-            final Vector3Builder offset = Vector3Builder.from(damageableEntity.getBoundingBox());
+            final BoundingBox box = damageableEntity.getBoundingBox();
+            final Vector3Builder offset = new Vector3Builder(
+                box.getWidthX() / 2,
+                box.getHeight() / 2,
+                box.getWidthZ() / 2
+            );
 
             damageableEntity.getWorld().spawnParticle(
                 Particle.DUST_COLOR_TRANSITION,

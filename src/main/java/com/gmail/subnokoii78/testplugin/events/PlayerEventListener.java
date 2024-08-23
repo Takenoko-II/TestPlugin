@@ -2,6 +2,7 @@ package com.gmail.subnokoii78.testplugin.events;
 
 import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
+import com.gmail.subnokoii78.testplugin.particles.ParticleDisplay;
 import com.gmail.subnokoii78.util.event.data.PlayerClickEvent;
 import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
@@ -220,6 +221,20 @@ public class PlayerEventListener implements Listener {
 
                     break;
                 }
+            }
+        });
+
+        TestPlugin.events().onLeftClick(event -> {
+            final var itemStack = event.getItemStack();
+            if (new ItemStackDataContainerManager(itemStack).equals("weapon.particle", "slash")) {
+                final ParticleDisplay.Builder displayBuilder = ParticleDisplay.builder()
+                    .frameTime(4)
+                    .font("slash/knight/fourth")
+                    .maxFrames(7)
+                    .leftRotation(TripleAxisRotationBuilder.from(DualAxisRotationBuilder.from(event.getPlayer())))
+                    .offset(new Vector3Builder(0, event.getPlayer().getEyeHeight(), 0));
+
+                displayBuilder.build().play(event.getPlayer());
             }
         });
     }
