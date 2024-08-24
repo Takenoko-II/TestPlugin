@@ -16,7 +16,7 @@ public final class JSONParser {
     private int location = 0;
 
     public JSONParser(@NotNull String json) {
-        this.text = json;
+        this.text = json.replaceAll("\n", "");
     }
 
     public JSONObject parseObject() {

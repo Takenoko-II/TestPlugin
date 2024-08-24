@@ -128,4 +128,10 @@ public class TextFileUtils {
             }
         }
     }
+
+    public static boolean exist(String path) {
+        final Path filePath = Path.of(path);
+
+        return Files.exists(filePath);
+    }
 }

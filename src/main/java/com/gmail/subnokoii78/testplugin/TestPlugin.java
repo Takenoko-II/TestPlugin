@@ -3,6 +3,7 @@ package com.gmail.subnokoii78.testplugin;
 import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
+import com.gmail.subnokoii78.testplugin.particles.TextFontParticleHandler;
 import com.gmail.subnokoii78.util.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii78.util.event.CustomEvents;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
@@ -60,8 +61,10 @@ public final class TestPlugin extends JavaPlugin {
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
-            event.registrar().register(getFooCommandNode());
-            event.registrar().register(getLoggerCommandNode());
+            final var registrar = event.registrar();
+            registrar.register(getFooCommandNode());
+            registrar.register(getLoggerCommandNode());
+            registrar.register(getReloadTestPluginNode());
         });
     }
 
@@ -100,6 +103,16 @@ public final class TestPlugin extends JavaPlugin {
         return Commands.literal("foo")
             .executes(ctx -> {
                 ctx.getSource().getSender().sendMessage(Component.text("foo!"));
+                return Command.SINGLE_SUCCESS;
+            })
+            .build();
+    }
+
+    private LiteralCommandNode<CommandSourceStack> getReloadTestPluginNode() {
+        return Commands.literal("pluginreload")
+            .executes(ctx -> {
+                TextFontParticleHandler.reload();
+                ctx.getSource().getSender().sendMessage(Component.text("font_particle_definitions.jsonをリロードしました"));
                 return Command.SINGLE_SUCCESS;
             })
             .build();

@@ -13,7 +13,6 @@ com\gmail\subnokoii78\util\other\ScheduleUtils$1.class
 com\gmail\subnokoii78\util\file\json\JSONSerializer.class
 com\gmail\subnokoii78\util\file\json\JSONArray.class
 com\gmail\subnokoii78\util\itemstack\components\FoodComponent.class
-com\gmail\subnokoii78\testplugin\particles\ParticleDisplay.class
 com\gmail\subnokoii78\util\other\ScheduleUtils.class
 com\gmail\subnokoii78\util\shape\Dodecagram.class
 com\gmail\subnokoii78\util\shape\Octagram.class
@@ -24,7 +23,6 @@ com\gmail\subnokoii78\util\itemstack\components\ItemNameComponent.class
 com\gmail\subnokoii78\util\shape\StraightLine.class
 com\gmail\subnokoii78\util\itemstack\components\DyedColorComponent.class
 com\gmail\subnokoii78\util\event\CustomEvents$Registrar.class
-com\gmail\subnokoii78\testplugin\particles\ParticleDisplay$Builder.class
 com\gmail\subnokoii78\util\ui\ChestUIClickEvent$Listener.class
 com\gmail\subnokoii78\util\shape\Heptagram.class
 com\gmail\subnokoii78\util\datacontainer\DataContainerCompound.class
@@ -46,6 +44,7 @@ com\gmail\subnokoii78\util\shape\ParticleSpawner.class
 com\gmail\subnokoii78\util\shape\ShapeTemplate$1.class
 com\gmail\subnokoii78\util\itemstack\components\EnchantmentGlintOverrideComponent.class
 com\gmail\subnokoii78\util\itemstack\components\UnbreakableComponent.class
+com\gmail\subnokoii78\testplugin\particles\TextFontParticleHandler.class
 com\gmail\subnokoii78\util\file\json\JSONObject.class
 com\gmail\subnokoii78\util\shape\Star.class
 com\gmail\subnokoii78\util\itemstack\components\TrimComponent.class
@@ -78,7 +77,6 @@ com\gmail\subnokoii78\util\datacontainer\ItemStackDataContainerManager.class
 com\gmail\subnokoii78\util\vector\Shape$ParticleDecoration.class
 com\gmail\subnokoii78\testplugin\commands\Test.class
 com\gmail\subnokoii78\testplugin\commands\Log.class
-com\gmail\subnokoii78\util\other\GameTickScheduler$3.class
 com\gmail\subnokoii78\util\itemstack\components\EnchantmentsComponent.class
 com\gmail\subnokoii78\util\itemstack\components\PotionContentsComponent.class
 com\gmail\subnokoii78\util\vector\TripleAxisRotationBuilder$LocalAxisProviderE.class
@@ -94,6 +92,7 @@ com\gmail\subnokoii78\util\vector\DualAxisRotationBuilder.class
 com\gmail\subnokoii78\util\itemstack\components\ProfileComponent.class
 com\gmail\subnokoii78\util\shape\Rhombus.class
 com\gmail\subnokoii78\util\datacontainer\InvalidContainerKeyException.class
+com\gmail\subnokoii78\testplugin\particles\TextFontParticleHandler$Builder.class
 com\gmail\subnokoii78\util\other\DisplayEditor.class
 com\gmail\subnokoii78\util\vector\Vector3Builder.class
 com\gmail\subnokoii78\util\shape\Pentagram.class

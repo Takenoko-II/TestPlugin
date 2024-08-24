@@ -128,7 +128,10 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
     @Override
     @Destructive
     public @NotNull DualAxisRotationBuilder invert() {
-        return scale(-1f);
+        final var rot = getDirection3d().invert().getRotation2d();
+        yaw(rot.yaw);
+        pitch(rot.pitch);
+        return this;
     }
 
     @Override

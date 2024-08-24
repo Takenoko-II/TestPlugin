@@ -111,7 +111,10 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
     @Override
     @Destructive
     public @NotNull TripleAxisRotationBuilder invert() {
-        return scale(-1f);
+        final var rot = getDirection3d().invert().getRotation2d();
+        yaw(rot.yaw());
+        pitch(rot.pitch());
+        return this;
     }
 
     @Override
@@ -129,7 +132,7 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
         return format
             .replaceAll("\\$x", yaw)
             .replaceAll("\\$y", pitch)
-            .replaceAll("\\$y", roll)
+            .replaceAll("\\$z", roll)
             .replaceFirst("\\$c", yaw)
             .replaceFirst("\\$c", pitch)
             .replaceFirst("\\$c", roll)

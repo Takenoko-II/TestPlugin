@@ -1,47 +1,56 @@
 package com.gmail.subnokoii78.util.other;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class GameTickScheduler {
-    private final BukkitRunnable callback;
+    private final Runnable callback;
+
+    private final Map<Integer, BukkitTask> tasks = new HashMap<>();
 
     public GameTickScheduler(Consumer<GameTickScheduler> callback) {
-        var that = this;
-        this.callback = new BukkitRunnable() {
-            @Override
-            public void run() {
-                callback.accept(that);
-            }
-        };
+        this.callback = () -> callback.accept(this);
     }
 
-    public GameTickScheduler(Runnable callback) {
-        this.callback = new BukkitRunnable() {
+    private int issue(Function<BukkitRunnable, BukkitTask> function) {
+        final int taskId = id++;
+        final var runnable = new BukkitRunnable() {
             @Override
             public void run() {
                 callback.run();
+                tasks.remove(taskId);
             }
         };
+
+        tasks.put(taskId, function.apply(runnable));
+
+        return taskId;
     }
 
-    public void runTimeout(long delay) {
+    public GameTickScheduler(Runnable callback) {
+        this.callback = callback;
+    }
+
+    public int runTimeout(long delay) {
         if (delay < 0) {
             throw new IllegalArgumentException("負の遅延は無効です");
         }
 
-        callback.runTaskLater(TestPlugin.getInstance(), delay);
+        return issue(runnable -> runnable.runTaskLater(TestPlugin.getInstance(), delay));
     }
 
-    public void runTimeout() {
-        runTimeout(0);
+    public int runTimeout() {
+        return runTimeout(0);
     }
 
-    public void runInterval(long interval) {
+    public int runInterval(long interval) {
         if (interval < 0) {
             throw new IllegalArgumentException("負の間隔は無効です");
         }
@@ -49,15 +58,24 @@ public class GameTickScheduler {
             throw new IllegalArgumentException("間隔0は危険です");
         }
 
-        callback.runTaskTimer(TestPlugin.getInstance(), interval, 0L);
+        return issue(runnable -> runnable.runTaskTimer(TestPlugin.getInstance(), interval, 0L));
     }
 
-    public void runInterval() {
-        runInterval(1);
+    public int runInterval() {
+        return runInterval(1);
+    }
+
+    public void clear(int id) {
+        if (!tasks.containsKey(id)) return;
+
+        final var task = tasks.get(id);
+        task.cancel();
+        tasks.remove(id);
     }
 
     public void clear() {
-        callback.cancel();
+        tasks.forEach((k, v) -> v.cancel());
+        tasks.clear();
     }
 
     /**
@@ -78,4 +96,6 @@ public class GameTickScheduler {
             }
         }, delay);
     }
+
+    private static int id = 0;
 }

@@ -1,3 +1,4 @@
+C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\other\TupleLR.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\testplugin\events\TickEventListener.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\file\json\JSONFileHandler.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\file\json\JSONArray.java
@@ -61,6 +62,7 @@ C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\ui\ChestUIBuilder.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\testplugin\commands\Log.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\testplugin\commands\Tools.java
+C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\function\TiFunction.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\other\GameTickScheduler.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\shape\Heptagram.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\file\json\JSONParser.java
@@ -69,6 +71,7 @@ C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\itemstack\components\DamageComponent.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\ui\ChestUIClickEvent.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\testplugin\BungeeCordUtils.java
+C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\other\TupleT.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\shape\Star.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\itemstack\ItemStackBuilder.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\itemstack\components\RecipesComponent.java
@@ -78,8 +81,10 @@ C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\testplugin\commands\Foo.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\vector\DualAxisRotationBuilder.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\shape\ParticleSpawner.java
+C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\testplugin\particles\ParticleDisplay.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\itemstack\components\InvalidComponentTypeException.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\datacontainer\ItemStackDataContainerManager.java
+C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\vector\Destructive.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\shape\Octagram.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\testplugin\commands\ManageDatabase.java
 C:\Users\wakab\IdeaProjects\TestPlugin\src\main\java\com\gmail\subnokoii78\util\shape\ShapeTemplate.java
