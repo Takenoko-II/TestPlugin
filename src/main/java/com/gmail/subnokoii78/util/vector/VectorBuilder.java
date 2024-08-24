@@ -1,5 +1,6 @@
 package com.gmail.subnokoii78.util.vector;
 
+import com.gmail.subnokoii78.util.function.TiFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;
@@ -23,6 +24,7 @@ public interface VectorBuilder<T extends VectorBuilder<T, U>, U extends Number> 
      * @param operator 関数
      * @return このベクトル
      */
+    @Destructive
     @NotNull T calculate(@NotNull UnaryOperator<U> operator);
 
     /**
@@ -30,13 +32,21 @@ public interface VectorBuilder<T extends VectorBuilder<T, U>, U extends Number> 
      * @param operator 関数
      * @return このベクトル
      */
+    @Destructive
     @NotNull T calculate(@NotNull T other, @NotNull BiFunction<U, U, U> operator);
+
+    /**
+     * 引数に渡された2つのベクトルとこのベクトルのそれぞれの成分に対して関数を呼び出し、その結果で成分の値を上書きします。
+     */
+    @Destructive
+    @NotNull T calculate(@NotNull T other1, @NotNull T other2, @NotNull TiFunction<U, U, U, U> operator);
 
     /**
      * 引数に渡された値との足し算を行って自身を返します。
      * @param other 他のインスタンス
      * @return このインスタンス自身
      */
+    @Destructive
     @NotNull T add(@NotNull T other);
 
     /**
@@ -44,6 +54,7 @@ public interface VectorBuilder<T extends VectorBuilder<T, U>, U extends Number> 
      * @param other 他のインスタンス
      * @return このインスタンス自身
      */
+    @Destructive
     @NotNull T subtract(@NotNull T other);
 
     /**
@@ -51,13 +62,22 @@ public interface VectorBuilder<T extends VectorBuilder<T, U>, U extends Number> 
      * @param scalar 実数
      * @return このインスタンス自身
      */
+    @Destructive
     @NotNull T scale(@NotNull U scalar);
 
     /**
      * ベクトルの向きを逆向きにして自身を返します。
      * @return このインスタンス自身
      */
+    @Destructive
     @NotNull T invert();
+
+    /**
+     * ベクトルの各成分の値の範囲を制限します。
+     * @return this
+     */
+    @Destructive
+    @NotNull T clamp(@NotNull T min, @NotNull T max);
 
     /**
      * このベクトルを形式に従って文字列化します。
@@ -77,4 +97,10 @@ public interface VectorBuilder<T extends VectorBuilder<T, U>, U extends Number> 
      * @return コピーされたベクトル
      */
     @NotNull T copy();
+
+    /**
+     * このベクトルの全成分が0であれば真を返します。
+     * @return components.every(v => v === 0);
+     */
+    boolean isZero();
 }

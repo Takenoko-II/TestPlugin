@@ -4,6 +4,7 @@ com\gmail\subnokoii78\testplugin\TestPlugin.class
 com\gmail\subnokoii78\util\itemstack\components\StoredEnchantmentsComponent.class
 com\gmail\subnokoii78\util\scoreboard\ScoreboardUtils$Objective.class
 com\gmail\subnokoii78\util\ui\ChestUIBuilder.class
+com\gmail\subnokoii78\util\vector\Destructive.class
 com\gmail\subnokoii78\util\scoreboard\ScoreboardUtils.class
 com\gmail\subnokoii78\util\file\json\JSONParser.class
 com\gmail\subnokoii78\util\shape\ShapeBase.class
@@ -12,15 +13,18 @@ com\gmail\subnokoii78\util\other\ScheduleUtils$1.class
 com\gmail\subnokoii78\util\file\json\JSONSerializer.class
 com\gmail\subnokoii78\util\file\json\JSONArray.class
 com\gmail\subnokoii78\util\itemstack\components\FoodComponent.class
+com\gmail\subnokoii78\testplugin\particles\ParticleDisplay.class
 com\gmail\subnokoii78\util\other\ScheduleUtils.class
 com\gmail\subnokoii78\util\shape\Dodecagram.class
 com\gmail\subnokoii78\util\shape\Octagram.class
+com\gmail\subnokoii78\util\function\TiFunction.class
 com\gmail\subnokoii78\util\itemstack\ItemStackBuilder.class
 com\gmail\subnokoii78\testplugin\events\EntityEventListener.class
 com\gmail\subnokoii78\util\itemstack\components\ItemNameComponent.class
 com\gmail\subnokoii78\util\shape\StraightLine.class
 com\gmail\subnokoii78\util\itemstack\components\DyedColorComponent.class
 com\gmail\subnokoii78\util\event\CustomEvents$Registrar.class
+com\gmail\subnokoii78\testplugin\particles\ParticleDisplay$Builder.class
 com\gmail\subnokoii78\util\ui\ChestUIClickEvent$Listener.class
 com\gmail\subnokoii78\util\shape\Heptagram.class
 com\gmail\subnokoii78\util\datacontainer\DataContainerCompound.class
@@ -31,6 +35,7 @@ com\gmail\subnokoii78\testplugin\commands\Foo.class
 com\gmail\subnokoii78\util\itemstack\components\MaxStackSizeComponent.class
 com\gmail\subnokoii78\util\vector\Shape$ShapeType.class
 com\gmail\subnokoii78\util\itemstack\components\AttributeModifiersComponent.class
+com\gmail\subnokoii78\util\other\TupleT.class
 com\gmail\subnokoii78\testplugin\commands\ManageDatabase.class
 com\gmail\subnokoii78\testplugin\commands\Tools.class
 com\gmail\subnokoii78\util\itemstack\TypedAttributeModifier.class
@@ -58,6 +63,7 @@ com\gmail\subnokoii78\util\ui\ChestUIBuilder$Button.class
 com\gmail\subnokoii78\util\itemstack\components\ComponentItemStackBuilder.class
 com\gmail\subnokoii78\util\vector\Shape$DustTransitionDecoration.class
 com\gmail\subnokoii78\util\itemstack\components\ItemStackComponentType.class
+com\gmail\subnokoii78\util\other\TupleLR.class
 com\gmail\subnokoii78\util\itemstack\components\CustomModelDataComponent.class
 com\gmail\subnokoii78\util\file\BinaryFileUtils.class
 com\gmail\subnokoii78\util\datacontainer\FileDataContainerManager.class

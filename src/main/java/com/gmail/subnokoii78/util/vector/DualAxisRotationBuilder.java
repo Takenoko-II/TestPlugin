@@ -1,5 +1,6 @@
 package com.gmail.subnokoii78.util.vector;
 
+import com.gmail.subnokoii78.util.function.TiFunction;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -48,6 +49,7 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
      * @param value 新しい値
      * @return this
      */
+    @Destructive
     public @NotNull DualAxisRotationBuilder yaw(float value) {
         yaw = value;
         return this;
@@ -66,38 +68,44 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
      * @param value 新しい値
      * @return this
      */
+    @Destructive
     public @NotNull DualAxisRotationBuilder pitch(float value) {
         pitch = value;
         return this;
     }
 
-    /**
-     * この回転のそれぞれの成分に対して関数を呼び出し、その結果で成分の値を上書きします。
-     * @param operator 関数
-     * @return this
-     */
     @Override
+    @Destructive
     public @NotNull DualAxisRotationBuilder calculate(@NotNull UnaryOperator<Float> operator) {
         yaw = operator.apply(yaw);
         pitch = operator.apply(pitch);
         return this;
     }
 
-    /**
-     * 引数に渡された回転とこの回転のそれぞれの成分に対して関数を呼び出し、その結果で成分の値を上書きします。
-     * @param operator 関数
-     * @return this
-     */
+    @Override
+    @Destructive
     public @NotNull DualAxisRotationBuilder calculate(@NotNull DualAxisRotationBuilder other, @NotNull BiFunction<Float, Float, Float> operator) {
         yaw = operator.apply(yaw, other.yaw);
         pitch = operator.apply(pitch, other.pitch);
         return this;
     }
 
+    @Override
+    @Destructive
+    public @NotNull DualAxisRotationBuilder calculate(@NotNull DualAxisRotationBuilder other1, @NotNull DualAxisRotationBuilder other2, @NotNull TiFunction<Float, Float, Float, Float> operator) {
+        this.yaw = operator.apply(yaw, other1.yaw, other2.yaw);
+        this.pitch = operator.apply(pitch, other1.pitch, other2.pitch);
+        return this;
+    }
+
+    @Override
+    @Destructive
     public @NotNull DualAxisRotationBuilder add(@NotNull DualAxisRotationBuilder addend) {
         return calculate(addend, Float::sum);
     }
 
+    @Override
+    @Destructive
     public @NotNull DualAxisRotationBuilder subtract(@NotNull DualAxisRotationBuilder subtrahend) {
         return add(subtrahend.copy().invert());
     }
@@ -108,6 +116,7 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
      * @return this
      */
     @Override
+    @Destructive
     public @NotNull DualAxisRotationBuilder scale(@NotNull Float scalar) {
         return calculate(component -> component * scalar);
     }
@@ -116,10 +125,19 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
      * この回転を逆向きにします。
      * @return this
      */
+    @Override
+    @Destructive
     public @NotNull DualAxisRotationBuilder invert() {
         return scale(-1f);
     }
 
+    @Override
+    @Destructive
+    public @NotNull DualAxisRotationBuilder clamp(@NotNull DualAxisRotationBuilder min, @NotNull DualAxisRotationBuilder max) {
+        return calculate(min, max, (value, minValue, maxValue) -> Math.max(minValue, Math.min(value, maxValue)));
+    }
+
+    @Override
     public @NotNull String format(@NotNull String format) {
         final String yawStr = String.format("%.2f", yaw());
         final String pitchStr = String.format("%.2f", pitch());
@@ -140,6 +158,11 @@ public class DualAxisRotationBuilder implements VectorBuilder<DualAxisRotationBu
     @Override
     public @NotNull DualAxisRotationBuilder copy() {
         return new DualAxisRotationBuilder(yaw, pitch);
+    }
+
+    @Override
+    public boolean isZero() {
+        return equals(new DualAxisRotationBuilder());
     }
 
     /**

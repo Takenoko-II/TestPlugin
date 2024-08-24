@@ -1,11 +1,15 @@
 package com.gmail.subnokoii78.util.vector;
 
+import com.gmail.subnokoii78.util.function.TiFunction;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 
 import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
+/**
+ * ヨー角・ピッチ角・ロール角による回転を表現するクラス
+ */
 public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxisRotationBuilder, Float> {
     private float yaw, pitch, roll;
 
@@ -32,6 +36,7 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
         return yaw;
     }
 
+    @Destructive
     public TripleAxisRotationBuilder yaw(float yaw) {
         this.yaw = yaw;
         return this;
@@ -41,6 +46,7 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
         return pitch;
     }
 
+    @Destructive
     public TripleAxisRotationBuilder pitch(float pitch) {
         this.pitch = pitch;
         return this;
@@ -50,17 +56,14 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
         return roll;
     }
 
+    @Destructive
     public TripleAxisRotationBuilder roll(float roll) {
         this.roll = roll;
         return this;
     }
 
-    /**
-     * このベクトルのそれぞれの成分に対して関数を呼び出し、その結果で成分の値を上書きします。
-     * @param operator 関数
-     * @return このベクトル
-     */
     @Override
+    @Destructive
     public @NotNull TripleAxisRotationBuilder calculate(@NotNull UnaryOperator<Float> operator) {
         yaw = operator.apply(yaw);
         pitch = operator.apply(pitch);
@@ -68,12 +71,8 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
         return this;
     }
 
-    /**
-     * 引数に渡されたベクトルとこのベクトルのそれぞれの成分に対して関数を呼び出し、その結果で成分の値を上書きします。
-     * @param operator 関数
-     * @return このベクトル
-     */
     @Override
+    @Destructive
     public @NotNull TripleAxisRotationBuilder calculate(@NotNull TripleAxisRotationBuilder other, @NotNull BiFunction<Float, Float, Float> operator) {
         yaw = operator.apply(yaw, other.yaw);
         pitch = operator.apply(pitch, other.pitch);
@@ -81,21 +80,44 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
         return this;
     }
 
+    @Override
+    @Destructive
+    public @NotNull TripleAxisRotationBuilder calculate(@NotNull TripleAxisRotationBuilder other1, @NotNull TripleAxisRotationBuilder other2, @NotNull TiFunction<Float, Float, Float, Float> operator) {
+        this.yaw = operator.apply(yaw, other1.yaw, other2.yaw);
+        this.pitch = operator.apply(pitch, other1.pitch, other2.pitch);
+        this.roll = operator.apply(roll, other1.roll, other2.roll);
+        return this;
+    }
+
+    @Override
+    @Destructive
     public @NotNull TripleAxisRotationBuilder add(@NotNull TripleAxisRotationBuilder other) {
         calculate(other, Float::sum);
         return this;
     }
 
+    @Override
+    @Destructive
     public @NotNull TripleAxisRotationBuilder subtract(@NotNull TripleAxisRotationBuilder other) {
         return add(other.copy().invert());
     }
 
+    @Override
+    @Destructive
     public @NotNull TripleAxisRotationBuilder scale(@NotNull Float scalar) {
         return calculate(component -> component * scalar);
     }
 
+    @Override
+    @Destructive
     public @NotNull TripleAxisRotationBuilder invert() {
         return scale(-1f);
+    }
+
+    @Override
+    @Destructive
+    public @NotNull TripleAxisRotationBuilder clamp(@NotNull TripleAxisRotationBuilder min, @NotNull TripleAxisRotationBuilder max) {
+        return calculate(min, max, (value, minValue, maxValue) -> Math.max(minValue, Math.min(value, maxValue)));
     }
 
     @Override
@@ -122,6 +144,11 @@ public final class TripleAxisRotationBuilder implements VectorBuilder<TripleAxis
     @Override
     public @NotNull TripleAxisRotationBuilder copy() {
         return new TripleAxisRotationBuilder(yaw, pitch, roll);
+    }
+
+    @Override
+    public boolean isZero() {
+        return equals(new TripleAxisRotationBuilder());
     }
 
     public LocalAxisProviderE getLocalAxisProviderE() {

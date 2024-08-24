@@ -1,5 +1,6 @@
 package com.gmail.subnokoii78.util.vector;
 
+import com.gmail.subnokoii78.util.function.TiFunction;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -54,6 +55,7 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
      * @param value 新しい値
      * @return this
      */
+    @Destructive
     public @NotNull Vector3Builder x(double value) {
         x = value;
         return this;
@@ -72,6 +74,7 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
      * @param value 新しい値
      * @return this
      */
+    @Destructive
     public @NotNull Vector3Builder y(double value) {
         y = value;
         return this;
@@ -91,12 +94,14 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
      * @param value 新しい値
      * @return this
      */
+    @Destructive
     public @NotNull Vector3Builder z(double value) {
         z = value;
         return this;
     }
 
     @Override
+    @Destructive
     public @NotNull Vector3Builder calculate(@NotNull UnaryOperator<Double> operator) {
         this.x = operator.apply(x);
         this.y = operator.apply(y);
@@ -105,6 +110,7 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
     }
 
     @Override
+    @Destructive
     public @NotNull Vector3Builder calculate(@NotNull Vector3Builder other, @NotNull BiFunction<Double, Double, Double> operator) {
         this.x = operator.apply(x, other.x);
         this.y = operator.apply(y, other.y);
@@ -112,19 +118,35 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
         return this;
     }
 
+    @Override
+    @Destructive
+    public @NotNull Vector3Builder calculate(@NotNull Vector3Builder other1, @NotNull Vector3Builder other2, @NotNull TiFunction<Double, Double, Double, Double> operator) {
+        this.x = operator.apply(x, other1.x, other2.x);
+        this.y = operator.apply(y, other1.y, other2.y);
+        this.z = operator.apply(z, other1.z, other2.z);
+        return this;
+    }
+
+    @Override
+    @Destructive
     public @NotNull Vector3Builder add(@NotNull Vector3Builder other) {
         return calculate(other, Double::sum);
     }
 
+    @Override
+    @Destructive
     public @NotNull Vector3Builder subtract(@NotNull Vector3Builder other) {
         return add(other.copy().invert());
     }
 
     @Override
+    @Destructive
     public @NotNull Vector3Builder scale(@NotNull Double scalar) {
         return calculate(component -> component * scalar);
     }
 
+    @Override
+    @Destructive
     public @NotNull Vector3Builder invert() {
         return scale(-1d);
     }
@@ -172,6 +194,7 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
      * @param length 新しい長さ
      * @return このベクトル
      */
+    @Destructive
     public @NotNull Vector3Builder length(double length) {
         final double previous = length();
 
@@ -193,6 +216,7 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
      * このベクトルを正規化します。
      * @return このベクトル
      */
+    @Destructive
     public @NotNull Vector3Builder normalize() {
         return length(1d);
     }
@@ -242,6 +266,15 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
     }
 
     /**
+     * 法線ベクトルを受け取ってこのベクトルを反射させた新しいベクトルを返します。
+     * @param normal 法線ベクトル
+     * @return 反射ベクトル
+     */
+    public Vector3Builder reflect(@NotNull Vector3Builder normal) {
+        return this.copy().calculate(normal, (a, b) -> a - 2 * this.dot(normal) * b);
+    }
+
+    /**
      * このベクトルを始点ベクトルとして、終点ベクトルへの線形補間を行います。
      * @param end 終点ベクトル
      * @param t 割合(0≦t≦1)
@@ -267,6 +300,12 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
         final Vector3Builder q2 = end.copy().scale(p2);
 
         return q1.add(q2);
+    }
+
+    @Override
+    @Destructive
+    public @NotNull Vector3Builder clamp(@NotNull Vector3Builder min, @NotNull Vector3Builder max) {
+        return calculate(min, max, (value, minValue, maxValue) -> Math.max(minValue, Math.min(value, maxValue)));
     }
 
     /**
@@ -297,6 +336,11 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
     @Override
     public @NotNull Vector3Builder copy() {
         return new Vector3Builder(x, y, z);
+    }
+
+    @Override
+    public boolean isZero() {
+        return equals(new Vector3Builder());
     }
 
     /**

@@ -41,7 +41,7 @@ public final class ParticleDisplay {
 
     private void next() {
         if (currentValue < maxFrames) {
-            displays.forEach(display -> display.text(Component.text(currentValue++)));
+            displays.forEach(display -> display.text(Component.text(currentValue++).font(font)));
             scheduler.runTimeout(frameTime);
         }
         else {
@@ -56,6 +56,8 @@ public final class ParticleDisplay {
         final TextDisplay right = player.getWorld().spawn(location.withRotationAndWorld(new DualAxisRotationBuilder().invert(), player.getWorld()), TextDisplay.class);
         displays.add(left);
         displays.add(right);
+        left.setTransformation(transformation);
+        right.setTransformation(transformation);
         next();
     }
 
