@@ -1,9 +1,10 @@
 package com.gmail.subnokoii78.testplugin.particles;
 
-import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
 import com.gmail.subnokoii78.util.file.json.*;
-import com.gmail.subnokoii78.util.other.GameTickScheduler;
+import com.gmail.subnokoii78.util.other.DisplayEditor;
+import com.gmail.subnokoii78.util.schedule.GameTickScheduler;
+import com.gmail.subnokoii78.util.other.TupleT;
 import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
@@ -20,9 +21,11 @@ import org.joml.Vector3f;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public final class TextFontParticleHandler {
-    private final Key font;
+@Deprecated
+public final class FontParticleHandler {
+    private final TupleT<Key> fonts;
 
     private final Transformation transformation;
 
@@ -38,8 +41,8 @@ public final class TextFontParticleHandler {
 
     private final Set<TextDisplay> displays = new HashSet<>();
 
-    private TextFontParticleHandler(@NotNull Key font, @NotNull Transformation transformation, int frameTime, int maxFrames, @NotNull TripleAxisRotationBuilder rotationOffset) {
-        this.font = font;
+    private FontParticleHandler(@NotNull TupleT<Key> fonts, @NotNull Transformation transformation, int frameTime, int maxFrames, @NotNull TripleAxisRotationBuilder rotationOffset) {
+        this.fonts = fonts;
         this.transformation = transformation;
         this.frameTime = frameTime;
         this.maxFrames = maxFrames;
@@ -48,10 +51,17 @@ public final class TextFontParticleHandler {
 
     private void next() {
         if (currentValue < maxFrames) {
+            final AtomicInteger i = new AtomicInteger();
             displays.forEach(display -> {
-                display.text(Component.text(currentValue).font(font));
+                if (i.get() == 0) {
+                    display.text(Component.text(currentValue).font(fonts.left()));
+                }
+                else {
+                    display.text(Component.text(currentValue).font(fonts.right()));
+                }
                 display.setBrightness(new Display.Brightness(15, 15));
                 display.setBackgroundColor(Color.fromARGB(0));
+                i.getAndIncrement();
             });
             currentValue++;
             scheduler.runTimeout(frameTime);
@@ -66,17 +76,25 @@ public final class TextFontParticleHandler {
 
         final Vector3Builder location = Vector3Builder.from(player);
 
-        final TextDisplay left = player.getWorld().spawn(location.withWorld(player.getWorld()), TextDisplay.class);
-        final TextDisplay right = player.getWorld().spawn(location.withRotationAndWorld(new DualAxisRotationBuilder().getDirection3d().invert().getRotation2d(), player.getWorld()), TextDisplay.class);
+        final TextDisplay left = player.getWorld().spawn(location.withRotationAndWorld(new DualAxisRotationBuilder(0, 0), player.getWorld()), TextDisplay.class);
+        final TextDisplay right = player.getWorld().spawn(location.withRotationAndWorld(new DualAxisRotationBuilder(180, 0), player.getWorld()), TextDisplay.class);
         displays.add(left);
         displays.add(right);
 
         final var playerRot = TripleAxisRotationBuilder.from(DualAxisRotationBuilder.from(player));
 
-        transformation.getLeftRotation().set(playerRot.copy().add(rotationOffset).getQuaternion4d());
         left.setTransformation(transformation);
-        transformation.getLeftRotation().set(playerRot.copy().add(rotationOffset.roll(rotationOffset.roll() * -1)).getQuaternion4d());
         right.setTransformation(transformation);
+
+        var editorl = new DisplayEditor(left)
+            .rotate(playerRot.getDirection3d(), rotationOffset.roll());
+
+        var editor = new DisplayEditor(right)
+            .rotate(playerRot.getDirection3d(),-rotationOffset.roll())
+            /*.rotate(playerRot.getLocalAxisProviderE().getX(), -rotationOffset.pitch())
+            .rotate(new Vector3Builder(0, 1, 0), rotationOffset.yaw())*/;
+
+        transformation.getLeftRotation().set(playerRot.copy().add(rotationOffset.pitch(rotationOffset.pitch() * -1).roll(-(rotationOffset.roll() - 180) + 180)).getQuaternion4d());
 
         next();
     }
@@ -86,7 +104,10 @@ public final class TextFontParticleHandler {
     }
 
     public static final class Builder {
-        private Key font = Key.key(Key.MINECRAFT_NAMESPACE, "default");
+        private TupleT<Key> fonts = new TupleT<>(
+            Key.key(Key.MINECRAFT_NAMESPACE, "default"),
+            Key.key(Key.MINECRAFT_NAMESPACE, "default")
+        );
 
         private int frameTime;
 
@@ -103,12 +124,11 @@ public final class TextFontParticleHandler {
 
         private Builder() {}
 
-        public Builder font(@NotNull String font) {
-            if (!Key.parseableValue(font)) {
-                throw new IllegalArgumentException();
-            }
-
-            this.font = Key.key(Key.MINECRAFT_NAMESPACE, font);
+        public Builder font(@NotNull TupleT<String> fonts) {
+            this.fonts = new TupleT<>(
+                Key.key(Key.MINECRAFT_NAMESPACE, fonts.left()),
+                Key.key(Key.MINECRAFT_NAMESPACE, fonts.right())
+            );
             return this;
         }
 
@@ -138,7 +158,7 @@ public final class TextFontParticleHandler {
         }
 
         public void buildAndPlay(@NotNull Player player) {
-            new TextFontParticleHandler(font, transformation, frameTime, maxFrames, rotationOffset).play(player);
+            new FontParticleHandler(fonts, transformation, frameTime, maxFrames, rotationOffset).play(player);
         }
     }
 
@@ -147,10 +167,14 @@ public final class TextFontParticleHandler {
 
         if (!TextFileUtils.exist(path)) {
             TextFileUtils.create(path);
-            final var defaultObj = new JSONParser("""
+            final var defaultObj = new JSONParser(
+                """
                 {
                     "knight_slash_fourth": {
-                        "font": "slash/knight/fourth",
+                        "font": [
+                            "slash/knight/fourth",
+                            "slash/knight/fourth_reversed"
+                        ],
                         "frame_time": 2,
                         "max_frames": 7,
                         "scale": [16, 16, 16],
@@ -160,15 +184,14 @@ public final class TextFontParticleHandler {
                         }
                     }
                 }
-                """).parseObject();
+                """
+            ).parseObject();
 
-            TestPlugin.log(TestPlugin.LoggingTarget.SERVER, "default");
             handler.writeObject(defaultObj);
 
             json = defaultObj;
         }
         else {
-            TestPlugin.log(TestPlugin.LoggingTarget.SERVER, "read");
             json = handler.readObject();
         }
     }
@@ -181,7 +204,9 @@ public final class TextFontParticleHandler {
         if (json == null) reload();
 
         final var definition = json.get(key, JSONValueType.OBJECT);
-        final String font = definition.get("font", JSONValueType.STRING);
+        final JSONArray fontsArray = definition.get("font", JSONValueType.ARRAY);
+        final String font1 = fontsArray.get(0, JSONValueType.STRING);
+        final String font2 = fontsArray.get(1, JSONValueType.STRING);
         final int frameTime = definition.get("frame_time", JSONValueType.NUMBER).intValue();
         final int maxFrames = definition.get("max_frames", JSONValueType.NUMBER).intValue();
         final JSONArray scaleArray = definition.get("scale", JSONValueType.ARRAY);
@@ -204,11 +229,8 @@ public final class TextFontParticleHandler {
             rotationOffsetArray.get(2, JSONValueType.NUMBER).floatValue()
         );
 
-        TestPlugin.log(TestPlugin.LoggingTarget.SERVER, positionOffset.toString());
-        TestPlugin.log(TestPlugin.LoggingTarget.SERVER, rotationOffset.toString());
-
         return builder()
-            .font(font)
+            .font(new TupleT<>(font1, font2))
             .frameTime(frameTime)
             .maxFrames(maxFrames)
             .scale(scale)

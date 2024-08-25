@@ -3,9 +3,8 @@ package com.gmail.subnokoii78.testplugin.events;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.testplugin.particles.TextFontParticleHandler;
+import com.gmail.subnokoii78.testplugin.particles.FontParticleHandler;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
-import com.gmail.subnokoii78.util.file.json.JSONFileHandler;
 import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
@@ -196,7 +195,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                     final Entity target = targets[0];
 
                     if (target instanceof Player player) {
-                        TextFontParticleHandler.createBuilder("knight_slash_fourth").buildAndPlay(player);
+                        FontParticleHandler.createBuilder("knight_slash_fourth").buildAndPlay(player);
                     }
 
                     break;

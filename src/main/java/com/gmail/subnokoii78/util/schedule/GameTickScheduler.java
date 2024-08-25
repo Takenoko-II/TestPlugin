@@ -1,22 +1,36 @@
-package com.gmail.subnokoii78.util.other;
+package com.gmail.subnokoii78.util.schedule;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class GameTickScheduler {
+/**
+ * tick単位で遅延をかけて処理を実行するためのクラス
+ */
+public final class GameTickScheduler implements Scheduler {
     private final Runnable callback;
 
     private final Map<Integer, BukkitTask> tasks = new HashMap<>();
 
+    public GameTickScheduler(Runnable callback) {
+        this.callback = callback;
+    }
+
     public GameTickScheduler(Consumer<GameTickScheduler> callback) {
         this.callback = () -> callback.accept(this);
+    }
+
+    public GameTickScheduler(BiConsumer<GameTickScheduler, Integer> callback) {
+        this.callback = () -> callback.accept(this, GameTickScheduler.id);
     }
 
     private int issue(Function<BukkitRunnable, BukkitTask> function) {
@@ -34,10 +48,6 @@ public class GameTickScheduler {
         return taskId;
     }
 
-    public GameTickScheduler(Runnable callback) {
-        this.callback = callback;
-    }
-
     public int runTimeout(long delay) {
         if (delay < 0) {
             throw new IllegalArgumentException("負の遅延は無効です");
@@ -48,6 +58,14 @@ public class GameTickScheduler {
 
     public int runTimeout() {
         return runTimeout(0);
+    }
+
+    public int runAt(@NotNull World world, long gameTime) {
+        if (gameTime < world.getGameTime()) {
+            throw new IllegalArgumentException("過去の時刻は無効です");
+        }
+
+        return runTimeout(gameTime - world.getGameTime());
     }
 
     public int runInterval(long interval) {
@@ -78,6 +96,8 @@ public class GameTickScheduler {
         tasks.clear();
     }
 
+    private static int id = 0;
+
     /**
      * 指定時間(ミリ秒)後に関数を実行します。
      * @param callback 実行する処理
@@ -96,6 +116,4 @@ public class GameTickScheduler {
             }
         }, delay);
     }
-
-    private static int id = 0;
 }

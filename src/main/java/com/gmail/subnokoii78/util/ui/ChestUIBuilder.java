@@ -206,7 +206,6 @@ public class ChestUIBuilder {
 
         public Button customModelData(int data) {
             itemStackBuilder.customModelData(data);
-
             return this;
         }
 

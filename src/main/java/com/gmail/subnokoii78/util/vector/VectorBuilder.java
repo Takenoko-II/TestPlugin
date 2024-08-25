@@ -1,6 +1,8 @@
 package com.gmail.subnokoii78.util.vector;
 
 import com.gmail.subnokoii78.util.function.TiFunction;
+import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;
@@ -103,4 +105,8 @@ public interface VectorBuilder<T extends VectorBuilder<T, U>, U extends Number> 
      * @return components.every(v => v === 0);
      */
     boolean isZero();
+
+    static void spawnFlameParticle(@NotNull Vector3Builder vector3Builder) {
+        Bukkit.getWorlds().getFirst().spawnParticle(Particle.FLAME, vector3Builder.withWorld(Bukkit.getWorlds().getFirst()), 1, 0, 0, 0, 0);
+    }
 }

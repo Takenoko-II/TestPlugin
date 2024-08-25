@@ -1,6 +1,7 @@
 package com.gmail.subnokoii78.util.itemstack.components;
 
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.meta.ArmorMeta;
 import org.bukkit.inventory.meta.ColorableArmorMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
@@ -18,15 +19,15 @@ public final class TrimComponent extends TooltipShowable {
     }
 
     public @Nullable ArmorTrim getTrim() {
-        if (itemMeta instanceof ColorableArmorMeta) {
-            return ((ColorableArmorMeta) itemMeta).getTrim();
+        if (itemMeta instanceof ArmorMeta) {
+            return ((ArmorMeta) itemMeta).getTrim();
         }
         else return null;
     }
 
     public boolean hasTrim() {
-        if (itemMeta instanceof ColorableArmorMeta) {
-            return ((ColorableArmorMeta) itemMeta).hasTrim();
+        if (itemMeta instanceof ArmorMeta) {
+            return ((ArmorMeta) itemMeta).hasTrim();
         }
         else return false;
     }
@@ -36,15 +37,15 @@ public final class TrimComponent extends TooltipShowable {
             throw new IllegalArgumentException();
         }
 
-        if(itemMeta instanceof ColorableArmorMeta) {
-            ((ColorableArmorMeta) itemMeta).setTrim(trim);
+        if (itemMeta instanceof ArmorMeta colorableArmorMeta) {
+            colorableArmorMeta.setTrim(trim);
         }
     }
 
     @Override
     public void disable() {
-        if (itemMeta instanceof ColorableArmorMeta) {
-            ((ColorableArmorMeta) itemMeta).setTrim(null);
+        if (itemMeta instanceof ArmorMeta colorableArmorMeta) {
+            colorableArmorMeta.setTrim(null);
         }
     }
 

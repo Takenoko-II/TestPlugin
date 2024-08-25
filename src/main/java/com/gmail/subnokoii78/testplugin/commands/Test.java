@@ -4,9 +4,11 @@ import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
 import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
+import com.gmail.subnokoii78.util.ui.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,6 +16,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.trim.TrimMaterial;
+import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -165,13 +169,25 @@ public class Test implements CommandExecutor, TabCompleter {
                     return false;
                 }
             }
-            case "get_database": {
-                sender.sendMessage(
-                    Component
-                    .text("TestPlugin Databaseは以下のデータを持っています:\n")
-                    .color(NamedTextColor.WHITE)
-                    .append(TestPlugin.database().toJson())
+            case "open_test_ui": {
+                final var ui = new ContainerUI(Component.text("title"), 3);
+                ui.set(
+                    0,
+                    new ItemButton(Material.STONE)
+                        .glint(true)
+                        .addLore(Component.text("lore1"))
+                        .addLore(Component.text("lore2"))
+                        .name(Component.text("name"))
+                        .amount(77)
+                        .onClick(event -> {
+                            event.getPlayer().sendMessage("a");
+                        })
                 );
+                ui.add(new PlayerHeadButton().player("Chuzume"));
+                ui.add(new PlayerHeadButton().player(sender.getName()));
+                ui.add(PotionButton.splashPotion().color(Color.GREEN));
+                ui.add(new ArmorButton(Material.NETHERITE_CHESTPLATE).trim(TrimMaterial.EMERALD, TrimPattern.SPIRE));
+                if (sender instanceof Player player) ui.open(player);
 
                 break;
             }
@@ -187,7 +203,7 @@ public class Test implements CommandExecutor, TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (args.length == 1) {
-            if (sender.isOp()) return List.of("get_info", "get_server_selector", "get_experimental_item", "get_database");
+            if (sender.isOp()) return List.of("get_info", "get_server_selector", "get_experimental_item", "open_test_ui");
             else return List.of("get_server_selector");
         }
         else if (args.length == 2) {

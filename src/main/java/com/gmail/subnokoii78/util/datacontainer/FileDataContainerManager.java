@@ -61,7 +61,7 @@ public final class FileDataContainerManager extends DataContainerManager {
             BinaryFileUtils.overwrite(filePath, data);
         }
         catch (IOException e) {
-            throw new RuntimeException("PersistentDataContainerのシリアライズに失敗しました");
+            throw new RuntimeException("PersistentDataContainerのシリアライズまたはファイルへの書き込みに失敗しました", e);
         }
     }
 

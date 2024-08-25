@@ -309,6 +309,35 @@ public class Vector3Builder implements VectorBuilder<Vector3Builder, Double> {
     }
 
     /**
+     * ベクトルを軸と角度に基づいて回転させます。
+     * @param axis 回転軸
+     * @param degree 角度
+     * @return this
+     */
+    @Destructive
+    public @NotNull Vector3Builder rotate(@NotNull Vector3Builder axis, float degree) {
+        final double radian = degree * Math.PI / 180;
+        final double sin = Math.sin(radian);
+        final double cos = Math.cos(radian);
+
+        final double x = axis.copy().normalize().x;
+        final double y = axis.copy().normalize().y;
+        final double z = axis.copy().normalize().z;
+
+        final double[][] matrix = new double[][]{
+            new double[]{cos + x * x * (1 - cos), x * y * (1 - cos) - z * sin, x * z * (1 - cos) + y * sin},
+            new double[]{y * x * (1 - cos) + z * sin, cos + y * y * (1 - cos), y * z * (1 - cos) - x * sin},
+            new double[]{z * x * (1 - cos) - y * sin, z * y * (1 - cos) + x * sin, cos + z * z * (1 - cos)}
+        };
+
+        this.x = matrix[0][0] * this.x + matrix[0][1] * this.y + matrix[0][2] * this.z;
+        this.y = matrix[1][0] * this.x + matrix[1][1] * this.y + matrix[1][2] * this.z;
+        this.z = matrix[2][0] * this.x + matrix[2][1] * this.y + matrix[2][2] * this.z;
+
+        return this;
+    }
+
+    /**
      * このベクトルを指定の形式に従って文字列化します。形式には"$x", "$y", "$z", "$c"が使えます。
      * @return 文字列化されたベクトル
      */

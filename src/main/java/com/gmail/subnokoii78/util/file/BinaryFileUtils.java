@@ -35,15 +35,6 @@ public class BinaryFileUtils {
     public static void create(String path) {
         final Path filePath = Path.of(path);
 
-        if (!Files.exists(filePath.getParent())) {
-            try {
-                Files.createFile(filePath.getParent());
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
         if (!Files.exists(filePath)) {
             try {
                 Files.createFile(filePath);
@@ -55,11 +46,13 @@ public class BinaryFileUtils {
     }
 
     public static void delete(String path) {
-        try {
-            Files.delete(Path.of(path));
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        if (TextFileUtils.exist(path)) {
+            try {
+                Files.delete(Path.of(path));
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

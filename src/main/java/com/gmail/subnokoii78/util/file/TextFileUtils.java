@@ -88,11 +88,13 @@ public class TextFileUtils {
     }
 
     public static void delete(String path) {
-        try {
-            Files.delete(Path.of(path));
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        if (exist(path)) {
+            try {
+                Files.delete(Path.of(path));
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -122,6 +124,20 @@ public class TextFileUtils {
         if (!Files.exists(filePath)) {
             try {
                 Files.createFile(filePath);
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static void create(String path, String defaultText) {
+        final Path filePath = Path.of(path);
+
+        if (!Files.exists(filePath)) {
+            try {
+                Files.createFile(filePath);
+                overwrite(path, List.of(defaultText));
             }
             catch (IOException e) {
                 throw new RuntimeException(e);

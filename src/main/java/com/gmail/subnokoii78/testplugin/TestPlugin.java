@@ -3,12 +3,13 @@ package com.gmail.subnokoii78.testplugin;
 import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
-import com.gmail.subnokoii78.testplugin.particles.TextFontParticleHandler;
 import com.gmail.subnokoii78.util.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii78.util.event.CustomEvents;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
+import com.gmail.subnokoii78.util.file.json.JSONObject;
+import com.gmail.subnokoii78.util.file.json.JSONSerializer;
 import com.gmail.subnokoii78.util.ui.ChestUIClickEvent;
-import com.gmail.subnokoii78.util.vector.Vector3Builder;
+import com.gmail.subnokoii78.util.ui.ContainerUI;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -18,13 +19,15 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.*;
-import org.bukkit.command.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public final class TestPlugin extends JavaPlugin {
@@ -40,6 +43,8 @@ public final class TestPlugin extends JavaPlugin {
         // 準備
         plugin = this;
 
+        PluginDirectoryManager.init();
+
         TestPlugin.log(LoggingTarget.ALL, "TestPluginが起動しました");
 
         // イベントリスナー登録
@@ -47,15 +52,13 @@ public final class TestPlugin extends JavaPlugin {
         PlayerEventListener.init();
         EntityEventListener.init();
         ChestUIClickEvent.Listener.init();
+        ContainerUI.UIEventHandler.init();
         TickEventListener.init();
 
         // コマンド登録
-        // setCommandManager("foo", new Foo());
-        setCommandManager("log", new Log());
         setCommandManager("lobby", new Lobby());
         setCommandManager("tools", new Tools());
         setCommandManager("test", new Test());
-        setCommandManager("database", new ManageDatabase());
 
         // BungeeCordに接続
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -64,7 +67,7 @@ public final class TestPlugin extends JavaPlugin {
             final var registrar = event.registrar();
             registrar.register(getFooCommandNode());
             registrar.register(getLoggerCommandNode());
-            registrar.register(getReloadTestPluginNode());
+            registrar.register(getReloadConfigCommandNode());
         });
     }
 
@@ -108,18 +111,23 @@ public final class TestPlugin extends JavaPlugin {
             .build();
     }
 
-    private LiteralCommandNode<CommandSourceStack> getReloadTestPluginNode() {
-        return Commands.literal("pluginreload")
-            .executes(ctx -> {
-                TextFontParticleHandler.reload();
-                ctx.getSource().getSender().sendMessage(Component.text("font_particle_definitions.jsonをリロードしました"));
+    private LiteralCommandNode<CommandSourceStack> getReloadConfigCommandNode() {
+        return Commands.literal("config")
+            .then(Commands.literal("reload").executes(ctx -> {
+                PluginDirectoryManager.reloadConfig();
+                ctx.getSource().getSender().sendPlainMessage(TestPlugin.CONFIG_FILE_PATH + "をリロードしました");
                 return Command.SINGLE_SUCCESS;
-            })
+            }))
+            .then(Commands.literal("get").executes(ctx -> {
+                final JSONObject jsonObject = PluginDirectoryManager.getConfig();
+                ctx.getSource().getSender().sendMessage(new JSONSerializer(jsonObject).serialize());
+                return Command.SINGLE_SUCCESS;
+            }))
             .build();
     }
 
     private LiteralCommandNode<CommandSourceStack> getLoggerCommandNode() {
-        return Commands.literal("serverlogger")
+        return Commands.literal("log")
             .then(
                 Commands.literal("read")
                     .then(Commands.literal("first").executes(getLogReader(0, 31, false)))
@@ -169,12 +177,7 @@ public final class TestPlugin extends JavaPlugin {
                 break;
             }
             case PLUGIN: {
-                final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-
-                TextFileUtils.create(LOG_FILE_PATH);
-                TextFileUtils.write(LOG_FILE_PATH, "[" + formatter.format(timestamp) + "] " + text);
-
+                PluginDirectoryManager.log(messages);
                 break;
             }
             case ALL: {
@@ -204,12 +207,7 @@ public final class TestPlugin extends JavaPlugin {
                 break;
             }
             case PLUGIN: {
-                final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-
-                TextFileUtils.create(LOG_FILE_PATH);
-                TextFileUtils.write(LOG_FILE_PATH, "[" + formatter.format(timestamp) + "] " + text.get().content());
-
+                PluginDirectoryManager.log(text.get().content());
                 break;
             }
             case ALL: {
@@ -282,13 +280,13 @@ public final class TestPlugin extends JavaPlugin {
         command.setTabCompleter(manager);
     }
 
-    public static FileDataContainerManager database() {
-        return new FileDataContainerManager(DATABASE_FILE_PATH);
-    }
+    public static final String PERSISTENT_DIRECTORY_PATH = "plugins/TestPluginPersistent";
 
-    private static final String LOG_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.log";
+    public static final String LOG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/plugin.log";
 
-    private static final String DATABASE_FILE_PATH = "plugins/TestPlugin-1.0-SNAPSHOT.bin";
+    public static final String DATABASE_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/database.dat";
+
+    public static final String CONFIG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/config.json";
 
     public enum LoggingTarget {
         SERVER,

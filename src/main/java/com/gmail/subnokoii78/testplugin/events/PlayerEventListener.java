@@ -2,9 +2,8 @@ package com.gmail.subnokoii78.testplugin.events;
 
 import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.testplugin.particles.TextFontParticleHandler;
+import com.gmail.subnokoii78.testplugin.particles.FontParticleHandler;
 import com.gmail.subnokoii78.util.event.data.PlayerClickEvent;
-import com.gmail.subnokoii78.util.file.json.JSONObject;
 import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
 import com.gmail.subnokoii78.util.other.ScheduleUtils;
@@ -230,7 +229,7 @@ public class PlayerEventListener implements Listener {
             final var itemStack = event.getItemStack();
 
             if (new ItemStackDataContainerManager(itemStack).equals("weapon.particle", "slash")) {
-                TextFontParticleHandler.createBuilder("knight_slash_fourth").buildAndPlay(player);
+                FontParticleHandler.createBuilder("knight_slash_fourth").buildAndPlay(player);
             }
         });
     }
