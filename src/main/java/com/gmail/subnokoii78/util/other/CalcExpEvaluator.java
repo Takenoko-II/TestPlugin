@@ -5,12 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.Supplier;
 
 public final class CalcExpEvaluator {
-    public static void main(String[] args) {
-        System.out.println(evaluate(""));
-    }
-
     private static final Set<Character> IGNORED = Set.of(' ', '\n');
 
     private static final Set<Character> SIGNS = Set.of('+', '-');
@@ -65,6 +62,10 @@ public final class CalcExpEvaluator {
         }
     ));
 
+    private final Map<String, Supplier<Double>> ZERO_ARGUMENT_FUNCTIONS = new HashMap<>(Map.of(
+        "pi", () -> Math.PI
+    ));
+
     private final Map<String, DoubleUnaryOperator> SINGLE_ARGUMENT_FUNCTIONS = new HashMap<>(Map.of(
         "sqrt", Math::sqrt
     ));
@@ -98,7 +99,10 @@ public final class CalcExpEvaluator {
     }
 
     private double number() {
-        if (isSingleArgFunction()) {
+        if (isZeroArgFunction()) {
+            return getZeroArgFunction().get();
+        }
+        else if (isSingleArgFunction()) {
             return getSingleArgFunction().applyAsDouble(factor());
         }
         else if (isDoubleArgsFunction()) {
@@ -220,6 +224,31 @@ public final class CalcExpEvaluator {
         else throw new IllegalArgumentException("関数の呼び出しには括弧が必要です: " + current);
     }
 
+    private boolean isZeroArgFunction() {
+        final String str = expression.substring(location);
+
+        for (final String name : ZERO_ARGUMENT_FUNCTIONS.keySet()) {
+            if (str.startsWith(name + "()")) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private Supplier<Double> getZeroArgFunction() {
+        final String str = expression.substring(location);
+
+        for (final String name : ZERO_ARGUMENT_FUNCTIONS.keySet()) {
+            if (str.startsWith(name + "()")) {
+                location += name.length() + 2;
+                return ZERO_ARGUMENT_FUNCTIONS.get(name);
+            }
+        }
+
+        throw new IllegalArgumentException("関数を取得できませんでした");
+    }
+
     private boolean isSingleArgFunction() {
         final String str = expression.substring(location);
 
@@ -279,11 +308,19 @@ public final class CalcExpEvaluator {
         return value;
     }
 
-    public void define() {
-
+    public void define(@NotNull String name, Supplier<Double> function) {
+        ZERO_ARGUMENT_FUNCTIONS.put(name, function);
     }
 
-    public static double evaluate(@NotNull String expression) {
+    public void define(@NotNull String name, DoubleUnaryOperator function) {
+        SINGLE_ARGUMENT_FUNCTIONS.put(name, function);
+    }
+
+    public void define(@NotNull String name, BinaryOperator<Double> function) {
+        DOUBLE_ARGUMENTS_FUNCTIONS.put(name, function);
+    }
+
+    public static double evaluateDefault(@NotNull String expression) {
         return new CalcExpEvaluator(expression).evaluate();
     }
 }
