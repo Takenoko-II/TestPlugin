@@ -34,7 +34,7 @@ public final class CalcExpEvaluator {
         },
         '%', (a, b) -> {
             if (a == 0 && b == 0) {
-                throw new IllegalArgumentException("式 '0 / 0'はNaNを返します");
+                throw new IllegalArgumentException("式 '0 % 0'はNaNを返します");
             }
 
             return a % b;
@@ -50,6 +50,9 @@ public final class CalcExpEvaluator {
         '!', value -> {
             if (value != (double) (int) value) {
                 throw new IllegalArgumentException("階乗演算子は実質的な整数の値にのみ使用できます");
+            }
+            else if (value < 0) {
+                throw new IllegalArgumentException("階乗演算子は負の値に使用できません");
             }
 
             double result = 1;
@@ -72,6 +75,13 @@ public final class CalcExpEvaluator {
 
     private final Map<String, BinaryOperator<Double>> DOUBLE_ARGUMENTS_FUNCTIONS = new HashMap<>(Map.of(
         "log", (a, b) -> Math.log(b) / Math.log(a)
+    ));
+
+    private final Map<String, Double> CONSTANTS = new HashMap<>(Map.of(
+        "NaN", Double.NaN,
+        "pi", Math.PI,
+        "e", Math.E,
+        "infinity", Double.POSITIVE_INFINITY
     ));
 
     private final String expression;
@@ -98,46 +108,98 @@ public final class CalcExpEvaluator {
         return current;
     }
 
+    private void beforeWhitespace() {
+        if (isOver()) return;
+
+        final char current = expression.charAt(location++);
+
+        if (IGNORED.contains(current)) {
+            beforeWhitespace();
+        }
+        else {
+            location--;
+        }
+    }
+
+    private boolean nextIf(char next) {
+        if (location >= expression.length()) {
+            return false;
+        }
+
+        final char current = expression.charAt(location);
+
+        if (current == next) {
+            location++;
+            return true;
+        }
+
+        return false;
+    }
+
     private double number() {
+        final char init = next();
+        final StringBuilder stringBuilder = new StringBuilder();
+
+        if (SIGNS.contains(init)) {
+            stringBuilder.append(init);
+            beforeWhitespace();
+        }
+        else {
+            location--;
+        }
+
         if (isZeroArgFunction()) {
-            return getZeroArgFunction().get();
+            final var function = getZeroArgFunction();
+            final var args = arguments();
+            if (!args.isEmpty()) throw new IllegalArgumentException("関数の引数の数は0つが要求されています");
+            stringBuilder.append(function.get());
+        }
+        else if (isConst()) {
+            stringBuilder.append(getConst());
         }
         else if (isSingleArgFunction()) {
-            return getSingleArgFunction().applyAsDouble(factor());
+            final var function = getSingleArgFunction();
+            final var args = arguments();
+            if (args.size() != 1) throw new IllegalArgumentException("関数の引数の数は1つが要求されています");
+            stringBuilder.append(function.applyAsDouble(args.getFirst()));
         }
         else if (isDoubleArgsFunction()) {
             final var function = getDoubleArgsFunction();
             final var args = arguments();
             if (args.size() != 2) throw new IllegalArgumentException("関数の引数の数は2つが要求されています");
-            return function.apply(args.get(0), args.get(1));
+            stringBuilder.append(function.apply(args.get(0), args.get(1)));
         }
-
-        final char init = next();
-
-        if (!INTEGERS.contains(init) && !SIGNS.contains(init)) {
-            throw new IllegalArgumentException("数値は[0-9+-]で開始する必要があります('" + init + "')");
-        }
-
-        final StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.append(init);
-        boolean dotAlreadyAppended = false;
-
-        while (!isOver()) {
-            final char current = next();
-
-            if (INTEGERS.contains(current)) stringBuilder.append(current);
-            else if (current == DECIMAL_POINT) {
-                if (dotAlreadyAppended) {
-                    throw new IllegalArgumentException("無効な小数点を検知しました");
-                }
-
-                stringBuilder.append(current);
-                dotAlreadyAppended = true;
+        else if (SIGNS.contains(expression.charAt(location)) || expression.charAt(location) == PARENTHESIS_START) {
+            final var val = polynomial();
+            if (val >= 0) stringBuilder.append(val);
+            else if (stringBuilder.charAt(0) == SIGNS.stream().toList().getFirst()) {
+                return val;
+            }
+            else if (stringBuilder.charAt(0) == SIGNS.stream().toList().get(1)) {
+                return -val;
             }
             else {
-                location--;
-                break;
+                throw new IllegalArgumentException("never happen?");
+            }
+        }
+        else {
+            boolean dotAlreadyAppended = false;
+            while (!isOver()) {
+                final char current = next();
+
+                if (INTEGERS.contains(current)) stringBuilder.append(current);
+                else if (current == DECIMAL_POINT) {
+                    if (dotAlreadyAppended) {
+                        throw new IllegalArgumentException("無効な小数点を検知しました");
+                    }
+
+                    stringBuilder.append(current);
+                    dotAlreadyAppended = true;
+                }
+                else {
+                    location--;
+                    break;
+                }
             }
         }
 
@@ -145,7 +207,7 @@ public final class CalcExpEvaluator {
             return Double.parseDouble(stringBuilder.toString());
         }
         catch (NumberFormatException e) {
-            throw new IllegalArgumentException("数値の解析に失敗しました", e);
+            throw new IllegalArgumentException("数値の解析に失敗しました: " + expression.substring(location), e);
         }
     }
 
@@ -198,7 +260,11 @@ public final class CalcExpEvaluator {
         }
         else {
             location--;
-            return number();
+            final var num = number();
+            if (Double.isNaN(num)) {
+                throw new IllegalArgumentException("関数または定数からNaNが出力されました");
+            }
+            return num;
         }
     }
 
@@ -207,6 +273,10 @@ public final class CalcExpEvaluator {
         final List<Double> args = new ArrayList<>();
 
         if (current == PARENTHESIS_START) {
+            if (nextIf(PARENTHESIS_END)) {
+                return args;
+            }
+
             while (true) {
                 if (isOver()) throw new IllegalArgumentException("引数の探索中に文字列外に来ました");
                 double value = polynomial();
@@ -224,11 +294,36 @@ public final class CalcExpEvaluator {
         else throw new IllegalArgumentException("関数の呼び出しには括弧が必要です: " + current);
     }
 
+    private boolean isConst() {
+        final String str = expression.substring(location);
+
+        for (final String name : CONSTANTS.keySet()) {
+            if (str.startsWith(name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private Double getConst() {
+        final String str = expression.substring(location);
+
+        for (final String name : CONSTANTS.keySet().stream().sorted((a, b) -> b.length() - a.length()).toList()) {
+            if (str.startsWith(name)) {
+                location += name.length();
+                return CONSTANTS.get(name);
+            }
+        }
+
+        throw new IllegalArgumentException("定数を取得できませんでした");
+    }
+
     private boolean isZeroArgFunction() {
         final String str = expression.substring(location);
 
-        for (final String name : ZERO_ARGUMENT_FUNCTIONS.keySet()) {
-            if (str.startsWith(name + "()")) {
+        for (final String name : ZERO_ARGUMENT_FUNCTIONS.keySet().stream().sorted((a, b) -> b.length() - a.length()).toList()) {
+            if (str.startsWith(name)) {
                 return true;
             }
         }
@@ -240,8 +335,8 @@ public final class CalcExpEvaluator {
         final String str = expression.substring(location);
 
         for (final String name : ZERO_ARGUMENT_FUNCTIONS.keySet()) {
-            if (str.startsWith(name + "()")) {
-                location += name.length() + 2;
+            if (str.startsWith(name)) {
+                location += name.length();
                 return ZERO_ARGUMENT_FUNCTIONS.get(name);
             }
         }
@@ -299,25 +394,49 @@ public final class CalcExpEvaluator {
         throw new IllegalArgumentException("関数を取得できませんでした");
     }
 
-    public double evaluate() {
-        if (isOver()) throw new IllegalArgumentException("空文字は計算できません");
-        final double value = polynomial();
+    private void checkExtra() {
         if (!expression.substring(location).isEmpty()) {
             throw new IllegalArgumentException("式の終了後に無効な文字を検出しました: " + expression.substring(location));
         }
+    }
+
+    private void checkDefined(@NotNull String name) {
+        if (
+            ZERO_ARGUMENT_FUNCTIONS.containsKey(name)
+            || SINGLE_ARGUMENT_FUNCTIONS.containsKey(name)
+            || DOUBLE_ARGUMENTS_FUNCTIONS.containsKey(name)
+            || CONSTANTS.containsKey(name)
+        ) {
+            throw new IllegalArgumentException("その名前は既に使用されています: " + name);
+        }
+    }
+
+    public double evaluate() {
+        if (isOver()) throw new IllegalArgumentException("空文字は計算できません");
+        final double value = polynomial();
+        checkExtra();
+        location = 0;
         return value;
     }
 
     public void define(@NotNull String name, Supplier<Double> function) {
+        checkDefined(name);
         ZERO_ARGUMENT_FUNCTIONS.put(name, function);
     }
 
     public void define(@NotNull String name, DoubleUnaryOperator function) {
+        checkDefined(name);
         SINGLE_ARGUMENT_FUNCTIONS.put(name, function);
     }
 
     public void define(@NotNull String name, BinaryOperator<Double> function) {
+        checkDefined(name);
         DOUBLE_ARGUMENTS_FUNCTIONS.put(name, function);
+    }
+
+    public void define(@NotNull String name, Double constant) {
+        checkDefined(name);
+        CONSTANTS.put(name, constant);
     }
 
     public static double evaluateDefault(@NotNull String expression) {
