@@ -161,16 +161,16 @@ public final class TestPlugin extends JavaPlugin {
     private LiteralCommandNode<CommandSourceStack> getEvaluateCommandNode() {
         return Commands.literal("evaluate")
             .then(
-                Commands.argument("expression", ArgumentTypes.signedMessage())
+                Commands.argument("expression", ArgumentTypes.component())
                     .then(Commands.argument("scale", IntegerArgumentType.integer()).executes(ctx -> {
-                        final var expression = ctx.getArgument("expression", SignedMessageResolver.class);
+                        final var expression = (TextComponent) ctx.getArgument("expression", Component.class);
                         final var scale = ctx.getArgument("scale", Integer.class);
                         final double result = CalcExpEvaluator.getDefaultEvaluator().evaluate(expression.content()) * scale;
                         ctx.getSource().getSender().sendMessage(Component.text("演算結果: ").append(Component.text(result)));
                         return (int) result;
                     }))
                     .executes(ctx -> {
-                        final var expression = ctx.getArgument("expression", SignedMessageResolver.class);
+                        final var expression = (TextComponent) ctx.getArgument("expression", Component.class);
                         final double result = CalcExpEvaluator.getDefaultEvaluator().evaluate(expression.content());
                         ctx.getSource().getSender().sendMessage(Component.text("演算結果: ").append(Component.text(result)));
                         return (int) result;
