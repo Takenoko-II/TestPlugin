@@ -25,14 +25,14 @@ public final class CalcExpEvaluator {
         '*', (a, b) -> a * b,
         '/', (a, b) -> {
             if (a == 0 && b == 0) {
-                throw new IllegalArgumentException("式 '0 / 0'はNaNを返します");
+                throw new CalcExpEvalException("式 '0 / 0'はNaNを返します");
             }
 
             return a / b;
         },
         '%', (a, b) -> {
             if (a == 0 && b == 0) {
-                throw new IllegalArgumentException("式 '0 % 0'はNaNを返します");
+                throw new CalcExpEvalException("式 '0 % 0'はNaNを返します");
             }
 
             return a % b;
@@ -44,13 +44,16 @@ public final class CalcExpEvaluator {
         '-', (a, b) -> a - b
     ));
 
-    private final Map<Character, DoubleUnaryOperator> NUMBER_PREFIX_OPERATOR = new HashMap<>(Map.of(
+    private final Map<Character, DoubleUnaryOperator> NUMBER_SUFFIX_OPERATOR = new HashMap<>(Map.of(
         '!', value -> {
             if (value != (double) (int) value) {
-                throw new IllegalArgumentException("階乗演算子は実質的な整数の値にのみ使用できます");
+                throw new CalcExpEvalException("階乗演算子は実質的な整数の値にのみ使用できます");
             }
             else if (value < 0) {
-                throw new IllegalArgumentException("階乗演算子は負の値に使用できません");
+                throw new CalcExpEvalException("階乗演算子は負の値に使用できません");
+            }
+            else if (value > 127) {
+                throw new CalcExpEvalException("階乗演算子は127!を超えた値を計算できないよう制限されています");
             }
 
             double result = 1;
@@ -83,7 +86,7 @@ public final class CalcExpEvaluator {
 
     private char next() {
         if (isOver()) {
-            throw new IllegalStateException("文字数を超えた位置へのアクセスが発生しました");
+            throw new CalcExpEvalException("文字数を超えた位置へのアクセスが発生しました");
         }
 
         final char current = expression.charAt(location++);
@@ -136,19 +139,19 @@ public final class CalcExpEvaluator {
         if (isZeroArgFunction()) {
             final var function = getZeroArgFunction();
             final var args = arguments();
-            if (!args.isEmpty()) throw new IllegalArgumentException("関数の引数の数は0つが要求されています");
+            if (!args.isEmpty()) throw new CalcExpEvalException("関数の引数の数は0つが要求されています");
             stringBuilder.append(function.get());
         }
         else if (isSingleArgFunction()) {
             final var function = getSingleArgFunction();
             final var args = arguments();
-            if (args.size() != 1) throw new IllegalArgumentException("関数の引数の数は1つが要求されています");
+            if (args.size() != 1) throw new CalcExpEvalException("関数の引数の数は1つが要求されています");
             stringBuilder.append(function.applyAsDouble(args.getFirst()));
         }
         else if (isDoubleArgsFunction()) {
             final var function = getDoubleArgsFunction();
             final var args = arguments();
-            if (args.size() != 2) throw new IllegalArgumentException("関数の引数の数は2つが要求されています");
+            if (args.size() != 2) throw new CalcExpEvalException("関数の引数の数は2つが要求されています");
             stringBuilder.append(function.apply(args.get(0), args.get(1)));
         }
         else if (isConst()) {
@@ -156,7 +159,9 @@ public final class CalcExpEvaluator {
         }
         else if (SIGNS.contains(expression.charAt(location)) || expression.charAt(location) == PARENTHESIS_START) {
             final var val = polynomial();
-            if (val >= 0) stringBuilder.append(val);
+            if (val == 0) return 0;
+
+            if (val > 0) stringBuilder.append(val);
             else if (stringBuilder.charAt(0) == SIGNS.stream().toList().getFirst()) {
                 return val;
             }
@@ -164,7 +169,7 @@ public final class CalcExpEvaluator {
                 return -val;
             }
             else {
-                throw new IllegalArgumentException("never happen?");
+                throw new CalcExpEvalException("never happen?");
             }
         }
         else {
@@ -175,7 +180,7 @@ public final class CalcExpEvaluator {
                 if (INTEGERS.contains(current)) stringBuilder.append(current);
                 else if (current == DECIMAL_POINT) {
                     if (dotAlreadyAppended) {
-                        throw new IllegalArgumentException("無効な小数点を検知しました");
+                        throw new CalcExpEvalException("無効な小数点を検知しました");
                     }
 
                     stringBuilder.append(current);
@@ -192,7 +197,7 @@ public final class CalcExpEvaluator {
             return Double.parseDouble(stringBuilder.toString());
         }
         catch (NumberFormatException e) {
-            throw new IllegalArgumentException("数値の解析に失敗しました: " + expression.substring(location), e);
+            throw new CalcExpEvalException("数値の解析に失敗しました: " + expression.substring(location), e);
         }
     }
 
@@ -204,8 +209,8 @@ public final class CalcExpEvaluator {
             if (MONOMIAL_OPERATORS.containsKey(current)) {
                 value = MONOMIAL_OPERATORS.get(current).apply(value, factor());
             }
-            else if (NUMBER_PREFIX_OPERATOR.containsKey(current)) {
-                value = NUMBER_PREFIX_OPERATOR.get(current).applyAsDouble(value);
+            else if (NUMBER_SUFFIX_OPERATOR.containsKey(current)) {
+                value = NUMBER_SUFFIX_OPERATOR.get(current).applyAsDouble(value);
             }
             else {
                 location--;
@@ -238,16 +243,16 @@ public final class CalcExpEvaluator {
 
         if (current == PARENTHESIS_START) {
             double value = polynomial();
-            if (isOver()) throw new IllegalArgumentException("括弧が閉じられていません");
+            if (isOver()) throw new CalcExpEvalException("括弧が閉じられていません");
             final char next = next();
             if (next == PARENTHESIS_END) return value;
-            else throw new IllegalArgumentException("括弧が閉じられていません: " + next);
+            else throw new CalcExpEvalException("括弧が閉じられていません: " + next);
         }
         else {
             location--;
             final var num = number();
             if (Double.isNaN(num)) {
-                throw new IllegalArgumentException("関数または定数からNaNが出力されました");
+                throw new CalcExpEvalException("関数または定数からNaNが出力されました");
             }
             return num;
         }
@@ -263,7 +268,7 @@ public final class CalcExpEvaluator {
             }
 
             while (true) {
-                if (isOver()) throw new IllegalArgumentException("引数の探索中に文字列外に来ました");
+                if (isOver()) throw new CalcExpEvalException("引数の探索中に文字列外に来ました");
                 double value = polynomial();
                 final char next = next();
                 if (next == FUNCTION_ARGUMENT_SEPARATOR) {
@@ -273,10 +278,10 @@ public final class CalcExpEvaluator {
                     args.add(value);
                     return args;
                 }
-                else throw new IllegalArgumentException("関数の引数の区切りが見つかりません: " + next);
+                else throw new CalcExpEvalException("関数の引数の区切りが見つかりません: " + next);
             }
         }
-        else throw new IllegalArgumentException("関数の呼び出しには括弧が必要です: " + current);
+        else throw new CalcExpEvalException("関数の呼び出しには括弧が必要です: " + current);
     }
 
     private boolean isConst() {
@@ -301,7 +306,7 @@ public final class CalcExpEvaluator {
             }
         }
 
-        throw new IllegalArgumentException("定数を取得できませんでした");
+        throw new CalcExpEvalException("定数を取得できませんでした");
     }
 
     private boolean isZeroArgFunction() {
@@ -326,7 +331,7 @@ public final class CalcExpEvaluator {
             }
         }
 
-        throw new IllegalArgumentException("関数を取得できませんでした");
+        throw new CalcExpEvalException("関数を取得できませんでした");
     }
 
     private boolean isSingleArgFunction() {
@@ -351,7 +356,7 @@ public final class CalcExpEvaluator {
             }
         }
 
-        throw new IllegalArgumentException("関数を取得できませんでした");
+        throw new CalcExpEvalException("関数を取得できませんでした");
     }
 
     private boolean isDoubleArgsFunction() {
@@ -376,12 +381,12 @@ public final class CalcExpEvaluator {
             }
         }
 
-        throw new IllegalArgumentException("関数を取得できませんでした");
+        throw new CalcExpEvalException("関数を取得できませんでした");
     }
 
     private void checkExtra() {
         if (!expression.substring(location).isEmpty()) {
-            throw new IllegalArgumentException("式の終了後に無効な文字を検出しました: " + expression.substring(location));
+            throw new CalcExpEvalException("式の終了後に無効な文字を検出しました: " + expression.substring(location));
         }
     }
 
@@ -396,9 +401,9 @@ public final class CalcExpEvaluator {
         }
     }
 
-    public double evaluate(@NotNull String expression) {
+    public double evaluate(@NotNull String expression) throws CalcExpEvalException {
         this.expression = expression;
-        if (isOver()) throw new IllegalArgumentException("空文字は計算できません");
+        if (isOver()) throw new CalcExpEvalException("空文字は計算できません");
         final double value = polynomial();
         checkExtra();
         location = 0;

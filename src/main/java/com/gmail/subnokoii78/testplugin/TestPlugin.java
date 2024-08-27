@@ -7,11 +7,14 @@ import com.gmail.subnokoii78.util.event.CustomEvents;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
 import com.gmail.subnokoii78.util.file.json.JSONObject;
 import com.gmail.subnokoii78.util.file.json.JSONSerializer;
+import com.gmail.subnokoii78.util.function.TiFunction;
+import com.gmail.subnokoii78.util.other.CalcExpEvalException;
 import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
 import com.gmail.subnokoii78.util.ui.ChestUIClickEvent;
 import com.gmail.subnokoii78.util.ui.ContainerUI;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -20,17 +23,19 @@ import io.papermc.paper.command.brigadier.argument.SignedMessageResolver;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.command.CommandException;
-import org.bukkit.command.PluginCommand;
+import org.bukkit.command.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
@@ -160,22 +165,30 @@ public final class TestPlugin extends JavaPlugin {
 
     private LiteralCommandNode<CommandSourceStack> getEvaluateCommandNode() {
         return Commands.literal("evaluate")
-            .then(
-                Commands.argument("expression", ArgumentTypes.component())
-                    .then(Commands.argument("scale", IntegerArgumentType.integer()).executes(ctx -> {
-                        final var expression = (TextComponent) ctx.getArgument("expression", Component.class);
-                        final var scale = ctx.getArgument("scale", Integer.class);
-                        final double result = CalcExpEvaluator.getDefaultEvaluator().evaluate(expression.content()) * scale;
-                        ctx.getSource().getSender().sendMessage(Component.text("演算結果: ").append(Component.text(result)));
-                        return (int) result;
-                    }))
-                    .executes(ctx -> {
-                        final var expression = (TextComponent) ctx.getArgument("expression", Component.class);
-                        final double result = CalcExpEvaluator.getDefaultEvaluator().evaluate(expression.content());
-                        ctx.getSource().getSender().sendMessage(Component.text("演算結果: ").append(Component.text(result)));
-                        return (int) result;
-                    })
-            )
+            .then(Commands.argument("expression", ArgumentTypes.signedMessage()).executes(ctx -> {
+                final CommandSender sender = ctx.getSource().getSender();
+                final String expression = ctx.getArgument("expression", SignedMessageResolver.class).content();
+                final CalcExpEvaluator evaluator = CalcExpEvaluator.getDefaultEvaluator();
+
+                try {
+                    final double result = evaluator.evaluate(expression);
+                    sender.sendMessage(Component.text("演算結果: ").append(Component.text(result)));
+                    return (int) result;
+                }
+                catch (CalcExpEvalException e) {
+                    sender.sendMessage(
+                        Component.text(e.getMessage() == null ? "式の評価に失敗しました" : ("式の評価に失敗しました: " + e.getMessage()))
+                            .color(NamedTextColor.RED)
+                            .hoverEvent(HoverEvent.showText(Component.text("クリックして例外を投げる").color(NamedTextColor.RED)))
+                            .clickEvent(ClickEvent.callback(audience -> {
+                                sender.sendMessage("発生した例外を投げます...");
+                                throw e;
+                            }))
+                    );
+
+                    return 0;
+                }
+            }))
             .build();
     }
 

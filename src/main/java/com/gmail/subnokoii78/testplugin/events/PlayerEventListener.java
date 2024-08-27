@@ -223,15 +223,6 @@ public class PlayerEventListener implements Listener {
                 }
             }
         });
-
-        TestPlugin.events().onLeftClick(event -> {
-            final var player = event.getPlayer();
-            final var itemStack = event.getItemStack();
-
-            if (new ItemStackDataContainerManager(itemStack).equals("weapon.particle", "slash")) {
-                FontParticleHandler.createBuilder("knight_slash_fourth").buildAndPlay(player);
-            }
-        });
     }
 
     @EventHandler

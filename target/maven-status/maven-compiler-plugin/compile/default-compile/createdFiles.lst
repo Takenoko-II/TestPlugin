@@ -61,6 +61,7 @@ com\gmail\subnokoii78\util\shape\PerfectCircle.class
 com\gmail\subnokoii78\testplugin\BungeeCordUtils.class
 com\gmail\subnokoii78\util\itemstack\PotionContent.class
 com\gmail\subnokoii78\util\ui\ContainerUI$UIEventHandler.class
+com\gmail\subnokoii78\util\other\CalcExpEvalException.class
 com\gmail\subnokoii78\testplugin\TestPlugin$LoggingTarget.class
 com\gmail\subnokoii78\util\ui\ChestUIBuilder$Button.class
 com\gmail\subnokoii78\util\ui\ArmorButton.class
