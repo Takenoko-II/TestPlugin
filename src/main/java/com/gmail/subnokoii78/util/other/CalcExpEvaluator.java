@@ -3,9 +3,7 @@ package com.gmail.subnokoii78.util.other;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public final class CalcExpEvaluator {
     private static final Set<Character> IGNORED = Set.of(' ', '\n');
@@ -65,32 +63,19 @@ public final class CalcExpEvaluator {
         }
     ));
 
-    private final Map<String, Supplier<Double>> ZERO_ARGUMENT_FUNCTIONS = new HashMap<>(Map.of(
-        "pi", () -> Math.PI
-    ));
+    private final Map<String, Supplier<Double>> ZERO_ARGUMENT_FUNCTIONS = new HashMap<>();
 
-    private final Map<String, DoubleUnaryOperator> SINGLE_ARGUMENT_FUNCTIONS = new HashMap<>(Map.of(
-        "sqrt", Math::sqrt
-    ));
+    private final Map<String, DoubleUnaryOperator> SINGLE_ARGUMENT_FUNCTIONS = new HashMap<>();
 
-    private final Map<String, BinaryOperator<Double>> DOUBLE_ARGUMENTS_FUNCTIONS = new HashMap<>(Map.of(
-        "log", (a, b) -> Math.log(b) / Math.log(a)
-    ));
+    private final Map<String, BinaryOperator<Double>> DOUBLE_ARGUMENTS_FUNCTIONS = new HashMap<>();
 
-    private final Map<String, Double> CONSTANTS = new HashMap<>(Map.of(
-        "NaN", Double.NaN,
-        "pi", Math.PI,
-        "e", Math.E,
-        "infinity", Double.POSITIVE_INFINITY
-    ));
+    private final Map<String, Double> CONSTANTS = new HashMap<>();
 
-    private final String expression;
+    private String expression;
 
     private int location = 0;
 
-    public CalcExpEvaluator(@NotNull String expression) {
-        this.expression = expression;
-    }
+    public CalcExpEvaluator() {}
 
     private boolean isOver() {
         return location >= expression.length();
@@ -154,9 +139,6 @@ public final class CalcExpEvaluator {
             if (!args.isEmpty()) throw new IllegalArgumentException("関数の引数の数は0つが要求されています");
             stringBuilder.append(function.get());
         }
-        else if (isConst()) {
-            stringBuilder.append(getConst());
-        }
         else if (isSingleArgFunction()) {
             final var function = getSingleArgFunction();
             final var args = arguments();
@@ -168,6 +150,9 @@ public final class CalcExpEvaluator {
             final var args = arguments();
             if (args.size() != 2) throw new IllegalArgumentException("関数の引数の数は2つが要求されています");
             stringBuilder.append(function.apply(args.get(0), args.get(1)));
+        }
+        else if (isConst()) {
+            stringBuilder.append(getConst());
         }
         else if (SIGNS.contains(expression.charAt(location)) || expression.charAt(location) == PARENTHESIS_START) {
             final var val = polynomial();
@@ -411,7 +396,8 @@ public final class CalcExpEvaluator {
         }
     }
 
-    public double evaluate() {
+    public double evaluate(@NotNull String expression) {
+        this.expression = expression;
         if (isOver()) throw new IllegalArgumentException("空文字は計算できません");
         final double value = polynomial();
         checkExtra();
@@ -419,27 +405,58 @@ public final class CalcExpEvaluator {
         return value;
     }
 
-    public void define(@NotNull String name, Supplier<Double> function) {
+    public void define(@NotNull String name, @NotNull Supplier<Double> function) {
         checkDefined(name);
         ZERO_ARGUMENT_FUNCTIONS.put(name, function);
     }
 
-    public void define(@NotNull String name, DoubleUnaryOperator function) {
+    public void define(@NotNull String name, @NotNull DoubleUnaryOperator function) {
         checkDefined(name);
         SINGLE_ARGUMENT_FUNCTIONS.put(name, function);
     }
 
-    public void define(@NotNull String name, BinaryOperator<Double> function) {
+    public void define(@NotNull String name, @NotNull BinaryOperator<Double> function) {
         checkDefined(name);
         DOUBLE_ARGUMENTS_FUNCTIONS.put(name, function);
     }
 
-    public void define(@NotNull String name, Double constant) {
+    public void define(@NotNull String name, double constant) {
         checkDefined(name);
         CONSTANTS.put(name, constant);
     }
 
-    public static double evaluateDefault(@NotNull String expression) {
-        return new CalcExpEvaluator(expression).evaluate();
+    public static @NotNull CalcExpEvaluator getDefaultEvaluator() {
+        final CalcExpEvaluator evaluator = new CalcExpEvaluator();
+
+        evaluator.define("NaN", Double.NaN);
+        evaluator.define("pi", Math.PI);
+        evaluator.define("e", Math.E);
+        evaluator.define("infinity", Double.POSITIVE_INFINITY);
+
+        evaluator.define("random", Math::random);
+
+        evaluator.define("sqrt", Math::sqrt);
+        evaluator.define("cbrt", Math::cbrt);
+        evaluator.define("abs", Math::abs);
+        evaluator.define("floor", Math::floor);
+        evaluator.define("ceil", Math::ceil);
+        evaluator.define("round", Math::round);
+        evaluator.define("sin", Math::sin);
+        evaluator.define("cos", Math::cos);
+        evaluator.define("tan", Math::tan);
+        evaluator.define("asin", Math::asin);
+        evaluator.define("acos", Math::acos);
+        evaluator.define("atan", Math::atan);
+        evaluator.define("exp", Math::exp);
+        evaluator.define("to_degrees", Math::toDegrees);
+        evaluator.define("to_radians", Math::toRadians);
+
+        evaluator.define("log", (a, b) -> Math.log(b) / Math.log(a));
+        evaluator.define("atan2", Math::atan2);
+        evaluator.define("min", Math::min);
+        evaluator.define("max", Math::max);
+        evaluator.define("pow", Math::pow);
+
+        return evaluator;
     }
 }

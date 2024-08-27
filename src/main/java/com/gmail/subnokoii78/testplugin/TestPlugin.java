@@ -3,18 +3,20 @@ package com.gmail.subnokoii78.testplugin;
 import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
-import com.gmail.subnokoii78.util.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii78.util.event.CustomEvents;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
 import com.gmail.subnokoii78.util.file.json.JSONObject;
 import com.gmail.subnokoii78.util.file.json.JSONSerializer;
+import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
 import com.gmail.subnokoii78.util.ui.ChestUIClickEvent;
 import com.gmail.subnokoii78.util.ui.ContainerUI;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.SignedMessageResolver;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -68,6 +70,7 @@ public final class TestPlugin extends JavaPlugin {
             registrar.register(getFooCommandNode());
             registrar.register(getLoggerCommandNode());
             registrar.register(getReloadConfigCommandNode());
+            registrar.register(getEvaluateCommandNode());
         });
     }
 
@@ -152,6 +155,27 @@ public final class TestPlugin extends JavaPlugin {
                 ctx.getSource().getSender().sendPlainMessage("ログのアーカイブを全て削除しました");
                 return Command.SINGLE_SUCCESS;
             }))
+            .build();
+    }
+
+    private LiteralCommandNode<CommandSourceStack> getEvaluateCommandNode() {
+        return Commands.literal("evaluate")
+            .then(
+                Commands.argument("expression", ArgumentTypes.signedMessage())
+                    .then(Commands.argument("scale", IntegerArgumentType.integer()).executes(ctx -> {
+                        final var expression = ctx.getArgument("expression", SignedMessageResolver.class);
+                        final var scale = ctx.getArgument("scale", Integer.class);
+                        final double result = CalcExpEvaluator.getDefaultEvaluator().evaluate(expression.content()) * scale;
+                        ctx.getSource().getSender().sendMessage(Component.text("演算結果: ").append(Component.text(result)));
+                        return (int) result;
+                    }))
+                    .executes(ctx -> {
+                        final var expression = ctx.getArgument("expression", SignedMessageResolver.class);
+                        final double result = CalcExpEvaluator.getDefaultEvaluator().evaluate(expression.content());
+                        ctx.getSource().getSender().sendMessage(Component.text("演算結果: ").append(Component.text(result)));
+                        return (int) result;
+                    })
+            )
             .build();
     }
 
