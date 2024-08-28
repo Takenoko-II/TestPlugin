@@ -1,7 +1,7 @@
 name: TestPlugin
 version: '${project.version}'
 main: com.gmail.subnokoii78.testplugin.TestPlugin
-api-version: '1.20'
+api-version: '1.21'
 commands:
   lobby:
     description: '実行者・もしくは指定のプレイヤーをロビーサーバーに転送します'

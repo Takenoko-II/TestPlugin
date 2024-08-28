@@ -7,14 +7,11 @@ import com.gmail.subnokoii78.util.event.CustomEvents;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
 import com.gmail.subnokoii78.util.file.json.JSONObject;
 import com.gmail.subnokoii78.util.file.json.JSONSerializer;
-import com.gmail.subnokoii78.util.function.TiFunction;
 import com.gmail.subnokoii78.util.other.CalcExpEvalException;
 import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
 import com.gmail.subnokoii78.util.ui.ChestUIClickEvent;
 import com.gmail.subnokoii78.util.ui.ContainerUI;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -33,9 +30,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
