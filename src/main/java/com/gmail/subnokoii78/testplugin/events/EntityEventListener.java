@@ -5,6 +5,7 @@ import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.testplugin.particles.FontParticleHandler;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
+import com.gmail.subnokoii78.util.other.PaperVelocityManager;
 import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
@@ -84,13 +85,11 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                     if (parameters.length != 1) return;
 
                     for (final Entity target : targets) {
-                        if (!(target instanceof Player)) continue;
+                        if (!(target instanceof Player player)) continue;
 
-                        final BungeeCordUtils.ServerType serverType = BungeeCordUtils.ServerType.from(parameters[0]);
+                        final PaperVelocityManager.BoAServerType serverType = PaperVelocityManager.BoAServerType.valueOf(parameters[0].toUpperCase());
 
-                        if (serverType == null) return;
-
-                        BungeeCordUtils.transfer((Player) target, serverType);
+                        TestPlugin.getPaperVelocityManager().transfer(player, serverType);
                     }
 
                     break;

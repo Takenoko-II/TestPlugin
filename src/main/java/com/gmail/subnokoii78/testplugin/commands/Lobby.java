@@ -1,6 +1,7 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
-import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
+import com.gmail.subnokoii78.testplugin.TestPlugin;
+import com.gmail.subnokoii78.util.other.PaperVelocityManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.Command;
@@ -24,7 +25,7 @@ public class Lobby implements CommandExecutor, TabCompleter {
                 return false;
             }
 
-            BungeeCordUtils.transfer((Player) commandSender, BungeeCordUtils.ServerType.LOBBY);
+            TestPlugin.getPaperVelocityManager().transfer((Player) commandSender, PaperVelocityManager.BoAServerType.LOBBY);
         }
         else {
             if (!commandSender.isOp()) {
@@ -39,7 +40,7 @@ public class Lobby implements CommandExecutor, TabCompleter {
                 return false;
             }
 
-            BungeeCordUtils.transfer(player, BungeeCordUtils.ServerType.LOBBY);
+            TestPlugin.getPaperVelocityManager().transfer(player, PaperVelocityManager.BoAServerType.LOBBY);
         }
 
         commandSender.sendMessage("lobbyサーバーへの接続を試行中...");

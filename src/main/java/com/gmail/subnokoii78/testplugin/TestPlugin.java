@@ -9,7 +9,7 @@ import com.gmail.subnokoii78.util.file.json.JSONObject;
 import com.gmail.subnokoii78.util.file.json.JSONSerializer;
 import com.gmail.subnokoii78.util.other.CalcExpEvalException;
 import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
-import com.gmail.subnokoii78.util.ui.ChestUIClickEvent;
+import com.gmail.subnokoii78.util.other.PaperVelocityManager;
 import com.gmail.subnokoii78.util.ui.ContainerUI;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -34,6 +34,8 @@ import java.util.*;
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
 
+    private static PaperVelocityManager paperVelocityManager;
+
     @Override
     public void onLoad() {
         getLogger().info("TestPluginを読み込んでいます...");
@@ -43,6 +45,7 @@ public final class TestPlugin extends JavaPlugin {
     public void onEnable() {
         // 準備
         plugin = this;
+        paperVelocityManager = PaperVelocityManager.register(plugin);
 
         PluginDirectoryManager.init();
 
@@ -52,8 +55,7 @@ public final class TestPlugin extends JavaPlugin {
         CustomEvents.init();
         PlayerEventListener.init();
         EntityEventListener.init();
-        ChestUIClickEvent.Listener.init();
-        ContainerUI.UIEventHandler.init();
+        ContainerUI.UIEventHandler.init(this);
         TickEventListener.init();
 
         // コマンド登録
@@ -192,6 +194,10 @@ public final class TestPlugin extends JavaPlugin {
      */
     public static TestPlugin getInstance() {
         return plugin;
+    }
+
+    public static PaperVelocityManager getPaperVelocityManager() {
+        return paperVelocityManager;
     }
 
     /**

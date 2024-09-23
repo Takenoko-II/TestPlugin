@@ -2,10 +2,10 @@ package com.gmail.subnokoii78.testplugin.events;
 
 import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.testplugin.particles.FontParticleHandler;
 import com.gmail.subnokoii78.util.event.data.PlayerClickEvent;
 import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
+import com.gmail.subnokoii78.util.other.PaperVelocityManager;
 import com.gmail.subnokoii78.util.other.ScheduleUtils;
 import com.gmail.subnokoii78.util.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii78.util.other.DisplayEditor;
@@ -204,7 +204,7 @@ public class PlayerEventListener implements Listener {
                 }
                 case "server_selector": {
                     event.cancel();
-                    BungeeCordUtils.openServerSelector(player);
+                    TestPlugin.getPaperVelocityManager().getServerSelector().open(player);
                     break;
                 }
                 case "magic": {
@@ -434,8 +434,7 @@ public class PlayerEventListener implements Listener {
 
         if (from.equals(World.Environment.NORMAL) && to.equals(World.Environment.NETHER)) {
             event.setCancelled(true);
-            BungeeCordUtils.transfer(event.getPlayer(), BungeeCordUtils.ServerType.GAME);
-            event.getPlayer().sendMessage("gameサーバーへの接続を試行中...");
+            TestPlugin.getPaperVelocityManager().transfer(event.getPlayer(), PaperVelocityManager.BoAServerType.GAME);
         }
     }
 
