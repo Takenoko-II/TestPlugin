@@ -39,15 +39,7 @@ public final class PluginDirectoryManager {
     }
 
     public static void reloadConfig() {
-        TextFileUtils.create(
-            TestPlugin.CONFIG_FILE_PATH,
-            """
-            {
-                "test": 0
-            }
-            """
-        );
-
+        TextFileUtils.create(TestPlugin.CONFIG_FILE_PATH, "{}");
         jsonObject = new JSONFileHandler(TestPlugin.CONFIG_FILE_PATH).readObject();
     }
 

@@ -204,7 +204,7 @@ public class PlayerEventListener implements Listener {
                 }
                 case "server_selector": {
                     event.cancel();
-                    TestPlugin.getPaperVelocityManager().getServerSelector().open(player);
+                    TestPlugin.getPaperVelocityManager().openServerSelector(player);
                     break;
                 }
                 case "magic": {
