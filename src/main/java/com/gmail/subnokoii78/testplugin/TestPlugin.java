@@ -4,12 +4,12 @@ import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.commands.brigadier.CommandNodes;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
+import com.gmail.subnokoii78.util.command.PluginDebugger;
 import com.gmail.subnokoii78.util.event.CustomEventHandlerRegistry;
 import com.gmail.subnokoii78.util.event.CustomEventType;
 import com.gmail.subnokoii78.util.event.CustomEvents;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
 import com.gmail.subnokoii78.util.ui.ContainerUI;
-import com.gmail.subnokoii78.util.ui.ItemButton;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -59,6 +59,7 @@ public final class TestPlugin extends JavaPlugin {
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final var registrar = event.registrar();
+            PluginDebugger.INSTANCE.init(registrar);
             for (final CommandNodes node : CommandNodes.values()) {
                 registrar.register(node.getNode());
             }

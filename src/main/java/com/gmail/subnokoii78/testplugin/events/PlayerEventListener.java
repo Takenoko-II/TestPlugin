@@ -2,15 +2,13 @@ package com.gmail.subnokoii78.testplugin.events;
 
 import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
+import com.gmail.subnokoii78.util.event.CustomEventHandlerRegistry;
+import com.gmail.subnokoii78.util.event.CustomEventType;
 import com.gmail.subnokoii78.util.event.data.PlayerClickEvent;
-import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
-import com.gmail.subnokoii78.util.other.ScheduleUtils;
 import com.gmail.subnokoii78.util.scoreboard.ScoreboardUtils;
-import com.gmail.subnokoii78.util.other.DisplayEditor;
 import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
-import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.Shape;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
 import net.kyori.adventure.text.Component;
@@ -59,19 +57,49 @@ public class PlayerEventListener implements Listener {
     }
 
     private static void registerPluginEvents() {
-        TestPlugin.events().onLeftClick(event -> {
-            instance.onLeftClick(event);
-
+        CustomEventHandlerRegistry.register(CustomEventType.PLAYER_LEFT_CLICK, event -> {
             final Player player = event.getPlayer();
-            final ItemStack itemStack = event.getItemStack();
+            final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
+
+            if (itemStack.getItemMeta() == null) return;
+
+            final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
+
+            if (tag != null) {
+                switch (tag) {
+                    case "instant_shoot_bow": {
+                        final int count = Objects.requireNonNullElse(shootableCountByLeftClick.get(player), 0);
+
+                        if (count <= 0) {
+                            player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 5f, 1f);
+                            break;
+                        }
+
+                        shootableCountByLeftClick.put(player, count - 1);
+
+                        final Vector3Builder vector = DualAxisRotationBuilder.from(player.getLocation())
+                            .getDirection3d();
+
+                        final Arrow arrow = player.getWorld().spawnArrow(player.getEyeLocation(), vector.toBukkitVector(), 1.6f, 12f);
+                        arrow.setCritical(true);
+                        arrow.setDamage(4d);
+                        arrow.setLifetimeTicks(1200);
+                        arrow.setShooter(player);
+                        arrow.setHasLeftShooter(false);
+
+                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 5f, 1f);
+                        break;
+                    }
+                }
+            }
 
             if (player.getScoreboardTags().contains("plugin_api.disable_left_click")) {
                 event.cancel();
             }
 
             ScoreboardUtils
-            .getOrCreateObjective("plugin_api.on_left_click")
-            .addScore(player, 1);
+                .getOrCreateObjective("plugin_api.on_left_click")
+                .addScore(player, 1);
 
             final String type = new ItemStackDataContainerManager(itemStack).getString("on_left_click.type");
             final String content = new ItemStackDataContainerManager(itemStack).getString("on_left_click.content");
@@ -85,42 +113,16 @@ public class PlayerEventListener implements Listener {
                         break;
                 }
             }
-
-            if (new ItemStackDataContainerManager(itemStack).equals("custom_item_tag", "slash")) {
-                final Vector3Builder.LocalAxisProvider axes = DualAxisRotationBuilder.from(player).getDirection3d().getLocalAxisProvider();
-
-                final Vector3Builder displayPos = Vector3Builder.from(player)
-                .add(new Vector3Builder(0, 1.3, 0))
-                .add(axes.getZ().scale(1.75));
-
-                final Quaternionf quaternion = TripleAxisRotationBuilder.from(DualAxisRotationBuilder.from(player))
-                    .add(new TripleAxisRotationBuilder(0, 0, (float) (Math.random() * 180 - 90)))
-                    .getQuaternion4d();
-
-                final Display display = DisplayEditor
-                    .spawnItemDisplay(
-                        displayPos.withWorld(player.getWorld()),
-                        new ItemStackBuilder(Material.KNOWLEDGE_BOOK).customModelData(24792).build()
-                    )
-                    .setScale(new Vector3Builder(5, 3, 0.1))
-                    .setLeftRotation(quaternion)
-                    .getEntity();
-
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 3f, 1.2f);
-
-                ScheduleUtils.runTimeoutByGameTick(display::remove, 8L);
-            }
         });
 
-        TestPlugin.events().onRightClick(event -> {
+        CustomEventHandlerRegistry.register(CustomEventType.PLAYER_RIGHT_CLICK, event -> {
             final Player player = event.getPlayer();
-            final ItemStack itemStack = event.getItemStack();
-
             ScoreboardUtils
-            .getOrCreateObjective("plugin_api.on_right_click")
-            .addScore(player, 1);
+                .getOrCreateObjective("plugin_api.on_right_click")
+                .addScore(player, 1);
 
-            if (itemStack == null) return;
+            final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
+            if (itemStack.getItemMeta() == null) return;
 
             final String type = new ItemStackDataContainerManager(itemStack).getString("on_right_click.type");
             final String content = new ItemStackDataContainerManager(itemStack).getString("on_right_click.content");
@@ -134,10 +136,14 @@ public class PlayerEventListener implements Listener {
             }
         });
 
-        TestPlugin.events().onCustomItemUse(event -> {
+        CustomEventHandlerRegistry.register(CustomEventType.PLAYER_CLICK, event -> {
             final Player player = event.getPlayer();
 
-            switch (event.getTag()) {
+            final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
+
+            if (itemStack.getItemMeta() == null) return;
+
+            switch (new ItemStackDataContainerManager(itemStack).getString("custom_item_tag")) {
                 case "quick_teleporter": {
                     event.cancel();
 
@@ -149,8 +155,8 @@ public class PlayerEventListener implements Listener {
                     final Vector3Builder direction = DualAxisRotationBuilder.from(player).getDirection3d();
 
                     final Location destination = Vector3Builder.from(block, face)
-                    .subtract(direction.length(0.5d))
-                    .withLocation(player.getLocation());
+                        .subtract(direction.length(0.5d))
+                        .withLocation(player.getLocation());
 
                     player.teleport(destination);
                     player.getWorld().playSound(destination, Sound.ENTITY_ENDERMAN_TELEPORT, 10.0f, 2.0f);
@@ -208,19 +214,15 @@ public class PlayerEventListener implements Listener {
                     break;
                 }
                 case "magic": {
-                    final Runnable runner = () -> {
-                        final Vector3Builder.LocalAxisProvider localAxes = DualAxisRotationBuilder.from(player).getDirection3d().getLocalAxisProvider();
-                        final Vector3Builder x = localAxes.getX().length(Math.floor(Math.random() * 10) + 1 - 5);
-                        final Vector3Builder y = localAxes.getY().length(Math.floor(Math.random() * 5 + 1 - 2.5));
-
-                        magicCircle(player, x.copy().add(y), (float) (Math.floor(Math.random() * 4) + 2));
-                        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 10f, 0.8f);
-                    };
-
-                    ScheduleUtils.runTimeoutByGameTick(runner, 0);
+                    final Vector3Builder.LocalAxisProvider localAxes = DualAxisRotationBuilder.from(player).getDirection3d().getLocalAxisProvider();
+                    final Vector3Builder x = localAxes.getX().length(Math.floor(Math.random() * 10) + 1 - 5);
+                    final Vector3Builder y = localAxes.getY().length(Math.floor(Math.random() * 5 + 1 - 2.5));
+                    magicCircle(player, x.copy().add(y), (float) (Math.floor(Math.random() * 4) + 2));
+                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 10f, 0.8f);
 
                     break;
                 }
+                case null, default: break;
             }
         });
     }
@@ -317,33 +319,7 @@ public class PlayerEventListener implements Listener {
 
         final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
 
-        if (tag != null) {
-            switch (tag) {
-                case "instant_shoot_bow": {
-                    final int count = Objects.requireNonNullElse(shootableCountByLeftClick.get(player), 0);
 
-                    if (count <= 0) {
-                        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 5f, 1f);
-                        break;
-                    }
-
-                    shootableCountByLeftClick.put(player, count - 1);
-
-                    final Vector3Builder vector = DualAxisRotationBuilder.from(player.getLocation())
-                    .getDirection3d();
-
-                    final Arrow arrow = player.getWorld().spawnArrow(player.getEyeLocation(), vector.toBukkitVector(), 1.6f, 12f);
-                    arrow.setCritical(true);
-                    arrow.setDamage(4d);
-                    arrow.setLifetimeTicks(1200);
-                    arrow.setShooter(player);
-                    arrow.setHasLeftShooter(false);
-
-                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 5f, 1f);
-                    break;
-                }
-            }
-        }
     }
 
     private static void magicCircle(Player player, Vector3Builder offset, float size) {

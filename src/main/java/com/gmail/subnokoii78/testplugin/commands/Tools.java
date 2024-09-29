@@ -91,7 +91,7 @@ public class Tools implements CommandExecutor, TabCompleter {
                         potion.potionContents().addContent(damage);
                         potion.potionContents().addContent(health);
                         potion.potionContents().setColor(Color.BLACK);
-                        potion.potionContents().setShowInTooltip(false);
+                        potion.hideAdditionalTooltip().enable();
                         potion.itemName().setItemName(Component.text("断命のスプラッシュポーション"));
                         potion.lore().addLore(Component.text("即死").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.RED));
                         potion.enchantmentGlintOverride().setGlintOverride(true);
@@ -127,6 +127,8 @@ public class Tools implements CommandExecutor, TabCompleter {
                         event.getPlayer().getInventory().addItem(itemStackBuilder.build());
                     })
             );
+
+        ui.onClose(viewer -> ui.freeUpMemory());
 
         ui.open(player);
 

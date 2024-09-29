@@ -1,12 +1,18 @@
 package com.gmail.subnokoii78.testplugin.events;
 
+import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.testplugin.system.PlayerComboHandler;
+import com.gmail.subnokoii78.util.event.DataPackMessageReceiveEvent;
 import com.gmail.subnokoii78.util.event.PlayerLeftClickEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public final class CustomEventListener {
     public static final CustomEventListener INSTANCE = new CustomEventListener();
@@ -31,5 +37,9 @@ public final class CustomEventListener {
         else {
             handler.stopCombo();
         }
+    }
+
+    public void onDataPackMessageReceive(DataPackMessageReceiveEvent event) {
+
     }
 }

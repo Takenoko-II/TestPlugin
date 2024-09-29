@@ -5,6 +5,8 @@ import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.testplugin.particles.FontParticleHandler;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
+import com.gmail.subnokoii78.util.event.CustomEventHandlerRegistry;
+import com.gmail.subnokoii78.util.event.CustomEventType;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
 import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
