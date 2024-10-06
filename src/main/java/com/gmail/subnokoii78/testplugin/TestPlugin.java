@@ -59,7 +59,7 @@ public final class TestPlugin extends JavaPlugin {
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final var registrar = event.registrar();
-            PluginDebugger.INSTANCE.init(registrar);
+            PluginDebugger.INSTANCE.init("tspldebugger", registrar);
             for (final CommandNodes node : CommandNodes.values()) {
                 registrar.register(node.getNode());
             }
