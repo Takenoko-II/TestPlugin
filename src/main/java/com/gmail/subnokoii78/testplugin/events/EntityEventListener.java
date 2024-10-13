@@ -186,7 +186,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
                         box.showOutline();
                     }
 
-                    for (final Entity entity : box.getIntersection()) {
+                    for (final Entity entity : box.getIntersectingEntitiesBySAT()) {
                         entity.addScoreboardTag("plugin_api.box_intersection");
                     }
 

@@ -113,7 +113,7 @@ public class Tools implements CommandExecutor, TabCompleter {
 
                         sword.attributeModifiers().setModifiers(new TypedAttributeModifier[]{attackDamage, attackSpeed});
                         sword.attributeModifiers().setShowInTooltip(false);
-                        sword.unbreakable().setUnbreakable(true);
+                        sword.unbreakable().enable();
                         sword.unbreakable().setShowInTooltip(false);
                         sword.itemName().setItemName(Component.text("Sword of Overwrite").color(NamedTextColor.GOLD));
                         sword.lore().addLore(Component.text(""));

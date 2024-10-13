@@ -5,22 +5,34 @@ import com.gmail.subnokoii78.testplugin.commands.brigadier.CommandNodes;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
 import com.gmail.subnokoii78.util.command.PluginDebugger;
-import com.gmail.subnokoii78.util.event.CustomEventHandlerRegistry;
-import com.gmail.subnokoii78.util.event.CustomEventType;
-import com.gmail.subnokoii78.util.event.CustomEvents;
+import com.gmail.subnokoii78.util.event.*;
+import com.gmail.subnokoii78.util.execute.*;
+import com.gmail.subnokoii78.util.file.json.JSONObject;
+import com.gmail.subnokoii78.util.file.json.JSONValueType;
+import com.gmail.subnokoii78.util.file.json.TypedJSONArray;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
+import com.gmail.subnokoii78.util.shape.DustSpawner;
+import com.gmail.subnokoii78.util.shape.ParticleSpawner;
+import com.gmail.subnokoii78.util.shape.ShapeTemplate;
+import com.gmail.subnokoii78.util.shape.StraightLine;
 import com.gmail.subnokoii78.util.ui.ContainerUI;
+import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
+import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
+import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
+import com.gmail.subnokoii78.util.vector.Vector3Builder;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
+import org.bukkit.*;
 import org.bukkit.command.*;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
@@ -68,6 +80,66 @@ public final class TestPlugin extends JavaPlugin {
         CustomEventHandlerRegistry.init(this);
 
         CustomEventHandlerRegistry.register(CustomEventType.PLAYER_LEFT_CLICK, CustomEventListener.INSTANCE::onLeftClick);
+
+        DataPackMessageReceiveEvent.DataPackMessageReceiverRegistry.INSTANCE.register("bounding_box", event -> {
+            final JSONObject message = event.getMessage();
+            final TiltedBoundingBox box = new TiltedBoundingBox(
+                message.get("width", JSONValueType.NUMBER).doubleValue(),
+                message.get("height", JSONValueType.NUMBER).doubleValue(),
+                message.get("depth", JSONValueType.NUMBER).doubleValue()
+            );
+
+            final float roll = message.get("roll", JSONValueType.NUMBER).floatValue();
+
+            box.put(event.getSender().getWorld(), Vector3Builder.from(event.getSender().getLocation()));
+            box.rotate(new TripleAxisRotationBuilder(event.getSender().getYaw(), event.getSender().getPitch(), roll));
+
+            final Set<Entity> entities = box.getIntersectingEntitiesBySAT();
+
+            if (entities.size() < 2) {
+                box.showOutline();
+            }
+            else {
+                box.showOutline(Color.RED);
+            }
+        });
+
+        DataPackMessageReceiveEvent.DataPackMessageReceiverRegistry.INSTANCE.register("y", event -> {
+            final DualAxisRotationBuilder d = DualAxisRotationBuilder.from(event.getSender());
+            final TripleAxisRotationBuilder t = TripleAxisRotationBuilder.from(d).roll(45f);
+
+            final var a = d.getDirection3d().getLocalAxisProvider();
+            final var b = t.getLocalAxisProviderE();
+            System.out.println("x: " + a.getX().getAngleBetween(b.getX()));
+            System.out.println("y: " + a.getY().getAngleBetween(b.getY()));
+            System.out.println("z: " + a.getZ().getAngleBetween(b.getZ()));
+        });
+
+        DataPackMessageReceiveEvent.DataPackMessageReceiverRegistry.INSTANCE.register("a", event -> {
+            final DualAxisRotationBuilder d = DualAxisRotationBuilder.from(event.getSender());
+            final TripleAxisRotationBuilder t = TripleAxisRotationBuilder.from(d);
+            t.roll(event.getMessage().get("r", JSONValueType.NUMBER).floatValue());
+            TripleAxisRotationBuilder.LocalAxisProviderE l = t.getLocalAxisProviderE();
+            new Execute(new SourceStack(SourceOrigin.of(event.getSender())))
+                .run.callback(stack -> {
+                    drawVector(stack.getDimension(), stack.getPosition(), Color.RED, l.getZ());
+                    drawVector(stack.getDimension(), stack.getPosition(), Color.BLUE, l.getX());
+                    drawVector(stack.getDimension(), stack.getPosition(), Color.LIME, l.getY());
+
+                    return Execute.SUCCESS;
+                });
+        });
+    }
+
+    private void drawVector(World dimension, Vector3Builder center, Color color, Vector3Builder vector) {
+        new ShapeTemplate()
+            .scale(2)
+            .world(dimension)
+            .center(center)
+            .particle(new DustSpawner(new Particle.DustOptions(color, 0.5f)))
+            .rotation(TripleAxisRotationBuilder.from(vector.getRotation2d()))
+            .newShape(StraightLine.class)
+            .draw();
     }
 
     @Override
