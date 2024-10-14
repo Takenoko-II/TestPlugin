@@ -1,17 +1,16 @@
 package com.gmail.subnokoii78.testplugin.system;
 
 import com.gmail.subnokoii78.util.schedule.GameTickScheduler;
+import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
-public final class PlayerComboHandler {
-    private static final Map<Player, PlayerComboHandler> comboHandlerMap = new HashMap<>();
+public class PlayerComboHandler {
+    private static final Map<Player, PlayerComboHandler> playerHandlerPair = new HashMap<>();
 
     private PlayerComboHandler(Player player) {
         this.player = player;
@@ -34,9 +33,14 @@ public final class PlayerComboHandler {
         }
     });
 
-    public @Nullable Integer nextCombo() {
+    public int getCurrentComboCount() {
+        return comboCount;
+    }
+
+    public int nextCombo() {
         if (isInCoolTime) {
-            return null;
+            combo.onComboIsInCT(player);
+            return -1;
         }
 
         comboCount++;
@@ -45,7 +49,7 @@ public final class PlayerComboHandler {
         // リログ時に新しくServerPlayerオブジェクトが作られることを願って()
         new GameTickScheduler(() -> isInCoolTime = false).runTimeout(combo.coolTime);
 
-        final int nextCount = comboCount;
+        final int nextComboCount = comboCount;
 
         if (comboCount >= combo.maxCombo) {
             // コンボ完成
@@ -58,7 +62,8 @@ public final class PlayerComboHandler {
             scheduler.runTimeout(combo.timeToReset);
             isAwaitingNextCombo = true;
         }
-        return nextCount;
+
+        return nextComboCount;
     }
 
     public void stopCombo() {
@@ -78,12 +83,12 @@ public final class PlayerComboHandler {
     }
 
     public static PlayerComboHandler getHandler(Player player) {
-        if (comboHandlerMap.containsKey(player)) {
-            return comboHandlerMap.get(player);
+        if (playerHandlerPair.containsKey(player)) {
+            return playerHandlerPair.get(player);
         }
         else {
             final PlayerComboHandler handler = new PlayerComboHandler(player);
-            comboHandlerMap.put(player, handler);
+            playerHandlerPair.put(player, handler);
             return handler;
         }
     }
@@ -113,14 +118,21 @@ public final class PlayerComboHandler {
             return coolTime;
         }
 
-        public abstract void onComboComplete(Player player);
+        public void onComboIsInCT(Player player) {}
 
-        public abstract void onComboStop(Player player);
+        public void onComboComplete(Player player) {}
+
+        public void onComboStop(Player player) {}
 
         public static final Combo FOR_DEBUG = new Combo(3, 30, 6) {
             @Override
+            public void onComboIsInCT(Player player) {
+                player.sendMessage(Component.text("onComboIsInCT").color(NamedTextColor.GRAY));
+            }
+
+            @Override
             public void onComboComplete(Player player) {
-                player.sendMessage(Component.text("onBeforeComboComplete").color(NamedTextColor.GREEN));
+                player.sendMessage(Component.text("onComboComplete").color(NamedTextColor.GREEN));
             }
 
             @Override

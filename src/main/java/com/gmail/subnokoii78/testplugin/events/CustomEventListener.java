@@ -5,6 +5,10 @@ import com.gmail.subnokoii78.testplugin.system.PlayerComboHandler;
 import com.gmail.subnokoii78.util.event.DataPackMessageReceiveEvent;
 import com.gmail.subnokoii78.util.event.DataPackMessageReceiverRegistry;
 import com.gmail.subnokoii78.util.event.PlayerLeftClickEvent;
+import com.gmail.subnokoii78.util.execute.EntityAnchorType;
+import com.gmail.subnokoii78.util.execute.Execute;
+import com.gmail.subnokoii78.util.execute.SourceOrigin;
+import com.gmail.subnokoii78.util.execute.SourceStack;
 import com.gmail.subnokoii78.util.file.json.JSONObject;
 import com.gmail.subnokoii78.util.file.json.JSONValueType;
 import com.gmail.subnokoii78.util.file.json.TypedJSONArray;
@@ -19,6 +23,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -26,6 +31,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public final class CustomEventListener {
@@ -34,22 +40,70 @@ public final class CustomEventListener {
     private CustomEventListener() {}
 
     public void onLeftClick(PlayerLeftClickEvent event) {
-        final PlayerComboHandler handler = PlayerComboHandler.getHandler(event.getPlayer());
+        // 左クリックしたプレイヤー
+        final Player player = event.getPlayer();
+        // プレイヤーの右手にあるアイテム
+        final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
+        // プレイヤーのコンボを管理するためのオブジェクト
+        final PlayerComboHandler handler = PlayerComboHandler.getHandler(player);
 
-        final ItemStack itemStack = event.getPlayer().getEquipment().getItem(EquipmentSlot.HAND);
-
+        // 鉄剣じゃなかったらreturn
         if (!itemStack.getType().equals(Material.IRON_SWORD)) return;
 
-        if (PlayerLeftClickEvent.Action.ENTITY_HIT.equals(event.getAction())) {
-            final Integer currentCount = handler.nextCombo();
-            if (currentCount == null) {
-                event.getPlayer().sendMessage(Component.text("CT中").color(NamedTextColor.GRAY));
-                event.cancel();
-            }
-            else event.getPlayer().sendMessage(Component.text("段数: " + currentCount));
+        // 鉄剣持ってたら殴りとかブロック破壊をキャンセル
+        event.cancel();
+
+        // 横4, 縦0.5, 奥行き2のボックス
+        final TiltedBoundingBox box = new TiltedBoundingBox(4, 0.5, 2);
+
+        new Execute(new SourceStack(SourceOrigin.of(player)))
+            .anchored(EntityAnchorType.EYES)
+            .positioned.$("^ ^ ^1")
+            .run.callback(stack -> {
+                // 適切な位置にボックス設置
+                box.put(stack.getAsBukkitLocation());
+                return Execute.SUCCESS;
+            });
+
+        // 現在の段数に応じて角度決定
+        box.rotation(box.rotation().roll(switch (handler.getCurrentComboCount()) {
+            case 0 -> -60f;
+            case 1 -> 30f;
+            case 2 -> 90f;
+            default -> throw new IllegalStateException("NEVER HAPPENS");
+        }));
+
+        // 外枠表示
+        box.showOutline(Color.RED);
+
+        // ボックスに衝突しているエンティティを取得
+        final Set<Entity> entities = new HashSet<>(box.getCollidingEntities());
+        // プレイヤー本人は除外
+        entities.remove(player);
+
+        if (entities.isEmpty()) {
+            // 衝突してるエンティティいなければコンボ止める
+            handler.stopCombo();
         }
         else {
-            handler.stopCombo();
+            // コンボを次に進める
+            int comboCount = handler.nextCombo();
+
+            // CT中の場合-1が返るので条件式は>0
+            if (comboCount > 0) {
+                // CT中じゃなければダメージとメッセージ
+                entities.forEach(entity -> {
+                    if (entity instanceof Damageable damageable) {
+                        damageable.damage(2, player);
+                    }
+                });
+
+                player.sendMessage(Component.text("段数: " + comboCount));
+            }
+            else {
+                // CT中のとき
+                player.sendMessage(Component.text("CT中").color(NamedTextColor.GRAY));
+            }
         }
     }
 
