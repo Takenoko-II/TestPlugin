@@ -21,7 +21,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 
-public enum CommandNodes {
+public enum BrigadierCommandNodes {
     FOO {
         public LiteralCommandNode<CommandSourceStack> getNode() {
             return Commands.literal("foo")

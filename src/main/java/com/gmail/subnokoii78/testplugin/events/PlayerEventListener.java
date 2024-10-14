@@ -4,8 +4,10 @@ import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.util.event.CustomEventHandlerRegistry;
 import com.gmail.subnokoii78.util.event.CustomEventType;
-import com.gmail.subnokoii78.util.event.data.PlayerClickEvent;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
+import com.gmail.subnokoii78.util.execute.Execute;
+import com.gmail.subnokoii78.util.execute.SourceOrigin;
+import com.gmail.subnokoii78.util.execute.SourceStack;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
 import com.gmail.subnokoii78.util.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
@@ -107,7 +109,8 @@ public class PlayerEventListener implements Listener {
             if (type != null && content != null) {
                 switch (type) {
                     case "run_command":
-                        TestPlugin.runCommandAsEntity(player, content);
+                        new Execute(new SourceStack(SourceOrigin.of(player)))
+                            .run.command(content);
                         break;
                     case "multiple":
                         break;
@@ -130,7 +133,8 @@ public class PlayerEventListener implements Listener {
             if (type != null && content != null) {
                 switch (type) {
                     case "run_command":
-                        TestPlugin.runCommandAsEntity(player, content);
+                        new Execute(new SourceStack(SourceOrigin.of(player)))
+                            .run.command(content);
                         break;
                 }
             }
@@ -299,27 +303,6 @@ public class PlayerEventListener implements Listener {
         }
 
         inventory.addItem(serverSelector);
-    }
-
-    @EventHandler
-    public void onLogin(PlayerLoginEvent event) {
-        final Player player = event.getPlayer();
-
-        TestPlugin.log(TestPlugin.LoggingTarget.PLUGIN, player.getName() + " joined the server.");
-    }
-
-    @EventHandler
-    public void onLeave(PlayerQuitEvent event) {
-        TestPlugin.log(TestPlugin.LoggingTarget.PLUGIN, event.getPlayer().getName() + " left.");
-    }
-
-    public void onLeftClick(PlayerClickEvent event) {
-        final Player player = event.getPlayer();
-        final ItemStack itemStack = event.getItemStack();
-
-        final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
-
-
     }
 
     private static void magicCircle(Player player, Vector3Builder offset, float size) {

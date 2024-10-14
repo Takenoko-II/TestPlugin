@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 import java.util.function.Consumer;
 
+@Deprecated
 public class CustomEvents implements Listener {
     private static CustomEvents instance;
 

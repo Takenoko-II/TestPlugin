@@ -1,16 +1,8 @@
 package com.gmail.subnokoii78.testplugin.events;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
-import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.testplugin.particles.FontParticleHandler;
 import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
-import com.gmail.subnokoii78.util.event.CustomEventHandlerRegistry;
-import com.gmail.subnokoii78.util.event.CustomEventType;
-import com.gmail.subnokoii78.util.other.PaperVelocityManager;
-import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
-import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
-import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -24,8 +16,6 @@ import org.bukkit.loot.Lootable;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
-import org.bukkit.util.Transformation;
-import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -46,163 +36,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
             Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.getInstance());
             instance.runTaskTimer(TestPlugin.getInstance(), 0L, 1L);
-
-            registerPluginEvents();
         }
-    }
-
-    private static void registerPluginEvents() {
-        TestPlugin.events().onDataPackMessageReceive(event -> {
-            final String id = event.getId();
-            final String[] parameters = event.getParameters();
-            final Entity[] targets = event.getTargets();
-
-            switch (id) {
-                case "logging": {
-                    if (parameters.length < 1) return;
-
-                    final String message = String.join(" ", parameters);
-
-                    TestPlugin.log(TestPlugin.LoggingTarget.ALL, message);
-
-                    break;
-                }
-                case "knockback": {
-                    if (parameters.length != 3) return;
-
-                    try {
-                        final double x = Double.parseDouble(parameters[0]);
-                        final double y = Double.parseDouble(parameters[1]);
-                        final double z = Double.parseDouble(parameters[2]);
-
-                        for (final Entity target : targets) {
-                            target.setVelocity(target.getVelocity().add(new Vector(x, y, z)));
-                        }
-                    }
-                    catch (IllegalArgumentException ignored) {}
-
-                    break;
-                }
-                case "transfer": {
-                    if (parameters.length != 1) return;
-
-                    for (final Entity target : targets) {
-                        if (!(target instanceof Player player)) continue;
-
-                        final PaperVelocityManager.BoAServerType serverType = PaperVelocityManager.BoAServerType.valueOf(parameters[0].toUpperCase());
-
-                        TestPlugin.getPaperVelocityManager().transfer(player, serverType);
-                    }
-
-                    break;
-                }
-                case "rotate_display": {
-                    if (parameters.length != 3) return;
-
-                    float yaw, pitch, roll;
-
-                    try {
-                        yaw = Float.parseFloat(parameters[0]);
-                        pitch = Float.parseFloat(parameters[1]);
-                        roll = Float.parseFloat(parameters[2]);
-                    }
-                    catch (IllegalArgumentException e) {
-                        return;
-                    }
-
-                    for (final Entity target : targets) {
-                        if (!(target instanceof Display display)) continue;
-
-                        final Transformation transformation = display.getTransformation();
-                        transformation.getLeftRotation()
-                            .set(new TripleAxisRotationBuilder(yaw, pitch, roll).getQuaternion4d());
-                        display.setTransformation(transformation);
-                    }
-
-                    break;
-                }
-                case "math": {
-                    if (parameters.length <= 1) return;
-
-                    final double x;
-
-                    try {
-                        x = Double.parseDouble(parameters[1]);
-                    }
-                    catch (IllegalArgumentException e) {
-                        return;
-                    }
-
-                    switch (parameters[0]) {
-                        case "sin": {
-                            event.returnValue(Math.sin(x * Math.PI / 180));
-                            break;
-                        }
-                        case "cos": {
-                            event.returnValue(Math.cos(x * Math.PI / 180));
-                            break;
-                        }
-                        case "tan": {
-                            event.returnValue(Math.tan(x * Math.PI / 180));
-                            break;
-                        }
-                        case "sqrt": {
-                            event.returnValue(Math.sqrt(x));
-                            break;
-                        }
-                        case "cbrt": {
-                            event.returnValue(Math.cbrt(x));
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-                case "spawn_bounding_box": {
-                    if (parameters.length < 5) return;
-
-                    double width, height, depth;
-                    boolean showOutline = parameters[3].equals("true") || parameters[3].equals("1") || parameters[3].equals("1b");
-                    float roll;
-
-                    try {
-                        width = Double.parseDouble(parameters[0]);
-                        height = Double.parseDouble(parameters[1]);
-                        depth = Double.parseDouble(parameters[2]);
-                        roll = Float.parseFloat(parameters[4]);
-                    }
-                    catch (IllegalArgumentException e) {
-                        return;
-                    }
-
-                    final TiltedBoundingBox box = new TiltedBoundingBox(width, height, depth);
-                    final Entity center = targets[0];
-                    final TripleAxisRotationBuilder rotation = TripleAxisRotationBuilder.from(DualAxisRotationBuilder.from(center));
-                    rotation.add(new TripleAxisRotationBuilder(0, 0, roll));
-                    box.put(center.getWorld(), Vector3Builder.from(center.getLocation()));
-                    box.rotate(rotation);
-
-                    if (showOutline) {
-                        box.showOutline();
-                    }
-
-                    for (final Entity entity : box.getIntersectingEntitiesBySAT()) {
-                        entity.addScoreboardTag("plugin_api.box_intersection");
-                    }
-
-                    break;
-                }
-                case "spawn_font_particle": {
-                    final Entity target = targets[0];
-
-                    if (target instanceof Player player) {
-                        FontParticleHandler.createBuilder("knight_slash_fourth").buildAndPlay(player);
-                    }
-
-                    break;
-                }
-            }
-        });
     }
 
     private EntityEventListener() {}

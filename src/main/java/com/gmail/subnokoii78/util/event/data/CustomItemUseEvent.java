@@ -8,6 +8,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+@Deprecated
 public class CustomItemUseEvent {
     private PlayerInteractEvent playerInteractEvent;
 

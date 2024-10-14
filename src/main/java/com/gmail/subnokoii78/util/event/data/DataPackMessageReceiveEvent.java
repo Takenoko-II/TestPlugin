@@ -5,6 +5,7 @@ import org.bukkit.entity.Entity;
 
 import java.util.Arrays;
 
+@Deprecated
 public class DataPackMessageReceiveEvent {
     private final Entity messenger;
 

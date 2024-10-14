@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class BungeeCordUtils {
     private BungeeCordUtils() {}
 
@@ -31,8 +32,6 @@ public class BungeeCordUtils {
         final byte[] data = output.toByteArray();
 
         player.sendPluginMessage(TestPlugin.getInstance(), "BungeeCord", data);
-
-        TestPlugin.log(TestPlugin.LoggingTarget.PLUGIN, player.getName() + "からBungeeCordチャンネルにプラグインメッセージが送信されました: [\"Connect\", \"" + serverType.name + "\"]");
     }
 
     public enum ServerType {
