@@ -3,11 +3,11 @@ package com.gmail.subnokoii78.testplugin.commands.brigadier;
 import com.gmail.subnokoii78.testplugin.PluginDirectoryManager;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
-import com.gmail.subnokoii78.util.file.json.JSONObject;
-import com.gmail.subnokoii78.util.file.json.JSONSerializer;
+import com.gmail.subnokoii78.util.file.json.*;
 import com.gmail.subnokoii78.util.other.CalcExpEvalException;
 import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -42,11 +42,41 @@ public enum BrigadierCommandNodes {
                     ctx.getSource().getSender().sendPlainMessage(TestPlugin.CONFIG_FILE_PATH + "をリロードしました");
                     return Command.SINGLE_SUCCESS;
                 }))
-                .then(Commands.literal("get").executes(ctx -> {
-                    final JSONObject jsonObject = PluginDirectoryManager.getConfig();
-                    ctx.getSource().getSender().sendMessage(new JSONSerializer(jsonObject).serialize());
-                    return Command.SINGLE_SUCCESS;
-                }))
+                .then(
+                    Commands.literal("get")
+                        .then(
+                            Commands.argument("path", StringArgumentType.string())
+                                .executes(ctx -> {
+                                    final JSONObject jsonObject = PluginDirectoryManager.getConfig();
+                                    final String path = ctx.getArgument("path", String.class);
+
+                                    if (!JSONPathAccessor.isValidPath(path)) {
+                                        ctx.getSource().getSender().sendMessage(Component.text("無効な形式のパスです").color(NamedTextColor.RED));
+                                        return 0;
+                                    }
+
+                                    if (jsonObject.has(path)) {
+                                        final Object value = jsonObject.get(path, jsonObject.getTypeOf(path));
+                                        if (value instanceof JSONValue<?> jsonValue) {
+                                            ctx.getSource().getSender().sendMessage(new JSONSerializer(jsonValue).serialize());
+                                        }
+                                        else {
+                                            ctx.getSource().getSender().sendMessage(value.toString());
+                                        }
+                                        return Command.SINGLE_SUCCESS;
+                                    }
+                                    else {
+                                        ctx.getSource().getSender().sendMessage(Component.text("そのパスは存在しません").color(NamedTextColor.RED));
+                                        return 0;
+                                    }
+                                })
+                        )
+                        .executes(ctx -> {
+                            final JSONObject jsonObject = PluginDirectoryManager.getConfig();
+                            ctx.getSource().getSender().sendMessage(new JSONSerializer(jsonObject).serialize());
+                            return Command.SINGLE_SUCCESS;
+                        })
+                )
                 .build();
         }
     },

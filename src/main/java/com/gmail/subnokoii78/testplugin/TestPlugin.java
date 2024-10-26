@@ -7,6 +7,7 @@ import com.gmail.subnokoii78.testplugin.events.TickEventListener;
 import com.gmail.subnokoii78.util.command.PluginDebugger;
 import com.gmail.subnokoii78.util.event.*;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
+import com.gmail.subnokoii78.util.schedule.GameTickScheduler;
 import com.gmail.subnokoii78.util.ui.ContainerUI;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.command.*;
@@ -28,6 +29,7 @@ public final class TestPlugin extends JavaPlugin {
         // 準備
         paperVelocityManager = PaperVelocityManager.register(this);
         PluginDirectoryManager.init();
+        GameTickScheduler.init(this);
 
         getLogger().info("TestPluginが起動しました");
 

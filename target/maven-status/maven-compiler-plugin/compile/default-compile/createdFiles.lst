@@ -17,7 +17,6 @@ com\gmail\subnokoii78\testplugin\commands\brigadier\BrigadierCommandNodes$3.clas
 com\gmail\subnokoii78\util\event\CustomEvents.class
 com\gmail\subnokoii78\util\event\data\PlayerClickEvent.class
 com\gmail\subnokoii78\testplugin\PluginDirectoryManager.class
-com\gmail\subnokoii78\util\schedule\GameTickScheduler.class
 com\gmail\subnokoii78\util\other\ScheduleUtils.class
 com\gmail\subnokoii78\testplugin\particles\FontParticleHandler.class
 com\gmail\subnokoii78\util\other\ScheduleUtils$2.class

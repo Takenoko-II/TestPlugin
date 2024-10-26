@@ -14,7 +14,6 @@ import com.gmail.subnokoii78.util.file.json.JSONValueType;
 import com.gmail.subnokoii78.util.file.json.TypedJSONArray;
 import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
-import com.gmail.subnokoii78.util.scoreboard.ScoreboardUtils;
 import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
 import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
@@ -107,8 +106,7 @@ public final class CustomEventListener {
         }
     }
 
-    public void onCallBoundingBox(DataPackMessageReceiveEvent event) {
-        final Entity sender = event.getMessenger();
+    public int onCallBoundingBox(DataPackMessageReceiveEvent event) {
         final JSONObject message = event.getMessage();
 
         final TypedJSONArray<Number> size = message.get("size", JSONValueType.ARRAY)
@@ -122,10 +120,8 @@ public final class CustomEventListener {
 
         final float roll = message.get("roll", JSONValueType.NUMBER).floatValue();
 
-        box.put(sender.getLocation());
+        box.put(event.getBukkitLocation());
         box.rotation(box.rotation().roll(roll));
-
-        sender.remove();
 
         final Set<Entity> entities = box.getCollidingEntities();
 
@@ -141,9 +137,11 @@ public final class CustomEventListener {
                 box.showOutline(Color.RED);
             }
         }
+
+        return 1;
     }
 
-    public void onCallKBVector3(DataPackMessageReceiveEvent event) {
+    public int onCallKBVector3(DataPackMessageReceiveEvent event) {
         final TypedJSONArray<Number> array = event.getMessage()
             .get("vector3", JSONValueType.ARRAY)
             .typed(JSONValueType.NUMBER);
@@ -162,10 +160,12 @@ public final class CustomEventListener {
                     .toBukkitVector()
             );
         });
+
+        return 1;
     }
 
-    public void onCallKBVector2(DataPackMessageReceiveEvent event) {
-        final DualAxisRotationBuilder vector2 = DualAxisRotationBuilder.from(event.getMessenger());
+    public int onCallKBVector2(DataPackMessageReceiveEvent event) {
+        final DualAxisRotationBuilder vector2 = DualAxisRotationBuilder.from(event.getBukkitLocation());
         final double strength = event.getMessage().get("strength", JSONValueType.NUMBER).doubleValue();
 
         event.getTargets().forEach(entity -> {
@@ -176,9 +176,11 @@ public final class CustomEventListener {
                     .toBukkitVector()
             );
         });
+
+        return 1;
     }
 
-    public void onCallRotateDisplay(DataPackMessageReceiveEvent event) {
+    public int onCallRotateDisplay(DataPackMessageReceiveEvent event) {
         final TypedJSONArray<Number> array = event.getMessage()
             .get("rotation", JSONValueType.ARRAY)
             .typed(JSONValueType.NUMBER);
@@ -196,9 +198,11 @@ public final class CustomEventListener {
             transformation.getLeftRotation().set(rotation.getQuaternion4d());
             display.setTransformation(transformation);
         }
+
+        return 1;
     }
 
-    public void onCallTransfer(DataPackMessageReceiveEvent event) {
+    public int onCallTransfer(DataPackMessageReceiveEvent event) {
         final PaperVelocityManager.BoAServerType serverType = PaperVelocityManager.BoAServerType.valueOf(
             event.getMessage().get("server", JSONValueType.STRING)
         );
@@ -208,22 +212,23 @@ public final class CustomEventListener {
 
             TestPlugin.getPaperVelocityManager().transfer(player, serverType);
         }
+
+        return 1;
     }
 
-    public void onCallLogging(DataPackMessageReceiveEvent event) {
+    public int onCallLogging(DataPackMessageReceiveEvent event) {
         TestPlugin.getInstance().getLogger().info(event.getMessage().get("message", JSONValueType.STRING));
+        return 1;
     }
 
-    public void onCallEvaluate(DataPackMessageReceiveEvent event) {
+    public int onCallEvaluate(DataPackMessageReceiveEvent event) {
         final String expression = event.getMessage().get("expression", JSONValueType.STRING);
-        final String objective = event.getMessage().get("objective", JSONValueType.STRING);
         final double value = CalcExpEvaluator.getDefaultEvaluator().evaluate(expression);
-        ScoreboardUtils.getOrCreateObjective(objective).setScore(event.getMessenger(), (int) value);
+        return (int) value;
     }
 
-    public void onCallIsEnabled(DataPackMessageReceiveEvent event) {
-        final String objective = event.getMessage().get("objective", JSONValueType.STRING);
-        ScoreboardUtils.getOrCreateObjective(objective).setScore(event.getMessenger(), 1);
+    public int onCallIsEnabled(DataPackMessageReceiveEvent event) {
+        return 1;
     }
 
     public void registerDataPackMessageIds() {
@@ -234,6 +239,6 @@ public final class CustomEventListener {
         DataPackMessageReceiverRegistry.register("transfer", CustomEventListener.INSTANCE::onCallTransfer);
         DataPackMessageReceiverRegistry.register("logging", CustomEventListener.INSTANCE::onCallLogging);
         DataPackMessageReceiverRegistry.register("evaluate", CustomEventListener.INSTANCE::onCallEvaluate);
-        DataPackMessageReceiverRegistry.register("isEnabled", CustomEventListener.INSTANCE::onCallIsEnabled);
+        DataPackMessageReceiverRegistry.register("is_enabled", CustomEventListener.INSTANCE::onCallIsEnabled);
     }
 }
