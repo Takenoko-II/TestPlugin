@@ -57,8 +57,8 @@ public enum BrigadierCommandNodes {
 
                                     if (jsonObject.has(path)) {
                                         final Object value = jsonObject.get(path, jsonObject.getTypeOf(path));
-                                        if (value instanceof JSONValue<?> jsonValue) {
-                                            ctx.getSource().getSender().sendMessage(new JSONSerializer(jsonValue).serialize());
+                                        if (value instanceof JSONStructure jsonValue) {
+                                            ctx.getSource().getSender().sendMessage(JSONSerializer.serialize(jsonValue));
                                         }
                                         else {
                                             ctx.getSource().getSender().sendMessage(value.toString());
@@ -73,7 +73,7 @@ public enum BrigadierCommandNodes {
                         )
                         .executes(ctx -> {
                             final JSONObject jsonObject = PluginDirectoryManager.getConfig();
-                            ctx.getSource().getSender().sendMessage(new JSONSerializer(jsonObject).serialize());
+                            ctx.getSource().getSender().sendMessage(JSONSerializer.serialize(jsonObject));
                             return Command.SINGLE_SUCCESS;
                         })
                 )

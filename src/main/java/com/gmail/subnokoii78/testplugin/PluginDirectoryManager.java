@@ -4,7 +4,7 @@ import com.gmail.subnokoii78.util.datacontainer.FileDataContainerManager;
 import com.gmail.subnokoii78.util.file.BinaryFileUtils;
 import com.gmail.subnokoii78.util.file.FolderUtils;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
-import com.gmail.subnokoii78.util.file.json.JSONFileHandler;
+import com.gmail.subnokoii78.util.file.json.JSONFile;
 import com.gmail.subnokoii78.util.file.json.JSONObject;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +40,7 @@ public final class PluginDirectoryManager {
 
     public static void reloadConfig() {
         TextFileUtils.create(TestPlugin.CONFIG_FILE_PATH, "{}");
-        jsonObject = new JSONFileHandler(TestPlugin.CONFIG_FILE_PATH).readObject();
+        jsonObject = new JSONFile(TestPlugin.CONFIG_FILE_PATH).readAsObject();
     }
 
     private static void deleteLegacy() {

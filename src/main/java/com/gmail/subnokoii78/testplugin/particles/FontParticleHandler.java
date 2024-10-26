@@ -163,11 +163,11 @@ public final class FontParticleHandler {
     }
 
     public static void reload() {
-        final JSONFileHandler handler = new JSONFileHandler(path);
+        final JSONFile handler = new JSONFile(path);
 
         if (!TextFileUtils.exist(path)) {
             TextFileUtils.create(path);
-            final var defaultObj = new JSONParser(
+            final var defaultObj = JSONParser.parseObject(
                 """
                 {
                     "knight_slash_fourth": {
@@ -185,14 +185,14 @@ public final class FontParticleHandler {
                     }
                 }
                 """
-            ).parseObject();
+            );
 
-            handler.writeObject(defaultObj);
+            handler.write(defaultObj);
 
             json = defaultObj;
         }
         else {
-            json = handler.readObject();
+            json = handler.readAsObject();
         }
     }
 
@@ -204,30 +204,13 @@ public final class FontParticleHandler {
         if (json == null) reload();
 
         final var definition = json.get(key, JSONValueType.OBJECT);
-        final JSONArray fontsArray = definition.get("font", JSONValueType.ARRAY);
-        final String font1 = fontsArray.get(0, JSONValueType.STRING);
-        final String font2 = fontsArray.get(1, JSONValueType.STRING);
+        final String font1 = definition.get("font[0]", JSONValueType.STRING);
+        final String font2 = definition.get("font[1]", JSONValueType.STRING);
         final int frameTime = definition.get("frame_time", JSONValueType.NUMBER).intValue();
         final int maxFrames = definition.get("max_frames", JSONValueType.NUMBER).intValue();
-        final JSONArray scaleArray = definition.get("scale", JSONValueType.ARRAY);
-        final Vector3Builder scale = new Vector3Builder(
-            scaleArray.get(0, JSONValueType.NUMBER).doubleValue(),
-            scaleArray.get(1, JSONValueType.NUMBER).doubleValue(),
-            scaleArray.get(2, JSONValueType.NUMBER).doubleValue()
-        );
-        final JSONObject offsets = definition.get("offsets", JSONValueType.OBJECT);
-        final JSONArray positionOffsetArray = offsets.get("position", JSONValueType.ARRAY);
-        final JSONArray rotationOffsetArray = offsets.get("rotation", JSONValueType.ARRAY);
-        final Vector3Builder positionOffset = new Vector3Builder(
-            positionOffsetArray.get(0, JSONValueType.NUMBER).doubleValue(),
-            positionOffsetArray.get(1, JSONValueType.NUMBER).doubleValue(),
-            positionOffsetArray.get(2, JSONValueType.NUMBER).doubleValue()
-        );
-        final TripleAxisRotationBuilder rotationOffset = new TripleAxisRotationBuilder(
-            rotationOffsetArray.get(0, JSONValueType.NUMBER).floatValue(),
-            rotationOffsetArray.get(1, JSONValueType.NUMBER).floatValue(),
-            rotationOffsetArray.get(2, JSONValueType.NUMBER).floatValue()
-        );
+        final Vector3Builder scale = definition.get("scale", JSONValueConverter.VECTOR3);
+        final Vector3Builder positionOffset = definition.get("offsets.position", JSONValueConverter.VECTOR3);
+        final TripleAxisRotationBuilder rotationOffset = definition.get("offsets.rotation", JSONValueConverter.TRIPLE_AXIS_ROTATION);
 
         return builder()
             .font(new TupleT<>(font1, font2))
