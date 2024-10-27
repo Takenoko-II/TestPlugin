@@ -5,15 +5,13 @@ import com.gmail.subnokoii78.testplugin.system.PlayerComboHandler;
 import com.gmail.subnokoii78.util.event.DataPackMessageReceiveEvent;
 import com.gmail.subnokoii78.util.event.DataPackMessageReceiverRegistry;
 import com.gmail.subnokoii78.util.event.PlayerLeftClickEvent;
-import com.gmail.subnokoii78.util.execute.EntityAnchorType;
-import com.gmail.subnokoii78.util.execute.Execute;
-import com.gmail.subnokoii78.util.execute.SourceOrigin;
-import com.gmail.subnokoii78.util.execute.SourceStack;
+import com.gmail.subnokoii78.util.execute.*;
 import com.gmail.subnokoii78.util.file.json.JSONObject;
 import com.gmail.subnokoii78.util.file.json.JSONValueType;
 import com.gmail.subnokoii78.util.file.json.TypedJSONArray;
 import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
+import com.gmail.subnokoii78.util.shape.VectorPrinter;
 import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
 import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
@@ -22,6 +20,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
@@ -137,7 +136,28 @@ public final class CustomEventListener {
                 box.showOutline(Color.RED);
             }
         }
+/*
+        final Execute execute = new Execute();
+        execute
+            .as(EntitySelector.E.build().arg(SelectorArgument.TAG, "Test"))
+            .at(EntitySelector.S)
+            .anchored(EntityAnchorType.EYES)
+            .positioned.$("^ ^ ^")
+            .run.callback(stack -> {
+                final VectorPrinter printer = new VectorPrinter(stack.getAsBukkitLocation());
+                final Vector3Builder v = stack.getRotation().getDirection3d().length(15d);
+                printer.print(v, Color.ORANGE);
 
+                final Vector3Builder begin = stack.getPosition();
+                final Vector3Builder end = begin.copy().add(v);
+
+                final Vector3Builder hit = box.rayCast(begin, end);
+                if (hit == null) return Execute.FAILURE;
+                stack.getDimension().spawnParticle(Particle.WITCH, hit.x(), hit.y(), hit.z(), 1, 0, 0, 0, 0);
+
+                return Execute.SUCCESS;
+            });
+*/
         return 1;
     }
 
