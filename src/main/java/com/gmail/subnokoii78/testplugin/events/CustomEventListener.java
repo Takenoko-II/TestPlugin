@@ -11,6 +11,7 @@ import com.gmail.subnokoii78.util.file.json.JSONValueType;
 import com.gmail.subnokoii78.util.file.json.TypedJSONArray;
 import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
+import com.gmail.subnokoii78.util.shape.ParticleSpawner;
 import com.gmail.subnokoii78.util.shape.VectorPrinter;
 import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
@@ -136,28 +137,25 @@ public final class CustomEventListener {
                 box.showOutline(Color.RED);
             }
         }
-/*
-        final Execute execute = new Execute();
-        execute
-            .as(EntitySelector.E.build().arg(SelectorArgument.TAG, "Test"))
+
+        /*final var execute = new Execute();
+        execute.as(EntitySelector.E.build().arg(SelectorArgument.TAG, "Test"))
             .at(EntitySelector.S)
             .anchored(EntityAnchorType.EYES)
             .positioned.$("^ ^ ^")
             .run.callback(stack -> {
-                final VectorPrinter printer = new VectorPrinter(stack.getAsBukkitLocation());
-                final Vector3Builder v = stack.getRotation().getDirection3d().length(15d);
-                printer.print(v, Color.ORANGE);
-
-                final Vector3Builder begin = stack.getPosition();
-                final Vector3Builder end = begin.copy().add(v);
-
-                final Vector3Builder hit = box.rayCast(begin, end);
+                final var printer = new VectorPrinter(stack.getAsBukkitLocation());
+                final var from = stack.getPosition();
+                final var delta = stack.getRotation().getDirection3d().length(15);
+                printer.print(delta, Color.BLUE);
+                final Vector3Builder hit = box.rayCast(from, stack.getPosition().add(delta));
                 if (hit == null) return Execute.FAILURE;
-                stack.getDimension().spawnParticle(Particle.WITCH, hit.x(), hit.y(), hit.z(), 1, 0, 0, 0, 0);
-
+                final var spawner = new ParticleSpawner<>(Particle.WITCH, null);
+                spawner.place(stack.getDimension(), hit);
+                spawner.spawn();
                 return Execute.SUCCESS;
-            });
-*/
+            });*/
+
         return 1;
     }
 
