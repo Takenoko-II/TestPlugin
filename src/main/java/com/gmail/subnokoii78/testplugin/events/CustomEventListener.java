@@ -60,7 +60,7 @@ public final class CustomEventListener {
             .positioned.$("^ ^ ^1")
             .run.callback(stack -> {
                 // 適切な位置にボックス設置
-                box.put(stack.getAsBukkitLocation());
+                box.put(stack.getLocation());
                 return Execute.SUCCESS;
             });
 
@@ -139,12 +139,12 @@ public final class CustomEventListener {
         }
 
         /*final var execute = new Execute();
-        execute.as(EntitySelector.E.build().arg(SelectorArgument.TAG, "Test"))
+        execute.as(EntitySelector.E.arg(SelectorArgument.TAG, "Test"))
             .at(EntitySelector.S)
             .anchored(EntityAnchorType.EYES)
             .positioned.$("^ ^ ^")
             .run.callback(stack -> {
-                final var printer = new VectorPrinter(stack.getAsBukkitLocation());
+                final var printer = new VectorPrinter(stack.getLocation());
                 final var from = stack.getPosition();
                 final var delta = stack.getRotation().getDirection3d().length(15);
                 printer.print(delta, Color.BLUE);
