@@ -6,12 +6,18 @@ import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
 import com.gmail.subnokoii78.util.command.PluginDebugger;
 import com.gmail.subnokoii78.util.event.*;
+import com.gmail.subnokoii78.util.execute.*;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
 import com.gmail.subnokoii78.util.schedule.GameTickScheduler;
 import com.gmail.subnokoii78.util.ui.ContainerUI;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.*;
+import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
@@ -56,6 +62,44 @@ public final class TestPlugin extends JavaPlugin {
         CustomEventHandlerRegistry.register(CustomEventType.PLAYER_LEFT_CLICK, CustomEventListener.INSTANCE::onLeftClick);
 
         CustomEventListener.INSTANCE.registerDataPackMessageIds();
+
+        PluginDebugger.INSTANCE.register("execute", ctx -> {
+            final Execute execute = new Execute()
+                .at(EntitySelector.P)
+                .as(EntitySelector.E.arg(SelectorArgument.TAG, "Test").arg(SelectorArgument.SORT, SelectorSortOrder.NEAREST))
+                .ifOrUnless(IfUnless.IF).items.entity(
+                    EntitySelector.S,
+                    ItemSlotsGroup.ARMOR.getSlots(ItemSlotsGroup.ArmorSlots.HEAD),
+                    itemStack -> {
+                        System.out.println(itemStack);
+                        var a = itemStack.getType().equals(Material.COMMAND_BLOCK);
+                        System.out.println(a);
+                        return a;
+                    }
+                )
+                .at(EntitySelector.S);
+
+            execute.at(EntitySelector.E.notArg(SelectorArgument.TYPE, EntityType.ARMOR_STAND).notArg(SelectorArgument.TYPE, EntityType.PLAYER).arg(SelectorArgument.SORT, SelectorSortOrder.FURTHEST))
+                .ifOrUnless(IfUnless.IF).score(
+                    ScoreHolder.of(EntitySelector.S), "_",
+                    ScoreComparator.EQUALS,
+                    ScoreHolder.of(EntitySelector.N), "_"
+                );
+
+            execute.run.command("say " + Bukkit.getCurrentTick() + " command");
+            execute.run.callback(stack -> {
+                System.out.println(Bukkit.getCurrentTick() + " callback");
+                return Execute.SUCCESS;
+            });
+
+            execute.anchored(EntityAnchorType.EYES)
+                .positioned.$("^ ^ ^1")
+                .run.callback(stack -> {
+                    stack.getExecutor().teleport(stack.getLocation());
+                    return Execute.SUCCESS;
+                });
+            return Execute.SUCCESS;
+        });
     }
 
     @Override

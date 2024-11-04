@@ -138,8 +138,9 @@ public final class CustomEventListener {
             }
         }
 
-        /*final var execute = new Execute();
-        execute.as(EntitySelector.E.arg(SelectorArgument.TAG, "Test"))
+        final var execute = new Execute();
+        execute
+            .as(EntitySelector.E.arg(SelectorArgument.TAG, "Test"))
             .at(EntitySelector.S)
             .anchored(EntityAnchorType.EYES)
             .positioned.$("^ ^ ^")
@@ -154,7 +155,7 @@ public final class CustomEventListener {
                 spawner.place(stack.getDimension(), hit);
                 spawner.spawn();
                 return Execute.SUCCESS;
-            });*/
+            });
 
         return 1;
     }
