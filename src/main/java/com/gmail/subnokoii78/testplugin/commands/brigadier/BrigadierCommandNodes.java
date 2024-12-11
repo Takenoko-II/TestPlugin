@@ -4,8 +4,8 @@ import com.gmail.subnokoii78.testplugin.PluginDirectoryManager;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
 import com.gmail.subnokoii78.util.file.json.*;
-import com.gmail.subnokoii78.util.other.CalcExpEvalException;
-import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
+import com.gmail.subnokoii78.util.eval.CalcExpEvaluator;
+import com.gmail.subnokoii78.util.eval.CalcExpEvaluationException;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
@@ -153,7 +153,7 @@ public enum BrigadierCommandNodes {
                         sender.sendMessage(Component.text("演算結果: ").append(Component.text(result)));
                         return (int) result;
                     }
-                    catch (CalcExpEvalException e) {
+                    catch (CalcExpEvaluationException e) {
                         sender.sendMessage(
                             Component.text(e.getMessage() == null ? "式の評価に失敗しました" : ("式の評価に失敗しました: " + e.getMessage()))
                                 .color(NamedTextColor.RED)

@@ -4,7 +4,7 @@ import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
 import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
-import com.gmail.subnokoii78.util.ui.*;
+import com.gmail.subnokoii78.util.ui.container.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;

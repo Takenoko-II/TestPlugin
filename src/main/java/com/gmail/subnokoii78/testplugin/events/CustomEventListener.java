@@ -1,6 +1,7 @@
 package com.gmail.subnokoii78.testplugin.events;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
+import com.gmail.subnokoii78.testplugin.system.ItemDisplayAnimator;
 import com.gmail.subnokoii78.testplugin.system.PlayerComboHandler;
 import com.gmail.subnokoii78.util.event.DataPackMessageReceiveEvent;
 import com.gmail.subnokoii78.util.event.DataPackMessageReceiverRegistry;
@@ -9,7 +10,7 @@ import com.gmail.subnokoii78.util.execute.*;
 import com.gmail.subnokoii78.util.file.json.JSONObject;
 import com.gmail.subnokoii78.util.file.json.JSONValueType;
 import com.gmail.subnokoii78.util.file.json.TypedJSONArray;
-import com.gmail.subnokoii78.util.other.CalcExpEvaluator;
+import com.gmail.subnokoii78.util.eval.CalcExpEvaluator;
 import com.gmail.subnokoii78.util.other.PaperVelocityManager;
 import com.gmail.subnokoii78.util.shape.ParticleSpawner;
 import com.gmail.subnokoii78.util.shape.VectorPrinter;
@@ -56,7 +57,7 @@ public final class CustomEventListener {
         final TiltedBoundingBox box = new TiltedBoundingBox(4, 0.5, 2);
 
         new Execute(new SourceStack(SourceOrigin.of(player)))
-            .anchored(EntityAnchorType.EYES)
+            .anchored(EntityAnchor.EYES)
             .positioned.$("^ ^ ^1")
             .run.callback(stack -> {
                 // 適切な位置にボックス設置
@@ -142,7 +143,7 @@ public final class CustomEventListener {
         execute
             .as(EntitySelector.E.arg(SelectorArgument.TAG, "Test"))
             .at(EntitySelector.S)
-            .anchored(EntityAnchorType.EYES)
+            .anchored(EntityAnchor.EYES)
             .positioned.$("^ ^ ^")
             .run.callback(stack -> {
                 final var printer = new VectorPrinter(stack.getLocation());
