@@ -12,6 +12,7 @@ import com.gmail.subnokoii78.util.schedule.GameTickScheduler;
 import com.gmail.subnokoii78.util.ui.container.ContainerUI;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.command.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class TestPlugin extends JavaPlugin {

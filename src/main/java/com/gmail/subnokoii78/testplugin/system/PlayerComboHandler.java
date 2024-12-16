@@ -30,14 +30,10 @@ public class PlayerComboHandler {
         }
     });
 
-    public int getCurrentComboCount() {
-        return comboCount;
-    }
-
-    public int nextCombo() {
+    public boolean nextCombo() {
         if (isInCoolTime) {
             combo.onComboIsInCT(player);
-            return -1;
+            return false;
         }
 
         comboCount++;
@@ -60,7 +56,9 @@ public class PlayerComboHandler {
             isAwaitingNextCombo = true;
         }
 
-        return nextComboCount;
+        combo.onComboProgress(player, nextComboCount);
+
+        return nextComboCount > 0;
     }
 
     public void stopCombo() {

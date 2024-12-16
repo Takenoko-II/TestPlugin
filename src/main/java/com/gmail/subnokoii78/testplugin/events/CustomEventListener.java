@@ -1,6 +1,7 @@
 package com.gmail.subnokoii78.testplugin.events;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
+import com.gmail.subnokoii78.testplugin.system.Combo;
 import com.gmail.subnokoii78.testplugin.system.ItemDisplayAnimator;
 import com.gmail.subnokoii78.testplugin.system.PlayerComboHandler;
 import com.gmail.subnokoii78.util.event.DataPackMessageReceiveEvent;
@@ -53,58 +54,9 @@ public final class CustomEventListener {
         // 鉄剣持ってたら殴りとかブロック破壊をキャンセル
         event.cancel();
 
-        // 横4, 縦0.5, 奥行き2のボックス
-        final TiltedBoundingBox box = new TiltedBoundingBox(4, 0.5, 2);
+        handler.combo(Combo.KNIGHT_SLASH);
 
-        new Execute(new SourceStack(SourceOrigin.of(player)))
-            .anchored(EntityAnchor.EYES)
-            .positioned.$("^ ^ ^1")
-            .run.callback(stack -> {
-                // 適切な位置にボックス設置
-                box.put(stack.getLocation());
-                return Execute.SUCCESS;
-            });
-
-        // 現在の段数に応じて角度決定
-        box.rotation(box.rotation().roll(switch (handler.getCurrentComboCount()) {
-            case 0 -> -60f;
-            case 1 -> 30f;
-            case 2 -> 90f;
-            default -> throw new IllegalStateException("NEVER HAPPENS");
-        }));
-
-        // 外枠表示
-        box.showOutline(Color.RED);
-
-        // ボックスに衝突しているエンティティを取得
-        final Set<Entity> entities = new HashSet<>(box.getCollidingEntities());
-        // プレイヤー本人は除外
-        entities.remove(player);
-
-        if (entities.isEmpty()) {
-            // 衝突してるエンティティいなければコンボ止める
-            handler.stopCombo();
-        }
-        else {
-            // コンボを次に進める
-            int comboCount = handler.nextCombo();
-
-            // CT中の場合-1が返るので条件式は>0
-            if (comboCount > 0) {
-                // CT中じゃなければダメージとメッセージ
-                entities.forEach(entity -> {
-                    if (entity instanceof Damageable damageable) {
-                        damageable.damage(2, player);
-                    }
-                });
-
-                player.sendMessage(Component.text("段数: " + comboCount));
-            }
-            else {
-                // CT中のとき
-                player.sendMessage(Component.text("CT中").color(NamedTextColor.GRAY));
-            }
-        }
+        handler.nextCombo();
     }
 
     public int onCallBoundingBox(DataPackMessageReceiveEvent event) {
