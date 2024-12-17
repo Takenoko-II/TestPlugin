@@ -17,7 +17,7 @@ public class PlayerComboHandler {
 
     private int comboCount = 0;
 
-    private Combo combo = Combo.KNIGHT_SLASH;
+    private Combo combo = Combo.KNIGHT_NORMAL_SLASH;
 
     private boolean isAwaitingNextCombo = false;
 
@@ -73,7 +73,7 @@ public class PlayerComboHandler {
     }
 
     public void combo(@NotNull Combo combo) {
-        Objects.requireNonNull(combo, "combo object must be not null");
+        Objects.requireNonNull(combo, "Combo object must be not null");
         this.combo = combo;
     }
 

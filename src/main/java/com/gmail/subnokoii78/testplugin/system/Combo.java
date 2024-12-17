@@ -12,30 +12,22 @@ import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public abstract class Combo {
-    private final Type type;
-
     private final int maxCombo;
 
     private final int timeToReset;
 
     private final int coolTime;
 
-    protected Combo(@NotNull Type type, int maxCombo, int timeToReset, int coolTime) {
-        this.type = type;
+    protected Combo(int maxCombo, int timeToReset, int coolTime) {
         this.maxCombo = maxCombo;
         this.timeToReset = timeToReset;
         this.coolTime = coolTime;
-    }
-
-    public final @NotNull Type getType() {
-        return type;
     }
 
     public final int getMaxCombo() {
@@ -66,12 +58,7 @@ public abstract class Combo {
 
     }
 
-    public enum Type {
-        NORMAL,
-        SPECIAL
-    }
-
-    public static final Combo KNIGHT_SLASH = new Combo(Type.NORMAL, 4, 30, 6) {
+    public static final Combo KNIGHT_NORMAL_SLASH = new Combo(4, 30, 6) {
         @Override
         public void onComboProgress(@NotNull Player player, int currentComboCount) {
             final PlayerComboHandler handler = PlayerComboHandler.getHandler(player);
@@ -84,15 +71,7 @@ public abstract class Combo {
                     // 適切な位置にボックス設置
                     box.put(stack.getLocation());
 
-                    /*switch (currentComboCount) {
-                        case 1 -> -60f;
-                        case 2 -> 30f;
-                        case 3 -> -30f;
-                        case 4 -> 90f;
-                        default -> throw new IllegalStateException("NEVER HAPPENS");
-                    })*/
-
-                    // box.rotation(box.rotation().roll(FRAMES_COMBO1.getRollAngle()));
+                    // box.rotation(roll);
 
                     // 外枠表示
                     box.showOutline(Color.RED);
@@ -115,9 +94,8 @@ public abstract class Combo {
                             }
                         });
 
-                        // ANIMATOR.rotation(FRAMES_COMBO1.getRollAngle());
-
-                        ANIMATOR.animate(FRAMES_COMBO1);
+                        ANIMATOR.put(stack.getLocation());
+                        ANIMATOR.animate(COMBO1);
 
                         return Execute.SUCCESS;
                     }
@@ -141,13 +119,13 @@ public abstract class Combo {
             player.sendMessage(Component.text("コンボ中断").color(NamedTextColor.RED));
         }
 
-        private final List<String> FRAMES_COMBO1 = List.of(
+        private final AnimationFrameChain COMBO1 = AnimationFrameChain.newChain(
             "knight_slash/normal_combo1/frame1",
             "knight_slash/normal_combo1/frame2",
             "knight_slash/normal_combo1/frame3",
             "knight_slash/normal_combo1/frame4",
             "knight_slash/normal_combo1/frame5"
-        );
+        ).modifier((pos, rot) -> rot.roll(-60f));
 
         private final List<String> FRAMES_COMBO2 = List.of(
             "knight_slash/normal_combo2/frame1",

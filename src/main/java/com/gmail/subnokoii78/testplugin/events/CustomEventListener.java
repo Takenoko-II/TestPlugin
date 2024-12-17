@@ -2,7 +2,6 @@ package com.gmail.subnokoii78.testplugin.events;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.testplugin.system.Combo;
-import com.gmail.subnokoii78.testplugin.system.ItemDisplayAnimator;
 import com.gmail.subnokoii78.testplugin.system.PlayerComboHandler;
 import com.gmail.subnokoii78.util.event.DataPackMessageReceiveEvent;
 import com.gmail.subnokoii78.util.event.DataPackMessageReceiverRegistry;
@@ -19,12 +18,9 @@ import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
 import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -32,7 +28,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public final class CustomEventListener {
@@ -54,7 +49,7 @@ public final class CustomEventListener {
         // 鉄剣持ってたら殴りとかブロック破壊をキャンセル
         event.cancel();
 
-        handler.combo(Combo.KNIGHT_SLASH);
+        handler.combo(Combo.KNIGHT_NORMAL_SLASH);
 
         handler.nextCombo();
     }
