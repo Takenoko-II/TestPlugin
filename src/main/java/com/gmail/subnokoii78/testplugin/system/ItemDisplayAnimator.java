@@ -58,7 +58,7 @@ public class ItemDisplayAnimator {
 
                 final Vector3Builder pos = position.copy();
                 final TripleAxisRotationBuilder rot = rotation.copy();
-                frameChain.getModifier().accept(pos, rot); // modifierが個別に欲しい
+                frameChain.getModifier().accept(pos, rot); // modifierが個別に欲しい あとめんどくさいからmodifier(T) -> void から modifier(T) -> Tで頼む
                 // displayのscaleとrotationからboxつくるメソッドもフレームチェーンクラスに欲しい
 
                 transformation.getTranslation().set(pos.toBukkitVector().toVector3f());
