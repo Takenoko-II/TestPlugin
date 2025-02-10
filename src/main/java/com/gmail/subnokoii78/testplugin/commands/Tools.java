@@ -109,8 +109,8 @@ public class Tools implements CommandExecutor, TabCompleter {
                     .addLore(Component.text(" 1.6 攻撃速度").decoration(TextDecoration.ITALIC, false).color(NamedTextColor.DARK_GREEN))
                     .onClick(event -> {
                         final ComponentItemStackBuilder sword = new ComponentItemStackBuilder(Material.GOLDEN_SWORD);
-                        final TypedAttributeModifier attackDamage = new TypedAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE).amount(0.1d);
-                        final TypedAttributeModifier attackSpeed = new TypedAttributeModifier(Attribute.GENERIC_ATTACK_SPEED).amount(-2.5d);
+                        final TypedAttributeModifier attackDamage = new TypedAttributeModifier(Attribute.ATTACK_DAMAGE).amount(0.1d);
+                        final TypedAttributeModifier attackSpeed = new TypedAttributeModifier(Attribute.ATTACK_SPEED).amount(-2.5d);
 
                         sword.attributeModifiers().setModifiers(new TypedAttributeModifier[]{attackDamage, attackSpeed});
                         sword.attributeModifiers().setShowInTooltip(false);

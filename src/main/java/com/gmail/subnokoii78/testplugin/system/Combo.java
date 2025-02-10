@@ -5,29 +5,38 @@ import com.gmail.subnokoii78.util.execute.Execute;
 import com.gmail.subnokoii78.util.execute.SourceOrigin;
 import com.gmail.subnokoii78.util.execute.SourceStack;
 import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
+import com.gmail.subnokoii78.util.vector.Vector3Builder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class Combo {
+    private final String id;
+
     private final int maxCombo;
 
     private final int timeToReset;
 
     private final int coolTime;
 
-    protected Combo(int maxCombo, int timeToReset, int coolTime) {
+    protected Combo(@NotNull String id, int maxCombo, int timeToReset, int coolTime) {
+        this.id = id;
         this.maxCombo = maxCombo;
         this.timeToReset = timeToReset;
         this.coolTime = coolTime;
+    }
+
+    public final @NotNull String getId() {
+        return id;
     }
 
     public final int getMaxCombo() {
@@ -58,7 +67,7 @@ public abstract class Combo {
 
     }
 
-    public static final Combo KNIGHT_NORMAL_SLASH = new Combo(4, 30, 6) {
+    public static final Combo KNIGHT_NORMAL_SLASH = new Combo("knight_slash", 4, 30, 6) {
         @Override
         public void onComboProgress(@NotNull Player player, int currentComboCount) {
             final PlayerComboHandler handler = PlayerComboHandler.getHandler(player);
@@ -68,23 +77,24 @@ public abstract class Combo {
                 .anchored(EntityAnchor.EYES)
                 .positioned.$("^ ^ ^1")
                 .run.callback(stack -> {
-                    // 適切な位置にボックス設置
+                    ANIMATOR.put(stack.getLocation());
+                    final AnimatorDisplayState state = ANIMATOR.animate(currentComboCount);
+
                     box.put(stack.getLocation());
-
-                    // box.rotation(roll);
-
-                    // 外枠表示
+                    box.rotation(state.rotation());
                     box.showOutline(Color.RED);
 
-                    // ボックスに衝突しているエンティティを取得
-                    final Set<Entity> entities = new HashSet<>(box.getCollidingEntities());
-                    // プレイヤー本人は除外
-                    entities.remove(player);
+                    final Set<Entity> entities = new HashSet<>(box.getCollidingEntities())
+                        .stream().filter(entity -> {
+                            if (entity instanceof Mob || entity instanceof Player) {
+                                return !entity.equals(player);
+                            }
+                            else return false;
+                        })
+                        .collect(Collectors.toSet());
 
                     if (entities.isEmpty()) {
-                        // 衝突してるエンティティいなければコンボ止める
                         handler.stopCombo();
-
                         return Execute.FAILURE;
                     }
                     else {
@@ -93,9 +103,6 @@ public abstract class Combo {
                                 damageable.damage(2, player);
                             }
                         });
-
-                        ANIMATOR.put(stack.getLocation());
-                        ANIMATOR.animate(COMBO1);
 
                         return Execute.SUCCESS;
                     }
@@ -119,40 +126,56 @@ public abstract class Combo {
             player.sendMessage(Component.text("コンボ中断").color(NamedTextColor.RED));
         }
 
-        private final AnimationFrameChain COMBO1 = AnimationFrameChain.newChain(
-            "knight_slash/normal_combo1/frame1",
-            "knight_slash/normal_combo1/frame2",
-            "knight_slash/normal_combo1/frame3",
-            "knight_slash/normal_combo1/frame4",
-            "knight_slash/normal_combo1/frame5"
-        ).modifier((pos, rot) -> rot.roll(-60f));
+        private final FrameGroup COMBO1 = FrameGroup.ofPaths(
+            "normal_combo1/frame1",
+            "normal_combo1/frame2",
+            "normal_combo1/frame3",
+            "normal_combo1/frame4",
+            "normal_combo1/frame5"
+        ).stateModifier(state -> {
+            state.rotation(state.rotation().roll(-60f));
+            return state;
+        });
 
-        private final List<String> FRAMES_COMBO2 = List.of(
-            "knight_slash/normal_combo2/frame1",
-            "knight_slash/normal_combo2/frame2",
-            "knight_slash/normal_combo2/frame3",
-            "knight_slash/normal_combo2/frame4",
-            "knight_slash/normal_combo2/frame5"
-        );
+        private final FrameGroup COMBO2 = FrameGroup.ofPaths(
+            "normal_combo2/frame1",
+            "normal_combo2/frame2",
+            "normal_combo2/frame3",
+            "normal_combo2/frame4",
+            "normal_combo2/frame5"
+        ).stateModifier(state -> {
+            state.rotation(state.rotation().roll(30f));
+            return state;
+        });
 
-        private final List<String> FRAMES_COMBO3 = List.of(
-            "knight_slash/normal_combo3/frame1",
-            "knight_slash/normal_combo3/frame2",
-            "knight_slash/normal_combo3/frame3",
-            "knight_slash/normal_combo3/frame4",
-            "knight_slash/normal_combo3/frame5"
-        );
+        private final FrameGroup COMBO3 = FrameGroup.ofPaths(
+            "normal_combo3/frame1",
+            "normal_combo3/frame2",
+            "normal_combo3/frame3",
+            "normal_combo3/frame4",
+            "normal_combo3/frame5"
+        ).stateModifier(state -> {
+            state.rotation(state.rotation().roll(70f));
+            return state;
+        });
 
-        private final List<String> FRAMES_COMBO4 = List.of(
-            "knight_slash/normal_combo4/frame1",
-            "knight_slash/normal_combo4/frame2",
-            "knight_slash/normal_combo4/frame3",
-            "knight_slash/normal_combo4/frame4",
-            "knight_slash/normal_combo4/frame5",
-            "knight_slash/normal_combo4/frame6",
-            "knight_slash/normal_combo4/frame7"
-        );
+        private final FrameGroup COMBO4 = FrameGroup.ofPaths(
+            "normal_combo4/frame1",
+            "normal_combo4/frame2",
+            "normal_combo4/frame3",
+            "normal_combo4/frame4",
+            "normal_combo4/frame5",
+            "normal_combo4/frame6",
+            "normal_combo4/frame7"
+        ).stateModifier(state -> {
+            return state;
+        });
 
-        private final ItemDisplayAnimator ANIMATOR = new ItemDisplayAnimator(2).displayScale(2, 2, 0);
+        private final ItemDisplayAnimator ANIMATOR = new ItemDisplayAnimator(getId(), 2)
+            .defaultScale(new Vector3Builder(2, 2, 0))
+            .addFrameGroup(COMBO1)
+            .addFrameGroup(COMBO2)
+            .addFrameGroup(COMBO3)
+            .addFrameGroup(COMBO4);
     };
 }

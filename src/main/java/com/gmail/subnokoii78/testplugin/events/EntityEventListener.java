@@ -186,7 +186,7 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
             );
 
             if (damageableEntity instanceof Lootable) {
-                ((Lootable) hurtEntity).setLootTable(LootTables.EMPTY.getLootTable());
+                ((Lootable) hurtEntity).clearLootTable();
             }
 
             damageableEntity.setHealth(0);

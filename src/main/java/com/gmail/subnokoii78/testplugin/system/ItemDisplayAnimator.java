@@ -1,34 +1,32 @@
 package com.gmail.subnokoii78.testplugin.system;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.util.execute.DimensionProvider;
 import com.gmail.subnokoii78.util.schedule.GameTickScheduler;
-import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.CustomModelData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemDisplayAnimator {
+    private final @NotNull String id;
+
     private final int frameTime;
 
-    private World dimension = DimensionProvider.OVERWORLD.getWorld();
+    private final List<FrameGroup> groups = new ArrayList<>();
 
-    private final Vector3Builder position = new Vector3Builder();
+    private final AnimatorDisplayState state = new AnimatorDisplayState();
 
-    private final TripleAxisRotationBuilder rotation = new TripleAxisRotationBuilder();
-
-    private final Vector3Builder scale = new Vector3Builder();
-
-    public ItemDisplayAnimator(int frameTime) {
+    public ItemDisplayAnimator(@NotNull String id, int frameTime) {
+        this.id = id;
         this.frameTime = frameTime;
     }
 
@@ -36,33 +34,41 @@ public class ItemDisplayAnimator {
         return frameTime;
     }
 
-    public final void put(@NotNull Location location) {
-        dimension = location.getWorld();
-        position.x(location.x()).y(location.y()).z(location.z());
-        rotation.yaw(location.getYaw()).pitch(location.getPitch());
+    public final @NotNull ItemDisplayAnimator addFrameGroup(@NotNull FrameGroup group) {
+        groups.add(group);
+        return this;
     }
 
-    public final @NotNull ItemDisplayAnimator displayScale(double width, double height, double depth) {
-        scale.x(width).y(height).z(depth);
-        return this;
-    } // ここもフレームチェーンクラスに任せたい
+    public final void put(@NotNull Location location) {
+        state.dimension(location.getWorld());
+        state.position(Vector3Builder.from(location));
+        state.rotation(
+            state.rotation().yaw(location.getYaw()).pitch(location.getPitch()).roll(state.rotation().roll())
+        );
+    }
 
-    public final void animate(@NotNull AnimationFrameChain frameChain) {
-        final ItemDisplay display = dimension.spawn(
-            position.withWorld(dimension),
+    public final @NotNull ItemDisplayAnimator defaultScale(@NotNull Vector3Builder scale) {
+        state.scale(scale);
+        return this;
+    }
+
+    public final @NotNull AnimatorDisplayState animate(int id) {
+        final FrameGroup group = groups.get(id - 1);
+
+        final ItemDisplay display = state.dimension().spawn(
+            state.position().withWorld(state.dimension()),
             ItemDisplay.class, entity -> {
                 final Transformation transformation = entity.getTransformation();
                 final ItemStack itemStack = new ItemStack(Material.KNOWLEDGE_BOOK);
 
-                transformation.getScale().set(scale.toBukkitVector().toVector3f());
+                final AnimatorDisplayState newState = group.stateModifier().apply(state.copy());
 
-                final Vector3Builder pos = position.copy();
-                final TripleAxisRotationBuilder rot = rotation.copy();
-                frameChain.getModifier().accept(pos, rot); // modifierが個別に欲しい あとめんどくさいからmodifier(T) -> void から modifier(T) -> Tで頼む
+                transformation.getScale().set(newState.scale().toBukkitVector().toVector3f());
+
                 // displayのscaleとrotationからboxつくるメソッドもフレームチェーンクラスに欲しい
 
-                transformation.getTranslation().set(pos.toBukkitVector().toVector3f());
-                transformation.getLeftRotation().set(rot.getQuaternion4d());
+                transformation.getTranslation().set(newState.position().toBukkitVector().toVector3f());
+                transformation.getLeftRotation().set(newState.rotation().getQuaternion4d());
 
                 entity.setTransformation(transformation);
                 entity.setItemStack(itemStack);
@@ -71,15 +77,26 @@ public class ItemDisplayAnimator {
             }
         );
 
-        final List<NamespacedKey> frames = frameChain.getFrames();
+        final List<String> frames = group.getPaths();
+        final NamespacedKey key = NamespacedKey.fromString(this.id);
+
+        if (key == null) {
+            throw new IllegalStateException("ItemDisplayAnimatorのidが無効です");
+        }
 
         final int[] index = {0};
         new GameTickScheduler(__scheduler__ -> {
             if (index[0] < frames.size()) {
                 final ItemStack itemStack = display.getItemStack();
-                final ItemMeta itemMeta = itemStack.getItemMeta();
-                itemMeta.setItemModel(frames.get(index[0]));
-                itemStack.setItemMeta(itemMeta);
+
+                itemStack.setData(DataComponentTypes.ITEM_MODEL, key);
+                itemStack.setData(
+                    DataComponentTypes.CUSTOM_MODEL_DATA,
+                    CustomModelData.customModelData()
+                        .addString(frames.get(index[0]))
+                        .build()
+                );
+
                 display.setItemStack(itemStack);
 
                 index[0]++;
@@ -89,5 +106,7 @@ public class ItemDisplayAnimator {
                 display.remove();
             }
         }).runTimeout();
+
+        return group.stateModifier().apply(state.copy());
     }
 }
