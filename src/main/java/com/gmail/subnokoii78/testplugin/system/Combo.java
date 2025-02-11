@@ -82,7 +82,7 @@ public abstract class Combo {
 
                     box.put(stack.getLocation());
                     box.rotation(state.rotation());
-                    box.showOutline(Color.RED);
+                    box.showOutline(Color.BLUE);
 
                     final Set<Entity> entities = new HashSet<>(box.getCollidingEntities())
                         .stream().filter(entity -> {
@@ -172,7 +172,7 @@ public abstract class Combo {
         });
 
         private final ItemDisplayAnimator ANIMATOR = new ItemDisplayAnimator(getId(), 2)
-            .defaultScale(new Vector3Builder(2, 2, 0))
+            .defaultScale(new Vector3Builder(3, 6, 0))
             .addFrameGroup(COMBO1)
             .addFrameGroup(COMBO2)
             .addFrameGroup(COMBO3)

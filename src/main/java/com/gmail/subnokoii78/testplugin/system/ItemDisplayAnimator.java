@@ -62,12 +62,12 @@ public class ItemDisplayAnimator {
                 final ItemStack itemStack = new ItemStack(Material.KNOWLEDGE_BOOK);
 
                 final AnimatorDisplayState newState = group.stateModifier().apply(state.copy());
+                newState.rotation(newState.rotation().roll(newState.rotation().roll() + 90f));
 
                 transformation.getScale().set(newState.scale().toBukkitVector().toVector3f());
 
                 // displayのscaleとrotationからboxつくるメソッドもフレームチェーンクラスに欲しい
 
-                transformation.getTranslation().set(newState.position().toBukkitVector().toVector3f());
                 transformation.getLeftRotation().set(newState.rotation().getQuaternion4d());
 
                 entity.setTransformation(transformation);
