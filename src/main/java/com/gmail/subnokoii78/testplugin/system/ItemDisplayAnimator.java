@@ -8,6 +8,7 @@ import io.papermc.paper.datacomponent.item.CustomModelData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
@@ -58,6 +59,8 @@ public class ItemDisplayAnimator {
         final ItemDisplay display = state.dimension().spawn(
             state.position().withWorld(state.dimension()),
             ItemDisplay.class, entity -> {
+                entity.setBrightness(new Display.Brightness(15, 15));
+
                 final Transformation transformation = entity.getTransformation();
                 final ItemStack itemStack = new ItemStack(Material.KNOWLEDGE_BOOK);
 

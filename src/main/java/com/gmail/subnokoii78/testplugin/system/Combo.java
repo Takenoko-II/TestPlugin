@@ -172,7 +172,7 @@ public abstract class Combo {
         });
 
         private final ItemDisplayAnimator ANIMATOR = new ItemDisplayAnimator(getId(), 2)
-            .defaultScale(new Vector3Builder(3, 6, 0))
+            .defaultScale(new Vector3Builder(3, 6, 0.1))
             .addFrameGroup(COMBO1)
             .addFrameGroup(COMBO2)
             .addFrameGroup(COMBO3)
