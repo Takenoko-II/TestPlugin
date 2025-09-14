@@ -1,8 +1,8 @@
 package com.gmail.subnokoii78.testplugin.system;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.util.schedule.GameTickScheduler;
-import com.gmail.subnokoii78.util.vector.Vector3Builder;
+import com.gmail.subnokoii78.tplcore.schedule.GameTickScheduler;
+import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 import org.bukkit.Location;
@@ -71,7 +71,7 @@ public class ItemDisplayAnimator {
 
                 // displayのscaleとrotationからboxつくるメソッドもフレームチェーンクラスに欲しい
 
-                transformation.getLeftRotation().set(newState.rotation().getQuaternion4d());
+                transformation.getLeftRotation().set(newState.rotation().getQuaternion4f());
 
                 entity.setTransformation(transformation);
                 entity.setItemStack(itemStack);

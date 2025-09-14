@@ -1,9 +1,12 @@
 package com.gmail.subnokoii78.testplugin.system;
 
+import com.gmail.subnokoii78.testplugin.PluginDirectoryManager;
 import com.gmail.subnokoii78.util.execute.EntityAnchor;
 import com.gmail.subnokoii78.util.execute.Execute;
 import com.gmail.subnokoii78.util.execute.SourceOrigin;
 import com.gmail.subnokoii78.util.execute.SourceStack;
+import com.gmail.subnokoii78.util.file.json.JSONValueConverter;
+import com.gmail.subnokoii78.util.file.json.JSONValueType;
 import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
 import com.gmail.subnokoii78.util.vector.Vector3Builder;
 import net.kyori.adventure.text.Component;
@@ -133,7 +136,13 @@ public abstract class Combo {
             "normal_combo1/frame4",
             "normal_combo1/frame5"
         ).stateModifier(state -> {
-            state.rotation(state.rotation().roll(-60f));
+            final float combo1Angle = PluginDirectoryManager.getConfigValueOf(
+                "combos.knight.normal_slash.angles[0]",
+                JSONValueType.NUMBER,
+                -60f
+            ).floatValue();
+
+            state.rotation(state.rotation().roll(combo1Angle));
             return state;
         });
 
@@ -144,7 +153,13 @@ public abstract class Combo {
             "normal_combo2/frame4",
             "normal_combo2/frame5"
         ).stateModifier(state -> {
-            state.rotation(state.rotation().roll(30f));
+            final float combo2Angle = PluginDirectoryManager.getConfigValueOf(
+                "combos.knight.normal_slash.angles[1]",
+                JSONValueType.NUMBER,
+                30f
+            ).floatValue();
+
+            state.rotation(state.rotation().roll(combo2Angle));
             return state;
         });
 
@@ -155,7 +170,13 @@ public abstract class Combo {
             "normal_combo3/frame4",
             "normal_combo3/frame5"
         ).stateModifier(state -> {
-            state.rotation(state.rotation().roll(70f));
+            final float combo3Angle = PluginDirectoryManager.getConfigValueOf(
+                "combos.knight.normal_slash.angles[2]",
+                JSONValueType.NUMBER,
+                70f
+            ).floatValue();
+
+            state.rotation(state.rotation().roll(combo3Angle));
             return state;
         });
 
@@ -168,11 +189,22 @@ public abstract class Combo {
             "normal_combo4/frame6",
             "normal_combo4/frame7"
         ).stateModifier(state -> {
+            final float combo4Angle = PluginDirectoryManager.getConfigValueOf(
+                "combos.knight.normal_slash.angles[3]",
+                JSONValueType.NUMBER,
+                0f
+            ).floatValue();
+
+            state.rotation(state.rotation().roll(combo4Angle));
             return state;
         });
 
         private final ItemDisplayAnimator ANIMATOR = new ItemDisplayAnimator(getId(), 2)
-            .defaultScale(new Vector3Builder(3, 6, 0.1))
+            .defaultScale(PluginDirectoryManager.getConfigValueOf(
+                "combos.knight.normal_slash.display_scale",
+                JSONValueConverter.VECTOR3,
+                new Vector3Builder(3, 6, 0.1)
+            ))
             .addFrameGroup(COMBO1)
             .addFrameGroup(COMBO2)
             .addFrameGroup(COMBO3)

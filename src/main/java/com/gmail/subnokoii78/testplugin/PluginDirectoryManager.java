@@ -6,10 +6,13 @@ import com.gmail.subnokoii78.util.file.FolderUtils;
 import com.gmail.subnokoii78.util.file.TextFileUtils;
 import com.gmail.subnokoii78.util.file.json.JSONFile;
 import com.gmail.subnokoii78.util.file.json.JSONObject;
+import com.gmail.subnokoii78.util.file.json.JSONValueConverter;
+import com.gmail.subnokoii78.util.file.json.JSONValueType;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.function.Consumer;
 
 public final class PluginDirectoryManager {
     private PluginDirectoryManager() {}
@@ -34,8 +37,48 @@ public final class PluginDirectoryManager {
 
     private static JSONObject jsonObject;
 
-    public static JSONObject getConfig() {
-        return jsonObject;
+    public static @NotNull JSONObject getConfig() {
+        final JSONFile file = new JSONFile(TestPlugin.CONFIG_FILE_PATH);
+        final JSONObject defaultObj = new JSONObject();
+
+        if (!file.exists()) {
+            file.create();
+            file.write(defaultObj);
+        }
+
+        return jsonObject == null ? defaultObj : jsonObject;
+    }
+
+    public static <T> T getConfigValueOf(@NotNull String path, @NotNull JSONValueType<T> type, T defaultValue) {
+        if (getConfig().has(path)) {
+            return getConfig().get(path, type);
+        }
+        else {
+            writeConfig(path, defaultValue);
+            return defaultValue;
+        }
+    }
+
+    public static <T> T getConfigValueOf(@NotNull String path, @NotNull JSONValueConverter<T> type, T defaultValue) {
+        if (getConfig().has(path)) {
+            return getConfig().get(path, type);
+        }
+        else {
+            writeConfig(path, defaultValue);
+            return defaultValue;
+        }
+    }
+
+    public static void writeConfig(@NotNull String path, @NotNull Object value) {
+        final JSONObject obj = getConfig();
+        obj.set(path, value);
+        final JSONFile file = new JSONFile(TestPlugin.CONFIG_FILE_PATH);
+
+        if (!file.exists()) {
+            file.create();
+        }
+
+        file.write(obj);
     }
 
     public static void reloadConfig() {

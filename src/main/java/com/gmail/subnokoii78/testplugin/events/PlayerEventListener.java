@@ -1,16 +1,19 @@
 package com.gmail.subnokoii78.testplugin.events;
 
-import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
-import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.util.event.CustomEventHandlerRegistry;
-import com.gmail.subnokoii78.util.event.CustomEventType;
-import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
-import com.gmail.subnokoii78.util.execute.*;
-import com.gmail.subnokoii78.util.other.PaperVelocityManager;
-import com.gmail.subnokoii78.util.scoreboard.ScoreboardUtils;
-import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
-import com.gmail.subnokoii78.util.vector.Shape;
-import com.gmail.subnokoii78.util.vector.Vector3Builder;
+import com.gmail.subnokoii78.tplcore.TPLCore;
+import com.gmail.subnokoii78.tplcore.events.PlayerClickEvent;
+import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
+import com.gmail.subnokoii78.tplcore.execute.CommandSourceStack;
+import com.gmail.subnokoii78.tplcore.execute.Execute;
+import com.gmail.subnokoii78.tplcore.execute.SourceOrigin;
+import com.gmail.subnokoii78.tplcore.itemstack.ItemStackCustomDataAccess;
+import com.gmail.subnokoii78.tplcore.network.PaperVelocityManager;
+import com.gmail.subnokoii78.tplcore.shape.Shape;
+import com.gmail.subnokoii78.tplcore.vector.DualAxisRotationBuilder;
+import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
+import com.gmail.takenokoii78.mojangson.MojangsonPath;
+import com.gmail.takenokoii78.mojangson.MojangsonValueTypes;
+import com.gmail.takenokoii78.mojangson.values.MojangsonByte;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.Color;
@@ -26,7 +29,6 @@ import org.bukkit.inventory.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
-import org.joml.Quaternionf;
 
 import java.util.HashMap;
 import java.util.ListIterator;
@@ -50,20 +52,27 @@ public class PlayerEventListener implements Listener {
         if (instance == null) {
             instance = new PlayerEventListener();
 
-            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.getInstance());
+            Bukkit.getServer().getPluginManager().registerEvents(instance, TPLCore.getPlugin());
 
             registerPluginEvents();
         }
     }
 
     private static void registerPluginEvents() {
-        CustomEventHandlerRegistry.register(CustomEventType.PLAYER_LEFT_CLICK, event -> {
+        TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, event -> {
+            if (!event.getClick().equals(PlayerClickEvent.Click.LEFT)) {
+                return;
+            }
+
             final Player player = event.getPlayer();
             final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
 
             if (itemStack.getItemMeta() == null) return;
 
-            final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
+            final String tag = ItemStackCustomDataAccess.of(itemStack)
+                .read()
+                .get("custom_item_tag", MojangsonValueTypes.STRING)
+                .getValue();
 
             if (tag != null) {
                 switch (tag) {
@@ -97,17 +106,23 @@ public class PlayerEventListener implements Listener {
                 event.cancel();
             }
 
-            ScoreboardUtils
-                .getOrCreateObjective("plugin_api.on_left_click")
+            TPLCore.scoreboard
+                .getOrAddObjective("plugin_api.on_left_click", null, null, null)
                 .addScore(player, 1);
 
-            final String type = new ItemStackDataContainerManager(itemStack).getString("on_left_click.type");
-            final String content = new ItemStackDataContainerManager(itemStack).getString("on_left_click.content");
+            final String type = ItemStackCustomDataAccess.of(itemStack)
+                .read()
+                .get(MojangsonPath.of("on_left_click.type"), MojangsonValueTypes.STRING)
+                .getValue();
+            final String content = ItemStackCustomDataAccess.of(itemStack)
+                .read()
+                .get(MojangsonPath.of("on_left_click.content"), MojangsonValueTypes.STRING)
+                .getValue();
 
             if (type != null && content != null) {
                 switch (type) {
                     case "run_command":
-                        new Execute(new SourceStack(SourceOrigin.of(player)))
+                        new Execute(new CommandSourceStack(SourceOrigin.of(player)))
                             .run.command(content);
                         break;
                     case "multiple":
@@ -116,36 +131,42 @@ public class PlayerEventListener implements Listener {
             }
         });
 
-        CustomEventHandlerRegistry.register(CustomEventType.PLAYER_RIGHT_CLICK, event -> {
+        TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, event -> {
             final Player player = event.getPlayer();
-            ScoreboardUtils
-                .getOrCreateObjective("plugin_api.on_right_click")
+            TPLCore.scoreboard
+                .getOrAddObjective("plugin_api.on_right_click", null, null, null)
                 .addScore(player, 1);
 
             final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
             if (itemStack.getItemMeta() == null) return;
 
-            final String type = new ItemStackDataContainerManager(itemStack).getString("on_right_click.type");
-            final String content = new ItemStackDataContainerManager(itemStack).getString("on_right_click.content");
+            final String type = ItemStackCustomDataAccess.of(itemStack)
+                .read()
+                .get(MojangsonPath.of("on_right_click.type"), MojangsonValueTypes.STRING)
+                .getValue();
+            final String content = ItemStackCustomDataAccess.of(itemStack)
+                .read()
+                .get(MojangsonPath.of("on_right_click.content"), MojangsonValueTypes.STRING)
+                .getValue();
 
             if (type != null && content != null) {
                 switch (type) {
                     case "run_command":
-                        new Execute(new SourceStack(SourceOrigin.of(player)))
+                        new Execute(new CommandSourceStack(SourceOrigin.of(player)))
                             .run.command(content);
                         break;
                 }
             }
         });
 
-        CustomEventHandlerRegistry.register(CustomEventType.PLAYER_CLICK, event -> {
+        TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, event -> {
             final Player player = event.getPlayer();
 
             final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
 
             if (itemStack.getItemMeta() == null) return;
 
-            switch (new ItemStackDataContainerManager(itemStack).getString("custom_item_tag")) {
+            switch (ItemStackCustomDataAccess.of(itemStack).read().get("custom_item_tag", MojangsonValueTypes.STRING).getValue()) {
                 case "quick_teleporter": {
                     event.cancel();
 
@@ -212,7 +233,7 @@ public class PlayerEventListener implements Listener {
                 }
                 case "server_selector": {
                     event.cancel();
-                    TestPlugin.getPaperVelocityManager().openServerSelector(player);
+                    TPLCore.paperVelocityManager.openServerSelectorInteraction(player);
                     break;
                 }
                 case "magic": {
@@ -232,9 +253,12 @@ public class PlayerEventListener implements Listener {
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
         final ItemStack itemStack = event.getItemDrop().getItemStack();
-        final Boolean locked = new ItemStackDataContainerManager(itemStack).getBoolean("locked");
 
-        if (locked == null) return;
+        final MojangsonByte b = ItemStackCustomDataAccess.of(itemStack).read().get("locked", MojangsonValueTypes.BYTE);
+
+        if (!b.isBooleanValue()) return;
+
+        final boolean locked = b.getAsBooleanValue();
 
         if (locked && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
@@ -250,9 +274,13 @@ public class PlayerEventListener implements Listener {
         final ItemStack itemStack = event.getCurrentItem();
         if (itemStack == null) return;
 
-        final Boolean locked = new ItemStackDataContainerManager(itemStack).getBoolean("locked");
+        final MojangsonByte b = ItemStackCustomDataAccess.of(itemStack)
+            .read()
+            .get("locked", MojangsonValueTypes.BYTE);
 
-        if (locked == null) return;
+        if (!b.isBooleanValue()) return;
+
+        final boolean locked = b.getAsBooleanValue();
 
         if (locked && !player.getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
@@ -264,8 +292,14 @@ public class PlayerEventListener implements Listener {
         final ItemStack mainHandItem = event.getMainHandItem();
         final ItemStack offhandItem = event.getOffHandItem();
 
-        final Boolean mainHandLocked = new ItemStackDataContainerManager(mainHandItem).getBoolean("locked");
-        final Boolean offHandLocked = new ItemStackDataContainerManager(offhandItem).getBoolean("locked");
+        final Boolean mainHandLocked = ItemStackCustomDataAccess.of(mainHandItem)
+            .read()
+            .get("locked", MojangsonValueTypes.BYTE)
+            .getAsBooleanValueOrNull();
+        final Boolean offHandLocked = ItemStackCustomDataAccess.of(offhandItem)
+            .read()
+            .get("locked", MojangsonValueTypes.BYTE)
+            .getAsBooleanValueOrNull();
 
         if (Objects.equals(mainHandLocked, true) && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
@@ -292,7 +326,10 @@ public class PlayerEventListener implements Listener {
 
             if (itemStack == null) continue;
 
-            final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
+            final String tag = ItemStackCustomDataAccess.of(itemStack)
+                .read()
+                .get("custom_item_tag", MojangsonValueTypes.STRING)
+                .getValue();
 
             if (Objects.equals(tag, "server_selector")) return;
 
@@ -344,7 +381,7 @@ public class PlayerEventListener implements Listener {
         final Vector3Builder target = Vector3Builder.from(player.getEyeLocation())
         .add(DualAxisRotationBuilder.from(player).getDirection3d().length(20));
 
-        final DualAxisRotationBuilder direction = center.getDirectionTo(target).getRotation2d();
+        final DualAxisRotationBuilder direction = center.getDirectionTo(target).getRotation2f();
 
         final Shape line = new Shape(Shape.ShapeType.STRAIGHT_LINE, direction);
         line.setScale(30);
@@ -391,7 +428,7 @@ public class PlayerEventListener implements Listener {
 
         if (from.equals(World.Environment.NORMAL) && to.equals(World.Environment.NETHER)) {
             event.setCancelled(true);
-            TestPlugin.getPaperVelocityManager().transfer(event.getPlayer(), PaperVelocityManager.BoAServerType.GAME);
+            TPLCore.paperVelocityManager.transfer(event.getPlayer(), PaperVelocityManager.BoAServer.GAME);
         }
     }
 

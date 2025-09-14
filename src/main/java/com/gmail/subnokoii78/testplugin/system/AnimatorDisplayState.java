@@ -1,13 +1,13 @@
 package com.gmail.subnokoii78.testplugin.system;
 
-import com.gmail.subnokoii78.util.execute.DimensionProvider;
-import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
-import com.gmail.subnokoii78.util.vector.Vector3Builder;
+import com.gmail.subnokoii78.tplcore.execute.DimensionAccess;
+import com.gmail.subnokoii78.tplcore.vector.TripleAxisRotationBuilder;
+import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 
 public class AnimatorDisplayState {
-    private World dimension = DimensionProvider.OVERWORLD.getWorld();
+    private World dimension = DimensionAccess.OVERWORLD.getWorld();
 
     private final Vector3Builder position = new Vector3Builder();
 

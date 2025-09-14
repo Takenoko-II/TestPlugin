@@ -7,7 +7,7 @@ import com.gmail.subnokoii78.util.file.json.*;
 import com.gmail.subnokoii78.util.eval.CalcExpEvaluator;
 import com.gmail.subnokoii78.util.eval.CalcExpEvaluationException;
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -18,6 +18,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -77,7 +78,46 @@ public enum BrigadierCommandNodes {
                             return Command.SINGLE_SUCCESS;
                         })
                 )
+                .then(
+                    Commands.literal("write")
+                        .then(
+                            Commands.argument("path", StringArgumentType.string())
+                                .then(
+                                    Commands.argument("value", BoolArgumentType.bool())
+                                        .executes(getConfigWriter(Boolean.class))
+                                )
+                                .then(
+                                    Commands.argument("value", DoubleArgumentType.doubleArg())
+                                        .executes(getConfigWriter(Double.class))
+                                )
+                                .then(
+                                    Commands.argument("value", StringArgumentType.string())
+                                        .executes(getConfigWriter(String.class))
+                                )
+                        )
+                )
                 .build();
+        }
+
+        private <T> Command<CommandSourceStack> getConfigWriter(@NotNull Class<T> valueType) {
+            return ctx -> {
+                final String path = ctx.getArgument("path", String.class);
+                final T value = ctx.getArgument("value", valueType);
+
+                if (!JSONPathAccessor.isValidPath(path)) {
+                    ctx.getSource().getSender().sendMessage(Component.text("無効な形式のパスです").color(NamedTextColor.RED));
+                    return 0;
+                }
+
+                if (PluginDirectoryManager.getConfig().has(path)) {
+                    PluginDirectoryManager.writeConfig(path, value);
+                    return Command.SINGLE_SUCCESS;
+                }
+                else {
+                    ctx.getSource().getSender().sendMessage(Component.text("そのパスは存在しません").color(NamedTextColor.RED));
+                    return 0;
+                }
+            };
         }
     },
 

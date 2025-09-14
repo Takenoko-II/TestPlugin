@@ -1,13 +1,16 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
-import com.gmail.subnokoii78.testplugin.BungeeCordUtils;
-import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.util.file.TextFileUtils;
-import com.gmail.subnokoii78.util.itemstack.ItemStackBuilder;
-import com.gmail.subnokoii78.util.ui.container.*;
+import com.gmail.subnokoii78.tplcore.TPLCore;
+import com.gmail.subnokoii78.tplcore.itemstack.ItemStackBuilder;
+import com.gmail.subnokoii78.tplcore.ui.container.ContainerInteraction;
+import com.gmail.subnokoii78.tplcore.ui.container.ItemButton;
+import com.gmail.subnokoii78.tplcore.ui.container.PlayerHeadButton;
+import com.gmail.subnokoii78.tplcore.ui.container.PotionButton;
+import com.gmail.takenokoii78.mojangson.MojangsonPath;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -21,9 +24,7 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 public class Test implements CommandExecutor, TabCompleter {
     @Override
@@ -50,17 +51,17 @@ public class Test implements CommandExecutor, TabCompleter {
                 else {
                     switch (args[1]) {
                         case "plugin_name": {
-                            final String name = TestPlugin.getInstance().getName();
+                            final String name = TPLCore.getPlugin().getName();
                             sender.sendMessage("現在のプラグイン名は" + name + "です");
                             break;
                         }
                         case "api_version": {
-                            final String version = TestPlugin.getInstance().getPluginMeta().getAPIVersion();
+                            final String version = TPLCore.getPlugin().getPluginMeta().getAPIVersion();
                             sender.sendMessage("APIのバージョンは" + version + "です");
                             break;
                         }
                         case "ip": {
-                            final String ip = TestPlugin.getInstance().getServer().getIp();
+                            final String ip = Bukkit.getServer().getIp();
 
                             if (ip.isEmpty()) sender.sendMessage("このサーバーはIPを持っていません");
                             else sender.sendMessage("このサーバーのIPは" + ip + "です");
@@ -68,37 +69,22 @@ public class Test implements CommandExecutor, TabCompleter {
                             break;
                         }
                         case "port": {
-                            final int port = TestPlugin.getInstance().getServer().getPort();
+                            final int port = Bukkit.getServer().getPort();
                             sender.sendMessage("このサーバーのポートは" + port + "です");
                             break;
                         }
                         case "current_tick": {
-                            final int tick = TestPlugin.getInstance().getServer().getCurrentTick();
+                            final int tick = Bukkit.getServer().getCurrentTick();
                             sender.sendMessage("現在のtickは" + tick + "です");
                             break;
                         }
                         case "max_players": {
-                            final int maxPlayers = TestPlugin.getInstance().getServer().getMaxPlayers();
+                            final int maxPlayers = Bukkit.getServer().getMaxPlayers();
                             sender.sendMessage("このサーバーのプレイヤーの最大人数は" + maxPlayers + "です");
                             break;
                         }
-                        case "log_archive_size": {
-                            final Optional<Long> size = Arrays.stream(TextFileUtils.getAll("logs"))
-                            .filter(path -> path.endsWith(".log.gz"))
-                            .map(TextFileUtils::getSize)
-                            .reduce(Long::sum);
-
-                            if (size.isEmpty()) {
-                                sender.sendMessage(Component.text("予期しないエラーが発生しました").color(TextColor.color(252, 64, 72)));
-                                return false;
-                            }
-
-                            sender.sendMessage("ログのアーカイブの合計ファイルサイズは" + (float) size.get() / 1024.0f + "KBです");
-
-                            break;
-                        }
                         case "bukkit_version": {
-                            final String version = TestPlugin.getInstance().getServer().getBukkitVersion();
+                            final String version = Bukkit.getServer().getBukkitVersion();
                             sender.sendMessage("このサーバーのBukkitのバージョンは" + version + "です");
                             break;
                         }
@@ -116,7 +102,7 @@ public class Test implements CommandExecutor, TabCompleter {
 
                 final Player player = (Player) sender;
 
-                final ItemStack serverSelector = BungeeCordUtils.getServerSelector();
+                final ItemStack serverSelector = TPLCore.paperVelocityManager.getServerSelectorItemStack();
 
                 if (player.getInventory().contains(serverSelector)) {
                     player.sendMessage(Component.text("あなたは既に所持しています").color(TextColor.color(252, 64, 72)));
@@ -142,16 +128,16 @@ public class Test implements CommandExecutor, TabCompleter {
                     switch (args[1]) {
                         case "grappling_hook": {
                             itemStackBuilder
-                            .type(Material.FISHING_ROD)
-                            .customName("Grappling Hook", NamedTextColor.GOLD)
-                            .dataContainer("custom_item_tag", "grappling_hook");
+                                .copyWithType(Material.FISHING_ROD)
+                                .itemName(Component.text("Grappling Hook").color(NamedTextColor.GOLD))
+                                .customData(MojangsonPath.of("custom_item_tag"), "grappling_hook");
                             break;
                         }
                         case "instant_shoot_bow": {
                             itemStackBuilder
-                            .type(Material.BOW)
-                            .customName("Instant Shoot Bow", NamedTextColor.GOLD)
-                            .dataContainer("custom_item_tag", "instant_shoot_bow");
+                                .copyWithType(Material.BOW)
+                                .customName(Component.text("Instant Shoot Bow").color(NamedTextColor.GOLD))
+                                .customData(MojangsonPath.of("custom_item_tag"), "instant_shoot_bow");
                             break;
                         }
                         default: {
@@ -170,23 +156,23 @@ public class Test implements CommandExecutor, TabCompleter {
                 }
             }
             case "open_test_ui": {
-                final var ui = new ContainerUI(Component.text("title"), 3);
+                final var ui = new ContainerInteraction(Component.text("title"), 3);
                 ui.set(
                     0,
-                    new ItemButton(Material.STONE)
+                    ItemButton.item(Material.STONE)
                         .glint(true)
-                        .addLore(Component.text("lore1"))
-                        .addLore(Component.text("lore2"))
+                        .lore(Component.text("lore1"))
+                        .lore(Component.text("lore2"))
                         .name(Component.text("name"))
                         .amount(77)
                         .onClick(event -> {
                             event.getPlayer().sendMessage("a");
                         })
                 );
-                ui.add(new PlayerHeadButton().player("Chuzume"));
-                ui.add(new PlayerHeadButton().player(sender.getName()));
-                ui.add(PotionButton.splashPotion().color(Color.GREEN));
-                ui.add(new ArmorButton(Material.NETHERITE_CHESTPLATE).trim(TrimMaterial.EMERALD, TrimPattern.SPIRE));
+                ui.add(ItemButton.playerHead().player("Chuzume"));
+                ui.add(ItemButton.playerHead().player(sender.getName()));
+                ui.add(ItemButton.splashPotion().color(Color.GREEN));
+                ui.add(ItemButton.armor(Material.NETHERITE_CHESTPLATE).trim(TrimMaterial.EMERALD, TrimPattern.SPIRE));
                 if (sender instanceof Player player) ui.open(player);
 
                 break;

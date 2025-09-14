@@ -1,7 +1,7 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
-import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.util.other.PaperVelocityManager;
+import com.gmail.subnokoii78.tplcore.TPLCore;
+import com.gmail.subnokoii78.tplcore.network.PaperVelocityManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.Command;
@@ -25,7 +25,7 @@ public class Lobby implements CommandExecutor, TabCompleter {
                 return false;
             }
 
-            TestPlugin.getPaperVelocityManager().transfer((Player) commandSender, PaperVelocityManager.BoAServerType.LOBBY);
+            TPLCore.paperVelocityManager.transfer((Player) commandSender, PaperVelocityManager.BoAServer.LOBBY);
         }
         else {
             if (!commandSender.isOp()) {
@@ -40,7 +40,7 @@ public class Lobby implements CommandExecutor, TabCompleter {
                 return false;
             }
 
-            TestPlugin.getPaperVelocityManager().transfer(player, PaperVelocityManager.BoAServerType.LOBBY);
+            TPLCore.paperVelocityManager.transfer(player, PaperVelocityManager.BoAServer.LOBBY);
         }
 
         commandSender.sendMessage("lobbyサーバーへの接続を試行中...");

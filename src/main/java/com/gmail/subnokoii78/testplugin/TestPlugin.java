@@ -4,15 +4,18 @@ import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.commands.brigadier.BrigadierCommandNodes;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
-import com.gmail.subnokoii78.util.command.PluginDebugger;
-import com.gmail.subnokoii78.util.event.*;
-import com.gmail.subnokoii78.util.execute.*;
-import com.gmail.subnokoii78.util.other.PaperVelocityManager;
-import com.gmail.subnokoii78.util.schedule.GameTickScheduler;
-import com.gmail.subnokoii78.util.ui.container.ContainerUI;
+import com.gmail.subnokoii78.tplcore.TPLCore;
+import com.gmail.subnokoii78.tplcore.events.DatapackMessageReceiveEvent;
+import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
+import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
+import com.gmail.subnokoii78.tplcore.execute.Execute;
+import com.gmail.subnokoii78.tplcore.execute.SelectorArgument;
+import com.gmail.subnokoii78.tplcore.network.PaperVelocityManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.function.Function;
 
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
@@ -27,18 +30,16 @@ public final class TestPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // 準備
-        paperVelocityManager = PaperVelocityManager.register(this);
+        // ライブラリを準備
+        TPLCore.initialize(plugin);
+
         PluginDirectoryManager.init();
-        GameTickScheduler.init(this);
 
         getLogger().info("TestPluginが起動しました");
 
         // イベントリスナー登録
         PlayerEventListener.init();
         EntityEventListener.init();
-        TickEventListener.init();
-        ContainerUI.UIEventHandler.init(this);
 
         // コマンド登録
         setCommandManager("lobby", new Lobby());
@@ -53,14 +54,9 @@ public final class TestPlugin extends JavaPlugin {
             }
         });
 
-        CustomEventHandlerRegistry.init(this);
-        CustomEventHandlerRegistry.register(CustomEventType.PLAYER_LEFT_CLICK, CustomEventListener.INSTANCE::onLeftClick);
-
-        DataPackMessageReceiverRegistry.register("foo", event -> {
-            return 1;
-        });
-
-        CustomEventListener.INSTANCE.registerDataPackMessageIds();
+        TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, CustomEventListener.INSTANCE::onLeftClick);
+        TPLCore.events.register(TPLEventTypes.DATAPACK_MESSAGE_RECEIVE, CustomEventListener.INSTANCE::onDatapackMessageReceive);
+        TPLCore.events.register(TPLEventTypes.TICK, TickEventListener.INSTANCE::onTick);
     }
 
     @Override
@@ -76,14 +72,6 @@ public final class TestPlugin extends JavaPlugin {
     }
 
     public static final String INTERNAL_ENTITY_TAG = "TestPlugin.Internal";
-
-    public static TestPlugin getInstance() {
-        return plugin;
-    }
-
-    public static PaperVelocityManager getPaperVelocityManager() {
-        return paperVelocityManager;
-    }
 
     private <T extends CommandExecutor & TabCompleter> void setCommandManager(String name, T manager) {
         final PluginCommand command = getCommand(name);

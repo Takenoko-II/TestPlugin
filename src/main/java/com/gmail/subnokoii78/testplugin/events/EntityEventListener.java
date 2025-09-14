@@ -1,9 +1,10 @@
 package com.gmail.subnokoii78.testplugin.events;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
-import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.util.datacontainer.ItemStackDataContainerManager;
-import com.gmail.subnokoii78.util.vector.Vector3Builder;
+import com.gmail.subnokoii78.tplcore.TPLCore;
+import com.gmail.subnokoii78.tplcore.itemstack.ItemStackCustomDataAccess;
+import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
+import com.gmail.takenokoii78.mojangson.MojangsonValueTypes;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -11,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.loot.LootTables;
 import org.bukkit.loot.Lootable;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -34,8 +34,8 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
         if (instance == null) {
             instance = new EntityEventListener();
 
-            Bukkit.getServer().getPluginManager().registerEvents(instance, TestPlugin.getInstance());
-            instance.runTaskTimer(TestPlugin.getInstance(), 0L, 1L);
+            Bukkit.getServer().getPluginManager().registerEvents(instance, TPLCore.getPlugin());
+            instance.runTaskTimer(TPLCore.getPlugin(), 0L, 1L);
         }
     }
 
@@ -132,19 +132,18 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         final Entity damagingEntity = event.getDamager();
 
-        if (!(damagingEntity instanceof LivingEntity)) return;
-
-        final LivingEntity livingEntity = (LivingEntity) damagingEntity;
+        if (!(damagingEntity instanceof LivingEntity livingEntity)) return;
 
         final Entity hurtEntity = event.getEntity();
 
-        if (!(hurtEntity instanceof Damageable)) return;
-
-        final Damageable damageableEntity = (Damageable) hurtEntity;
+        if (!(hurtEntity instanceof Damageable damageableEntity)) return;
 
         final ItemStack itemStack = livingEntity.getEquipment().getItemInMainHand();
 
-        final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
+        final String tag = ItemStackCustomDataAccess.of(itemStack)
+            .read()
+            .get("custom_item_tag", MojangsonValueTypes.STRING)
+            .getValue();
 
         if (tag == null) return;
 
@@ -200,7 +199,10 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
     private boolean isGrapplingHook(ItemStack itemStack) {
         if (itemStack == null) return false;
 
-        final String tag = new ItemStackDataContainerManager(itemStack).getString("custom_item_tag");
+        final String tag = ItemStackCustomDataAccess.of(itemStack)
+            .read()
+            .get("custom_item_tag", MojangsonValueTypes.STRING)
+            .getValue();
         return itemStack.getType().equals(Material.FISHING_ROD) && Objects.equals(tag, "grappling_hook");
     }
 }

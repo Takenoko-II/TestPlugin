@@ -73,12 +73,17 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <version>1.21.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-->
+            ↓はmavenのローカルリポジトリにTPLCoreのプロジェクトディレクトリ下にあるjarファイルを登録するコマンド
+            TPLCoreのプロジェクトディレクトリ下にあるjarファイルを更新したら実行してね
+            mvn install:install-file -U -Dfile="C:\Users\wakab\IdeaProjects\TPLCore\build\libs\TPLCore-1.0-SNAPSHOT.jar" -DgroupId="com.gmail.subnokoii78" -DartifactId=TPLCore -Dversion="1.0-SNAPSHOT" -Dpackaging=jar
+            <-->
             <groupId>com.gmail.subnokoii78</groupId>
-            <artifactId>Util</artifactId>
+            <artifactId>TPLCore</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

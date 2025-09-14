@@ -1,23 +1,25 @@
 package com.gmail.subnokoii78.testplugin.events;
 
-import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.testplugin.system.Combo;
 import com.gmail.subnokoii78.testplugin.system.PlayerComboHandler;
-import com.gmail.subnokoii78.util.event.DataPackMessageReceiveEvent;
-import com.gmail.subnokoii78.util.event.DataPackMessageReceiverRegistry;
-import com.gmail.subnokoii78.util.event.PlayerLeftClickEvent;
-import com.gmail.subnokoii78.util.execute.*;
-import com.gmail.subnokoii78.util.file.json.JSONObject;
-import com.gmail.subnokoii78.util.file.json.JSONValueType;
-import com.gmail.subnokoii78.util.file.json.TypedJSONArray;
-import com.gmail.subnokoii78.util.eval.CalcExpEvaluator;
-import com.gmail.subnokoii78.util.other.PaperVelocityManager;
-import com.gmail.subnokoii78.util.shape.ParticleSpawner;
-import com.gmail.subnokoii78.util.shape.VectorPrinter;
-import com.gmail.subnokoii78.util.vector.DualAxisRotationBuilder;
-import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
-import com.gmail.subnokoii78.util.vector.TripleAxisRotationBuilder;
-import com.gmail.subnokoii78.util.vector.Vector3Builder;
+import com.gmail.subnokoii78.tplcore.TPLCore;
+import com.gmail.subnokoii78.tplcore.events.DatapackMessageReceiveEvent;
+import com.gmail.subnokoii78.tplcore.events.PlayerClickEvent;
+import com.gmail.subnokoii78.tplcore.execute.EntityAnchor;
+import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
+import com.gmail.subnokoii78.tplcore.execute.Execute;
+import com.gmail.subnokoii78.tplcore.execute.SelectorArgument;
+import com.gmail.subnokoii78.tplcore.network.PaperVelocityManager;
+import com.gmail.subnokoii78.tplcore.shape.ParticleSpawner;
+import com.gmail.subnokoii78.tplcore.shape.VectorPrinter;
+import com.gmail.subnokoii78.tplcore.vector.DualAxisRotationBuilder;
+import com.gmail.subnokoii78.tplcore.vector.OrientedBoundingBox;
+import com.gmail.subnokoii78.tplcore.vector.TripleAxisRotationBuilder;
+import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
+import com.gmail.takenokoii78.json.JSONValueTypes;
+import com.gmail.takenokoii78.json.values.JSONNumber;
+import com.gmail.takenokoii78.json.values.JSONObject;
+import com.gmail.takenokoii78.json.values.TypedJSONArray;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -29,13 +31,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 
 import java.util.Set;
+import java.util.function.Function;
 
 public final class CustomEventListener {
     public static final CustomEventListener INSTANCE = new CustomEventListener();
 
     private CustomEventListener() {}
 
-    public void onLeftClick(PlayerLeftClickEvent event) {
+    public void onLeftClick(PlayerClickEvent event) {
+        if (!event.getClick().equals(PlayerClickEvent.Click.LEFT)) return;
+
         // 左クリックしたプレイヤー
         final Player player = event.getPlayer();
         // プレイヤーの右手にあるアイテム
@@ -49,26 +54,26 @@ public final class CustomEventListener {
         // 鉄剣持ってたら殴りとかブロック破壊をキャンセル
         event.cancel();
 
-        handler.combo(Combo.KNIGHT_NORMAL_SLASH);
+        handler.setCombo(Combo.KNIGHT_NORMAL_SLASH);
 
         handler.nextCombo();
     }
 
-    public int onCallBoundingBox(DataPackMessageReceiveEvent event) {
+    public int onCallBoundingBox(DatapackMessageReceiveEvent event) {
         final JSONObject message = event.getMessage();
 
-        final TypedJSONArray<Number> size = message.get("size", JSONValueType.ARRAY)
-            .typed(JSONValueType.NUMBER);
+        final TypedJSONArray<JSONNumber> size = message.get("size", JSONValueTypes.ARRAY)
+            .typed(JSONValueTypes.NUMBER);
 
-        final TiltedBoundingBox box = new TiltedBoundingBox(
+        final OrientedBoundingBox box = new OrientedBoundingBox(
             size.get(0).doubleValue(),
             size.get(1).doubleValue(),
             size.get(2).doubleValue()
         );
 
-        final float roll = message.get("roll", JSONValueType.NUMBER).floatValue();
+        final float roll = message.get("roll", JSONValueTypes.NUMBER).floatValue();
 
-        box.put(event.getBukkitLocation());
+        box.put(event.getLocation());
         box.rotation(box.rotation().roll(roll));
 
         final Set<Entity> entities = box.getCollidingEntities();
@@ -77,7 +82,7 @@ public final class CustomEventListener {
             entity.addScoreboardTag("plugin_api.box_intersection");
         });
 
-        if (event.getMessage().get("show_outline", JSONValueType.NUMBER).byteValue() > 0) {
+        if (event.getMessage().get("show_outline", JSONValueTypes.NUMBER).byteValue() > 0) {
             if (entities.isEmpty()) {
                 box.showOutline();
             }
@@ -99,7 +104,7 @@ public final class CustomEventListener {
                 printer.print(delta, Color.BLUE);
                 final Vector3Builder hit = box.rayCast(from, stack.getPosition().add(delta));
                 if (hit == null) return Execute.FAILURE;
-                final var spawner = new ParticleSpawner<>(Particle.WITCH, null);
+                final var spawner = new ParticleSpawner<>(Particle.WITCH);
                 spawner.place(stack.getDimension(), hit);
                 spawner.spawn();
                 return Execute.SUCCESS;
@@ -108,10 +113,10 @@ public final class CustomEventListener {
         return 1;
     }
 
-    public int onCallKBVector3(DataPackMessageReceiveEvent event) {
-        final TypedJSONArray<Number> array = event.getMessage()
-            .get("vector3", JSONValueType.ARRAY)
-            .typed(JSONValueType.NUMBER);
+    public int onCallKBVector3(DatapackMessageReceiveEvent event) {
+        final TypedJSONArray<JSONNumber> array = event.getMessage()
+            .get("vector3", JSONValueTypes.ARRAY)
+            .typed(JSONValueTypes.NUMBER);
 
         final Vector3Builder vector3 = new Vector3Builder(
             array.get(0).doubleValue(),
@@ -131,9 +136,9 @@ public final class CustomEventListener {
         return 1;
     }
 
-    public int onCallKBVector2(DataPackMessageReceiveEvent event) {
-        final DualAxisRotationBuilder vector2 = DualAxisRotationBuilder.from(event.getBukkitLocation());
-        final double strength = event.getMessage().get("strength", JSONValueType.NUMBER).doubleValue();
+    public int onCallKBVector2(DatapackMessageReceiveEvent event) {
+        final DualAxisRotationBuilder vector2 = DualAxisRotationBuilder.from(event.getLocation());
+        final double strength = event.getMessage().get("strength", JSONValueTypes.NUMBER).doubleValue();
 
         event.getTargets().forEach(entity -> {
             entity.setVelocity(
@@ -147,10 +152,10 @@ public final class CustomEventListener {
         return 1;
     }
 
-    public int onCallRotateDisplay(DataPackMessageReceiveEvent event) {
-        final TypedJSONArray<Number> array = event.getMessage()
-            .get("rotation", JSONValueType.ARRAY)
-            .typed(JSONValueType.NUMBER);
+    public int onCallRotateDisplay(DatapackMessageReceiveEvent event) {
+        final TypedJSONArray<JSONNumber> array = event.getMessage()
+            .get("rotation", JSONValueTypes.ARRAY)
+            .typed(JSONValueTypes.NUMBER);
 
         final TripleAxisRotationBuilder rotation = new TripleAxisRotationBuilder(
             array.get(0).floatValue(),
@@ -162,50 +167,47 @@ public final class CustomEventListener {
             if (!(target instanceof Display display)) continue;
 
             final Transformation transformation = display.getTransformation();
-            transformation.getLeftRotation().set(rotation.getQuaternion4d());
+            transformation.getLeftRotation().set(rotation.getQuaternion4f());
             display.setTransformation(transformation);
         }
 
         return 1;
     }
 
-    public int onCallTransfer(DataPackMessageReceiveEvent event) {
-        final PaperVelocityManager.BoAServerType serverType = PaperVelocityManager.BoAServerType.valueOf(
-            event.getMessage().get("server", JSONValueType.STRING)
+    public int onCallTransfer(DatapackMessageReceiveEvent event) {
+        final PaperVelocityManager.BoAServer serverType = PaperVelocityManager.BoAServer.valueOf(
+            event.getMessage().get("server", JSONValueTypes.STRING).getValue()
         );
 
         for (final Entity target : event.getTargets()) {
             if (!(target instanceof Player player)) continue;
 
-            TestPlugin.getPaperVelocityManager().transfer(player, serverType);
+            TPLCore.paperVelocityManager.transfer(player, serverType);
         }
 
         return 1;
     }
 
-    public int onCallLogging(DataPackMessageReceiveEvent event) {
-        TestPlugin.getInstance().getLogger().info(event.getMessage().get("message", JSONValueType.STRING));
+    public int onCallLogging(DatapackMessageReceiveEvent event) {
+        TPLCore.getPlugin().getLogger().info(event.getMessage().get("message", JSONValueTypes.STRING).getValue());
         return 1;
     }
 
-    public int onCallEvaluate(DataPackMessageReceiveEvent event) {
-        final String expression = event.getMessage().get("expression", JSONValueType.STRING);
-        final double value = CalcExpEvaluator.getDefaultEvaluator().evaluate(expression);
-        return (int) value;
-    }
-
-    public int onCallIsEnabled(DataPackMessageReceiveEvent event) {
+    public int onCallIsEnabled(DatapackMessageReceiveEvent event) {
         return 1;
     }
 
-    public void registerDataPackMessageIds() {
-        DataPackMessageReceiverRegistry.register("spawn_bounding_box", CustomEventListener.INSTANCE::onCallBoundingBox);
-        DataPackMessageReceiverRegistry.register("knockback_vec2", CustomEventListener.INSTANCE::onCallKBVector2);
-        DataPackMessageReceiverRegistry.register("knockback_vec3", CustomEventListener.INSTANCE::onCallKBVector3);
-        DataPackMessageReceiverRegistry.register("rotate_display", CustomEventListener.INSTANCE::onCallRotateDisplay);
-        DataPackMessageReceiverRegistry.register("transfer", CustomEventListener.INSTANCE::onCallTransfer);
-        DataPackMessageReceiverRegistry.register("logging", CustomEventListener.INSTANCE::onCallLogging);
-        DataPackMessageReceiverRegistry.register("evaluate", CustomEventListener.INSTANCE::onCallEvaluate);
-        DataPackMessageReceiverRegistry.register("is_enabled", CustomEventListener.INSTANCE::onCallIsEnabled);
+    public void onDatapackMessageReceive(DatapackMessageReceiveEvent event) {
+        final Function<DatapackMessageReceiveEvent, Integer> listener = switch (event.getId()) {
+            case "spawn_bounding_box" -> CustomEventListener.INSTANCE::onCallBoundingBox;
+            case "knockback_vec2" -> CustomEventListener.INSTANCE::onCallKBVector2;
+            case "knockback_vec3" -> CustomEventListener.INSTANCE::onCallKBVector3;
+            case "rotate_display" -> CustomEventListener.INSTANCE::onCallRotateDisplay;
+            case "transfer" -> CustomEventListener.INSTANCE::onCallTransfer;
+            case "logging" -> CustomEventListener.INSTANCE::onCallLogging;
+            case "is_enabled" -> CustomEventListener.INSTANCE::onCallIsEnabled;
+            default -> $ -> 0;
+        };
+        event.setReturnValue(listener.apply(event));
     }
 }

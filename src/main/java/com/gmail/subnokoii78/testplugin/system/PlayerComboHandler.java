@@ -68,11 +68,11 @@ public class PlayerComboHandler {
         }
     }
 
-    public Combo combo() {
+    public Combo getCombo() {
         return combo;
     }
 
-    public void combo(@NotNull Combo combo) {
+    public void setCombo(@NotNull Combo combo) {
         Objects.requireNonNull(combo, "Combo object must be not null");
         this.combo = combo;
     }
