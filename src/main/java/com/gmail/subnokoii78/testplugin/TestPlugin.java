@@ -5,22 +5,16 @@ import com.gmail.subnokoii78.testplugin.commands.brigadier.BrigadierCommandNodes
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
 import com.gmail.subnokoii78.tplcore.TPLCore;
-import com.gmail.subnokoii78.tplcore.events.DatapackMessageReceiveEvent;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
 import com.gmail.subnokoii78.tplcore.execute.Execute;
 import com.gmail.subnokoii78.tplcore.execute.SelectorArgument;
-import com.gmail.subnokoii78.tplcore.network.PaperVelocityManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.function.Function;
-
 public final class TestPlugin extends JavaPlugin {
     private static TestPlugin plugin;
-
-    private static PaperVelocityManager paperVelocityManager;
 
     @Override
     public void onLoad() {
@@ -33,7 +27,7 @@ public final class TestPlugin extends JavaPlugin {
         // ライブラリを準備
         TPLCore.initialize(plugin);
 
-        PluginDirectoryManager.init();
+        PluginConfigurationManager.reload();
 
         getLogger().info("TestPluginが起動しました");
 
@@ -48,7 +42,6 @@ public final class TestPlugin extends JavaPlugin {
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final var registrar = event.registrar();
-            PluginDebugger.DEFAULT_DEBUGGER.init("tspldebugger", registrar);
             for (final BrigadierCommandNodes node : BrigadierCommandNodes.values()) {
                 registrar.register(node.getNode());
             }

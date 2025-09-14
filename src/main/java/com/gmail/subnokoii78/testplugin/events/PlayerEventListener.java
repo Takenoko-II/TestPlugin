@@ -316,7 +316,7 @@ public class PlayerEventListener implements Listener {
         final Player player = event.getPlayer();
         final PlayerInventory inventory = player.getInventory();
 
-        final ItemStack serverSelector = BungeeCordUtils.getServerSelector();
+        final ItemStack serverSelector = TPLCore.paperVelocityManager.getServerSelectorItemStack();
 
         final ListIterator<ItemStack> itemStacks = inventory.iterator();
 

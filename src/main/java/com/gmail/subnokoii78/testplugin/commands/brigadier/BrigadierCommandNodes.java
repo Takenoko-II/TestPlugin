@@ -1,26 +1,20 @@
 package com.gmail.subnokoii78.testplugin.commands.brigadier;
 
-import com.gmail.subnokoii78.testplugin.PluginDirectoryManager;
+import com.gmail.subnokoii78.testplugin.PluginConfigurationManager;
 import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.util.file.TextFileUtils;
-import com.gmail.subnokoii78.util.file.json.*;
-import com.gmail.subnokoii78.util.eval.CalcExpEvaluator;
-import com.gmail.subnokoii78.util.eval.CalcExpEvaluationException;
+import com.gmail.takenokoii78.json.JSONParseException;
+import com.gmail.takenokoii78.json.JSONPath;
+import com.gmail.takenokoii78.json.JSONSerializer;
+import com.gmail.takenokoii78.json.values.JSONObject;
+import com.gmail.takenokoii78.json.values.JSONStructure;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
-import io.papermc.paper.command.brigadier.argument.SignedMessageResolver;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
 
 public enum BrigadierCommandNodes {
     FOO {
@@ -39,7 +33,7 @@ public enum BrigadierCommandNodes {
         public LiteralCommandNode<CommandSourceStack> getNode() {
             return Commands.literal("config")
                 .then(Commands.literal("reload").executes(ctx -> {
-                    PluginDirectoryManager.reloadConfig();
+                    PluginConfigurationManager.reload();
                     ctx.getSource().getSender().sendPlainMessage(TestPlugin.CONFIG_FILE_PATH + "をリロードしました");
                     return Command.SINGLE_SUCCESS;
                 }))
@@ -48,10 +42,13 @@ public enum BrigadierCommandNodes {
                         .then(
                             Commands.argument("path", StringArgumentType.string())
                                 .executes(ctx -> {
-                                    final JSONObject jsonObject = PluginDirectoryManager.getConfig();
-                                    final String path = ctx.getArgument("path", String.class);
+                                    final JSONObject jsonObject = PluginConfigurationManager.getRootObject();
 
-                                    if (!JSONPathAccessor.isValidPath(path)) {
+                                    final JSONPath path;
+                                    try {
+                                        path = JSONPath.of(ctx.getArgument("path", String.class));
+                                    }
+                                    catch (JSONParseException e) {
                                         ctx.getSource().getSender().sendMessage(Component.text("無効な形式のパスです").color(NamedTextColor.RED));
                                         return 0;
                                     }
@@ -73,7 +70,7 @@ public enum BrigadierCommandNodes {
                                 })
                         )
                         .executes(ctx -> {
-                            final JSONObject jsonObject = PluginDirectoryManager.getConfig();
+                            final JSONObject jsonObject = PluginConfigurationManager.getRootObject();
                             ctx.getSource().getSender().sendMessage(JSONSerializer.serialize(jsonObject));
                             return Command.SINGLE_SUCCESS;
                         })
@@ -101,16 +98,19 @@ public enum BrigadierCommandNodes {
 
         private <T> Command<CommandSourceStack> getConfigWriter(@NotNull Class<T> valueType) {
             return ctx -> {
-                final String path = ctx.getArgument("path", String.class);
-                final T value = ctx.getArgument("value", valueType);
-
-                if (!JSONPathAccessor.isValidPath(path)) {
+                final JSONPath path;
+                try {
+                    path = JSONPath.of(ctx.getArgument("path", String.class));
+                }
+                catch (JSONParseException e) {
                     ctx.getSource().getSender().sendMessage(Component.text("無効な形式のパスです").color(NamedTextColor.RED));
                     return 0;
                 }
 
-                if (PluginDirectoryManager.getConfig().has(path)) {
-                    PluginDirectoryManager.writeConfig(path, value);
+                final T value = ctx.getArgument("value", valueType);
+
+                if (PluginConfigurationManager.getRootObject().has(path)) {
+                    PluginConfigurationManager.write(path, value);
                     return Command.SINGLE_SUCCESS;
                 }
                 else {
@@ -118,96 +118,6 @@ public enum BrigadierCommandNodes {
                     return 0;
                 }
             };
-        }
-    },
-
-    LOGGER {
-        private Command<CommandSourceStack> getLogReader(int start, int end, boolean fromLast) {
-            return ctx -> {
-                final var log = TextFileUtils.read("logs/latest.log");
-                final var sender = ctx.getSource().getSender();
-                var component = fromLast
-                    ? Component.text("ログの終わり" + (end - start + 1) + "行を表示しています")
-                    : Component.text("ログの初め" + (end - start + 1) + "行を表示しています");
-
-                final var sub = fromLast
-                    ? log.subList(log.size() - (end + 1), log.size() - (start + 1))
-                    : log.subList(start, end);
-
-                for (int i = 0; i < sub.size(); i++) {
-                    final var line = sub.get(i);
-                    if (i % 2 == 0) {
-                        component = component.append(Component.text("\n- ").color(NamedTextColor.BLUE)).append(Component.text(line).color(NamedTextColor.WHITE));
-                    }
-                    else {
-                        component = component.append(Component.text("\n- ").color(NamedTextColor.BLUE)).append(Component.text(line).color(NamedTextColor.GRAY));
-                    }
-                }
-                sender.sendMessage(component);
-                return Command.SINGLE_SUCCESS;
-            };
-        }
-
-        @Override
-        public LiteralCommandNode<CommandSourceStack> getNode() {
-            return Commands.literal("log")
-                .then(
-                    Commands.literal("read")
-                        .then(Commands.literal("first").executes(getLogReader(0, 31, false)))
-                        .then(Commands.literal("last").executes(getLogReader(0, 31, true)))
-                        .executes(getLogReader(0, 15, true))
-                )
-                .then(
-                    Commands.literal("write")
-                        .then(Commands.argument("message", ArgumentTypes.component())
-                            .executes(ctx -> {
-                                final var message = ctx.getArgument("message", Component.class);
-                                TestPlugin.getInstance().getComponentLogger().info(message);
-                                ctx.getSource().getSender().sendMessage(Component.text("メッセージをログに書き込みました: ").append(message));
-                                return Command.SINGLE_SUCCESS;
-                            })
-                        )
-                )
-                .then(Commands.literal("clear").executes(ctx -> {
-                    Arrays.stream(TextFileUtils.getAll("logs"))
-                        .filter(path -> path.endsWith(".log.gz"))
-                        .forEach(TextFileUtils::delete);
-                    ctx.getSource().getSender().sendPlainMessage("ログのアーカイブを全て削除しました");
-                    return Command.SINGLE_SUCCESS;
-                }))
-                .build();
-        }
-    },
-
-    EVALUATE {
-        @Override
-        public LiteralCommandNode<CommandSourceStack> getNode() {
-            return Commands.literal("evaluate")
-                .then(Commands.argument("expression", ArgumentTypes.signedMessage()).executes(ctx -> {
-                    final CommandSender sender = ctx.getSource().getSender();
-                    final String expression = ctx.getArgument("expression", SignedMessageResolver.class).content();
-                    final CalcExpEvaluator evaluator = CalcExpEvaluator.getDefaultEvaluator();
-
-                    try {
-                        final double result = evaluator.evaluate(expression);
-                        sender.sendMessage(Component.text("演算結果: ").append(Component.text(result)));
-                        return (int) result;
-                    }
-                    catch (CalcExpEvaluationException e) {
-                        sender.sendMessage(
-                            Component.text(e.getMessage() == null ? "式の評価に失敗しました" : ("式の評価に失敗しました: " + e.getMessage()))
-                                .color(NamedTextColor.RED)
-                                .hoverEvent(HoverEvent.showText(Component.text("クリックして例外を投げる").color(NamedTextColor.RED)))
-                                .clickEvent(ClickEvent.callback(audience -> {
-                                    sender.sendMessage("発生した例外を投げます...");
-                                    throw e;
-                                }))
-                        );
-
-                        return 0;
-                    }
-                }))
-                .build();
         }
     };
 

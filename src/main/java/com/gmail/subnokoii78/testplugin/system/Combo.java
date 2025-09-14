@@ -1,14 +1,16 @@
 package com.gmail.subnokoii78.testplugin.system;
 
-import com.gmail.subnokoii78.testplugin.PluginDirectoryManager;
-import com.gmail.subnokoii78.util.execute.EntityAnchor;
-import com.gmail.subnokoii78.util.execute.Execute;
-import com.gmail.subnokoii78.util.execute.SourceOrigin;
-import com.gmail.subnokoii78.util.execute.SourceStack;
-import com.gmail.subnokoii78.util.file.json.JSONValueConverter;
-import com.gmail.subnokoii78.util.file.json.JSONValueType;
-import com.gmail.subnokoii78.util.vector.TiltedBoundingBox;
-import com.gmail.subnokoii78.util.vector.Vector3Builder;
+import com.gmail.subnokoii78.testplugin.PluginConfigurationManager;
+import com.gmail.subnokoii78.testplugin.util.Converter;
+import com.gmail.subnokoii78.tplcore.execute.CommandSourceStack;
+import com.gmail.subnokoii78.tplcore.execute.EntityAnchor;
+import com.gmail.subnokoii78.tplcore.execute.Execute;
+import com.gmail.subnokoii78.tplcore.execute.SourceOrigin;
+import com.gmail.subnokoii78.tplcore.vector.OrientedBoundingBox;
+import com.gmail.takenokoii78.json.JSONPath;
+import com.gmail.takenokoii78.json.JSONValueTypes;
+import com.gmail.takenokoii78.json.values.JSONArray;
+import com.gmail.takenokoii78.json.values.JSONNumber;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
@@ -19,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -74,9 +77,9 @@ public abstract class Combo {
         @Override
         public void onComboProgress(@NotNull Player player, int currentComboCount) {
             final PlayerComboHandler handler = PlayerComboHandler.getHandler(player);
-            final TiltedBoundingBox box = new TiltedBoundingBox(4, 0.5, 2);
+            final OrientedBoundingBox box = new OrientedBoundingBox(4, 0.5, 2);
 
-            new Execute(new SourceStack(SourceOrigin.of(player)))
+            new Execute(new CommandSourceStack(SourceOrigin.of(player)))
                 .anchored(EntityAnchor.EYES)
                 .positioned.$("^ ^ ^1")
                 .run.callback(stack -> {
@@ -136,10 +139,10 @@ public abstract class Combo {
             "normal_combo1/frame4",
             "normal_combo1/frame5"
         ).stateModifier(state -> {
-            final float combo1Angle = PluginDirectoryManager.getConfigValueOf(
-                "combos.knight.normal_slash.angles[0]",
-                JSONValueType.NUMBER,
-                -60f
+            final float combo1Angle = PluginConfigurationManager.getOrWriteDefault(
+                JSONPath.of("combos.knight.normal_slash.angles[0]"),
+                JSONValueTypes.NUMBER,
+                JSONNumber.valueOf(-60f)
             ).floatValue();
 
             state.rotation(state.rotation().roll(combo1Angle));
@@ -153,10 +156,10 @@ public abstract class Combo {
             "normal_combo2/frame4",
             "normal_combo2/frame5"
         ).stateModifier(state -> {
-            final float combo2Angle = PluginDirectoryManager.getConfigValueOf(
-                "combos.knight.normal_slash.angles[1]",
-                JSONValueType.NUMBER,
-                30f
+            final float combo2Angle = PluginConfigurationManager.getOrWriteDefault(
+                JSONPath.of("combos.knight.normal_slash.angles[1]"),
+                JSONValueTypes.NUMBER,
+                JSONNumber.valueOf(30f)
             ).floatValue();
 
             state.rotation(state.rotation().roll(combo2Angle));
@@ -170,10 +173,10 @@ public abstract class Combo {
             "normal_combo3/frame4",
             "normal_combo3/frame5"
         ).stateModifier(state -> {
-            final float combo3Angle = PluginDirectoryManager.getConfigValueOf(
-                "combos.knight.normal_slash.angles[2]",
-                JSONValueType.NUMBER,
-                70f
+            final float combo3Angle = PluginConfigurationManager.getOrWriteDefault(
+                JSONPath.of("combos.knight.normal_slash.angles[2]"),
+                JSONValueTypes.NUMBER,
+                JSONNumber.valueOf(70f)
             ).floatValue();
 
             state.rotation(state.rotation().roll(combo3Angle));
@@ -189,10 +192,10 @@ public abstract class Combo {
             "normal_combo4/frame6",
             "normal_combo4/frame7"
         ).stateModifier(state -> {
-            final float combo4Angle = PluginDirectoryManager.getConfigValueOf(
-                "combos.knight.normal_slash.angles[3]",
-                JSONValueType.NUMBER,
-                0f
+            final float combo4Angle = PluginConfigurationManager.getOrWriteDefault(
+                JSONPath.of("combos.knight.normal_slash.angles[3]"),
+                JSONValueTypes.NUMBER,
+                JSONNumber.valueOf(0f)
             ).floatValue();
 
             state.rotation(state.rotation().roll(combo4Angle));
@@ -200,10 +203,16 @@ public abstract class Combo {
         });
 
         private final ItemDisplayAnimator ANIMATOR = new ItemDisplayAnimator(getId(), 2)
-            .defaultScale(PluginDirectoryManager.getConfigValueOf(
-                "combos.knight.normal_slash.display_scale",
-                JSONValueConverter.VECTOR3,
-                new Vector3Builder(3, 6, 0.1)
+            .defaultScale(Converter.jsonArrayToVector3(
+                PluginConfigurationManager.getOrWriteDefault(
+                    JSONPath.of("combos.knight.normal_slash.display_scale"),
+                    JSONValueTypes.ARRAY,
+                    new JSONArray(List.of(
+                        JSONNumber.valueOf(3),
+                        JSONNumber.valueOf(6),
+                        JSONNumber.valueOf(0.1)
+                    ))
+                ).typed(JSONValueTypes.NUMBER)
             ))
             .addFrameGroup(COMBO1)
             .addFrameGroup(COMBO2)

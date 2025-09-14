@@ -1,6 +1,6 @@
 package com.gmail.subnokoii78.testplugin.system;
 
-import com.gmail.subnokoii78.util.schedule.GameTickScheduler;
+import com.gmail.subnokoii78.tplcore.schedule.GameTickScheduler;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
