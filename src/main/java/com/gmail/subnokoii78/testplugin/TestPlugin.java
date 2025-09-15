@@ -10,22 +10,35 @@ import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
 import com.gmail.subnokoii78.tplcore.execute.Execute;
 import com.gmail.subnokoii78.tplcore.execute.SelectorArgument;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 public final class TestPlugin extends JavaPlugin {
-    private static TestPlugin plugin;
+    private final TestPluginBootstrap bootstrap;
+
+    TestPlugin(@NotNull TestPluginBootstrap bootstrap) {
+        this.bootstrap = bootstrap;
+    }
 
     @Override
     public void onLoad() {
-        getLogger().info("TestPluginを読み込んでいます...");
-        plugin = this;
+        getComponentLogger().info(Component.text("TestPluginを読み込んでいます...").color(NamedTextColor.GRAY));
+
+        if (bootstrap.getDatapack().isEnabled()) {
+            getComponentLogger().info(Component.text("データパック tpl をロードしました").color(NamedTextColor.GREEN));
+        }
+        else {
+            getComponentLogger().info(Component.text("データパック tpl のロードに失敗しました").color(NamedTextColor.RED));
+        }
     }
 
     @Override
     public void onEnable() {
         // ライブラリを準備
-        TPLCore.initialize(plugin);
+        TPLCore.initialize(this, bootstrap);
 
         PluginConfigurationManager.reload();
 

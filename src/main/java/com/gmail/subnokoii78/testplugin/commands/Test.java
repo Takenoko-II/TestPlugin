@@ -4,8 +4,6 @@ import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.itemstack.ItemStackBuilder;
 import com.gmail.subnokoii78.tplcore.ui.container.ContainerInteraction;
 import com.gmail.subnokoii78.tplcore.ui.container.ItemButton;
-import com.gmail.subnokoii78.tplcore.ui.container.PlayerHeadButton;
-import com.gmail.subnokoii78.tplcore.ui.container.PotionButton;
 import com.gmail.takenokoii78.mojangson.MojangsonPath;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -127,14 +125,14 @@ public class Test implements CommandExecutor, TabCompleter {
                 if (args.length == 2) {
                     switch (args[1]) {
                         case "grappling_hook": {
-                            itemStackBuilder
+                            itemStackBuilder = itemStackBuilder
                                 .copyWithType(Material.FISHING_ROD)
                                 .itemName(Component.text("Grappling Hook").color(NamedTextColor.GOLD))
                                 .customData(MojangsonPath.of("custom_item_tag"), "grappling_hook");
                             break;
                         }
                         case "instant_shoot_bow": {
-                            itemStackBuilder
+                            itemStackBuilder = itemStackBuilder
                                 .copyWithType(Material.BOW)
                                 .customName(Component.text("Instant Shoot Bow").color(NamedTextColor.GOLD))
                                 .customData(MojangsonPath.of("custom_item_tag"), "instant_shoot_bow");

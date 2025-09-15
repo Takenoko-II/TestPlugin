@@ -1,4 +1,5 @@
 name: TestPlugin
+description: '何故か未だに名前がTestPluginになってるプラグイン'
 version: '${project.version}'
 main: com.gmail.subnokoii78.testplugin.TestPlugin
 api-version: '1.21'
