@@ -32,12 +32,12 @@ public final class PluginConfigurationManager {
             return getRootObject().get(path, type);
         }
         else {
-            write(path, defaultValue);
+            write(path, defaultValue, true);
             return defaultValue;
         }
     }
 
-    public static void write(@NotNull JSONPath path, @NotNull Object value) {
+    public static void write(@NotNull JSONPath path, @NotNull Object value, boolean forced) {
         final JSONObject obj = getRootObject();
         obj.set(path, value);
         final JSONFile file = new JSONFile(TestPlugin.CONFIG_FILE_PATH);
@@ -46,7 +46,13 @@ public final class PluginConfigurationManager {
             file.create();
         }
 
-        file.write(obj);
+        if (forced) file.write(obj);
+        else if (getRootObject().has(path)) {
+            file.write(obj);
+        }
+        else {
+            throw new IllegalArgumentException("存在しないパスのため値を設定できませんでした: 既存のキーのみ変更可能です");
+        }
     }
 
     public static void reload() {

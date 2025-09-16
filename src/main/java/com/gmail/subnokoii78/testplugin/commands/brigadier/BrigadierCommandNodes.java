@@ -109,7 +109,7 @@ public enum BrigadierCommandNodes {
 
                 final T value = ctx.getArgument(valueArgId, valueType);
 
-                PluginConfigurationManager.write(path, value);
+                PluginConfigurationManager.write(path, value, false);
                 return Command.SINGLE_SUCCESS;
             };
         }
