@@ -5,6 +5,7 @@ import com.gmail.subnokoii78.testplugin.commands.brigadier.BrigadierCommandNodes
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
 import com.gmail.subnokoii78.tplcore.TPLCore;
+import com.gmail.subnokoii78.tplcore.commands.ConsoleCommand;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
 import com.gmail.subnokoii78.tplcore.execute.Execute;
@@ -90,8 +91,10 @@ public final class TestPlugin extends JavaPlugin {
 
     public static final String PERSISTENT_DIRECTORY_PATH = "plugins/TestPluginPersistent";
 
+    @Deprecated
     public static final String LOG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/plugin.log";
 
+    @Deprecated
     public static final String DATABASE_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/database.dat";
 
     public static final String CONFIG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/config.json";
