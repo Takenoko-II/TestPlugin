@@ -10,10 +10,15 @@ import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
 import com.gmail.subnokoii78.tplcore.execute.Execute;
 import com.gmail.subnokoii78.tplcore.execute.SelectorArgument;
+import com.gmail.subnokoii78.tplcore.itemstack.ItemStackCustomDataAccess;
+import com.mojang.brigadier.Command;
+import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -71,6 +76,11 @@ public final class TestPlugin extends JavaPlugin {
             final var registrar = event.registrar();
             for (final BrigadierCommandNodes node : BrigadierCommandNodes.values()) {
                 registrar.register(node.getNode());
+                registrar.register(Commands.literal("debug").executes(ctx -> {
+                    final ItemStack itemStack = ((Player) ctx.getSource().getExecutor()).getEquipment().getItemInMainHand();
+                    System.out.println("debug: " + ItemStackCustomDataAccess.of(itemStack).read());
+                    return Command.SINGLE_SUCCESS;
+                }).build());
             }
         });
 
@@ -113,3 +123,9 @@ public final class TestPlugin extends JavaPlugin {
 
     public static final String CONFIG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/config.json";
 }
+
+/* TODO
+* モブを殴ったりする(気のせいかも)と「plugin_api.on_right_clickは存在しないよ」と出る -> TPLCoreのhasObjective()をよく見て、反転忘れてるよ？
+* サーバーセレクターが右クリックで開けない(=TPLCore.eventsを怪しむ) -> またあした
+* 左右どちらもクリックイベントが発火しない？ -> 「キー "custom_item_tag" は存在しないよ」-> DataContainerのころと仕様が違うから。has()してからget()するようにTestPlugin側を書き換える
+*/
