@@ -106,7 +106,7 @@ public class PlayerEventListener implements Listener {
                 event.cancel();
             }
 
-            TPLCore.scoreboard
+            TPLCore.getScoreboard()
                 .getOrAddObjective("plugin_api.on_left_click", null, null, null)
                 .addScore(player, 1);
 
@@ -133,7 +133,7 @@ public class PlayerEventListener implements Listener {
 
         TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, event -> {
             final Player player = event.getPlayer();
-            TPLCore.scoreboard
+            TPLCore.getScoreboard()
                 .getOrAddObjective("plugin_api.on_right_click", null, null, null)
                 .addScore(player, 1);
 

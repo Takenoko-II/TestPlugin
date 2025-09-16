@@ -17,6 +17,10 @@ import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public final class TestPlugin extends JavaPlugin {
     private final TestPluginBootstrap bootstrap;
 
@@ -27,6 +31,12 @@ public final class TestPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         getComponentLogger().info(Component.text("TestPluginを読み込んでいます...").color(NamedTextColor.GRAY));
+    }
+
+    @Override
+    public void onEnable() {
+        // ライブラリを準備
+        TPLCore.initialize(this, bootstrap);
 
         if (bootstrap.getDatapack().isEnabled()) {
             getComponentLogger().info(Component.text("データパック tpl をロードしました").color(NamedTextColor.GREEN));
@@ -34,12 +44,14 @@ public final class TestPlugin extends JavaPlugin {
         else {
             getComponentLogger().info(Component.text("データパック tpl のロードに失敗しました").color(NamedTextColor.RED));
         }
-    }
 
-    @Override
-    public void onEnable() {
-        // ライブラリを準備
-        TPLCore.initialize(this, bootstrap);
+        // TestPluginPersistentディレクトリを用意
+        try {
+            Files.createDirectories(Path.of(TestPlugin.PERSISTENT_DIRECTORY_PATH));
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         PluginConfigurationManager.reload();
 
@@ -50,9 +62,10 @@ public final class TestPlugin extends JavaPlugin {
         EntityEventListener.init();
 
         // コマンド登録
-        setCommandManager("lobby", new Lobby());
-        setCommandManager("tools", new Tools());
-        setCommandManager("test", new Test());
+        // TODO: 廃止済みらしいのでbrigadier式に置き換え
+        // setCommandManager("lobby", new Lobby());
+        // setCommandManager("tools", new Tools());
+        // setCommandManager("test", new Test());
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final var registrar = event.registrar();
@@ -80,6 +93,7 @@ public final class TestPlugin extends JavaPlugin {
 
     public static final String INTERNAL_ENTITY_TAG = "TestPlugin.Internal";
 
+    @Deprecated
     private <T extends CommandExecutor & TabCompleter> void setCommandManager(String name, T manager) {
         final PluginCommand command = getCommand(name);
 

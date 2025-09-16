@@ -3,12 +3,3 @@ description: '何故か未だに名前がTestPluginになってるプラグイ�
 version: '${project.version}'
 main: com.gmail.subnokoii78.testplugin.TestPlugin
 api-version: '1.21'
-commands:
-  lobby:
-    description: '実行者・もしくは指定のプレイヤーをロビーサーバーに転送します'
-    usage: '/<command> [<player>]'
-  tools:
-    description: 'プラグイン製のツールを取り出すためのUIを表示します'
-    usage: '/<command>'
-  test:
-    description: 'デバッグ用コマンドのため機能が頻繁に追加・削除・変更されます'

@@ -80,23 +80,23 @@ public enum BrigadierCommandNodes {
                         .then(
                             Commands.argument("path", StringArgumentType.string())
                                 .then(
-                                    Commands.argument("value", BoolArgumentType.bool())
-                                        .executes(getConfigWriter(Boolean.class))
+                                    Commands.argument("value_b", BoolArgumentType.bool())
+                                        .executes(getConfigWriter("value_b", Boolean.class))
                                 )
                                 .then(
-                                    Commands.argument("value", DoubleArgumentType.doubleArg())
-                                        .executes(getConfigWriter(Double.class))
+                                    Commands.argument("value_d", DoubleArgumentType.doubleArg())
+                                        .executes(getConfigWriter("value_d", Double.class))
                                 )
                                 .then(
-                                    Commands.argument("value", StringArgumentType.string())
-                                        .executes(getConfigWriter(String.class))
+                                    Commands.argument("value_s", StringArgumentType.string())
+                                        .executes(getConfigWriter("value_s", String.class))
                                 )
                         )
                 )
                 .build();
         }
 
-        private <T> Command<CommandSourceStack> getConfigWriter(@NotNull Class<T> valueType) {
+        private <T> Command<CommandSourceStack> getConfigWriter(@NotNull String valueArgId, @NotNull Class<T> valueType) {
             return ctx -> {
                 final JSONPath path;
                 try {
@@ -107,16 +107,10 @@ public enum BrigadierCommandNodes {
                     return 0;
                 }
 
-                final T value = ctx.getArgument("value", valueType);
+                final T value = ctx.getArgument(valueArgId, valueType);
 
-                if (PluginConfigurationManager.getRootObject().has(path)) {
-                    PluginConfigurationManager.write(path, value);
-                    return Command.SINGLE_SUCCESS;
-                }
-                else {
-                    ctx.getSource().getSender().sendMessage(Component.text("そのパスは存在しません").color(NamedTextColor.RED));
-                    return 0;
-                }
+                PluginConfigurationManager.write(path, value);
+                return Command.SINGLE_SUCCESS;
             };
         }
     };
