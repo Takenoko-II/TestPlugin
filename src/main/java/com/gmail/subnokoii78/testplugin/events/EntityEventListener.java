@@ -140,6 +140,8 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
         final ItemStack itemStack = livingEntity.getEquipment().getItemInMainHand();
 
+        if (!ItemStackCustomDataAccess.of(itemStack).read().has("custom_item_tag")) return;
+
         final String tag = ItemStackCustomDataAccess.of(itemStack)
             .read()
             .get("custom_item_tag", MojangsonValueTypes.STRING)
@@ -198,6 +200,8 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
     private boolean isGrapplingHook(ItemStack itemStack) {
         if (itemStack == null) return false;
+
+        if (!ItemStackCustomDataAccess.of(itemStack).read().has("custom_item_tag")) return false;
 
         final String tag = ItemStackCustomDataAccess.of(itemStack)
             .read()

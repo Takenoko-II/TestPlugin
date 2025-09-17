@@ -1,11 +1,9 @@
 package com.gmail.subnokoii78.testplugin;
 
-import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.commands.brigadier.BrigadierCommandNodes;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
 import com.gmail.subnokoii78.tplcore.TPLCore;
-import com.gmail.subnokoii78.tplcore.commands.ConsoleCommand;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
 import com.gmail.subnokoii78.tplcore.execute.Execute;
@@ -87,6 +85,10 @@ public final class TestPlugin extends JavaPlugin {
         TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, CustomEventListener.INSTANCE::onLeftClick);
         TPLCore.events.register(TPLEventTypes.DATAPACK_MESSAGE_RECEIVE, CustomEventListener.INSTANCE::onDatapackMessageReceive);
         TPLCore.events.register(TPLEventTypes.TICK, TickEventListener.INSTANCE::onTick);
+
+        TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, event -> {
+            event.getPlayer().sendMessage(Component.text(event.getClick().toString()));
+        });
     }
 
     @Override

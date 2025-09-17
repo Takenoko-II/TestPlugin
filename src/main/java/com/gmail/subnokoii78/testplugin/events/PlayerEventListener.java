@@ -14,6 +14,7 @@ import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
 import com.gmail.takenokoii78.mojangson.MojangsonPath;
 import com.gmail.takenokoii78.mojangson.MojangsonValueTypes;
 import com.gmail.takenokoii78.mojangson.values.MojangsonByte;
+import com.gmail.takenokoii78.mojangson.values.MojangsonCompound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.Color;
@@ -69,10 +70,11 @@ public class PlayerEventListener implements Listener {
 
             if (itemStack.getItemMeta() == null) return;
 
-            final String tag = ItemStackCustomDataAccess.of(itemStack)
-                .read()
-                .get("custom_item_tag", MojangsonValueTypes.STRING)
-                .getValue();
+            final MojangsonCompound compound = ItemStackCustomDataAccess.of(itemStack).read();
+
+            final String tag = compound.has("custom_item_tag")
+                ? compound.get("custom_item_tag", MojangsonValueTypes.STRING).getValue()
+                : null;
 
             if (tag != null) {
                 switch (tag) {
@@ -110,14 +112,14 @@ public class PlayerEventListener implements Listener {
                 .getOrAddObjective("plugin_api.on_left_click", null, null, null)
                 .addScore(player, 1);
 
-            final String type = ItemStackCustomDataAccess.of(itemStack)
-                .read()
-                .get(MojangsonPath.of("on_left_click.type"), MojangsonValueTypes.STRING)
-                .getValue();
-            final String content = ItemStackCustomDataAccess.of(itemStack)
-                .read()
-                .get(MojangsonPath.of("on_left_click.content"), MojangsonValueTypes.STRING)
-                .getValue();
+            final MojangsonCompound compoundL = ItemStackCustomDataAccess.of(itemStack).read();
+
+            final String type = compoundL.has("on_left_click.type")
+                ? compoundL.get(MojangsonPath.of("on_left_click.type"), MojangsonValueTypes.STRING).getValue()
+                : null;
+            final String content = compoundL.has("on_left_click.content")
+                ? compoundL.get(MojangsonPath.of("on_left_click.content"), MojangsonValueTypes.STRING).getValue()
+                : null;
 
             if (type != null && content != null) {
                 switch (type) {
@@ -140,14 +142,14 @@ public class PlayerEventListener implements Listener {
             final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
             if (itemStack.getItemMeta() == null) return;
 
-            final String type = ItemStackCustomDataAccess.of(itemStack)
-                .read()
-                .get(MojangsonPath.of("on_right_click.type"), MojangsonValueTypes.STRING)
-                .getValue();
-            final String content = ItemStackCustomDataAccess.of(itemStack)
-                .read()
-                .get(MojangsonPath.of("on_right_click.content"), MojangsonValueTypes.STRING)
-                .getValue();
+            final MojangsonCompound compound = ItemStackCustomDataAccess.of(itemStack).read();
+
+            final String type = compound.has("on_right_click.type")
+                ? compound.get(MojangsonPath.of("on_right_click.type"), MojangsonValueTypes.STRING).getValue()
+                : null;
+            final String content = compound.has("on_right_click.content")
+                ? compound.get(MojangsonPath.of("on_right_click.content"), MojangsonValueTypes.STRING).getValue()
+                : null;
 
             if (type != null && content != null) {
                 switch (type) {
@@ -166,7 +168,9 @@ public class PlayerEventListener implements Listener {
 
             if (itemStack.getItemMeta() == null) return;
 
-            switch (ItemStackCustomDataAccess.of(itemStack).read().get("custom_item_tag", MojangsonValueTypes.STRING).getValue()) {
+            final MojangsonCompound compound = ItemStackCustomDataAccess.of(itemStack).read();
+
+            switch (compound.has("custom_item_tag") ? compound.get("custom_item_tag", MojangsonValueTypes.STRING).getValue() : null) {
                 case "quick_teleporter": {
                     event.cancel();
 
@@ -254,7 +258,9 @@ public class PlayerEventListener implements Listener {
     public void onDropItem(PlayerDropItemEvent event) {
         final ItemStack itemStack = event.getItemDrop().getItemStack();
 
-        final MojangsonByte b = ItemStackCustomDataAccess.of(itemStack).read().get("locked", MojangsonValueTypes.BYTE);
+        final MojangsonCompound compound = ItemStackCustomDataAccess.of(itemStack).read();
+
+        final MojangsonByte b = compound.has("locked") ? compound.get("locked", MojangsonValueTypes.BYTE) : MojangsonByte.valueOf((byte) 0);
 
         if (!b.isBooleanValue()) return;
 
@@ -274,9 +280,11 @@ public class PlayerEventListener implements Listener {
         final ItemStack itemStack = event.getCurrentItem();
         if (itemStack == null) return;
 
-        final MojangsonByte b = ItemStackCustomDataAccess.of(itemStack)
-            .read()
-            .get("locked", MojangsonValueTypes.BYTE);
+        final MojangsonCompound compound = ItemStackCustomDataAccess.of(itemStack).read();
+
+        final MojangsonByte b = compound.has("locked")
+            ? compound.get("locked", MojangsonValueTypes.BYTE)
+            : MojangsonByte.valueOf((byte) 0);
 
         if (!b.isBooleanValue()) return;
 
@@ -292,14 +300,15 @@ public class PlayerEventListener implements Listener {
         final ItemStack mainHandItem = event.getMainHandItem();
         final ItemStack offhandItem = event.getOffHandItem();
 
-        final Boolean mainHandLocked = ItemStackCustomDataAccess.of(mainHandItem)
-            .read()
-            .get("locked", MojangsonValueTypes.BYTE)
-            .getAsBooleanValueOrNull();
-        final Boolean offHandLocked = ItemStackCustomDataAccess.of(offhandItem)
-            .read()
-            .get("locked", MojangsonValueTypes.BYTE)
-            .getAsBooleanValueOrNull();
+        final MojangsonCompound compoundMain = ItemStackCustomDataAccess.of(mainHandItem).read();
+        final MojangsonCompound compoundOff = ItemStackCustomDataAccess.of(offhandItem).read();
+
+        final Boolean mainHandLocked = compoundMain.has("locked")
+            ? compoundMain.get("locked", MojangsonValueTypes.BYTE).getAsBooleanValueOrNull()
+            : null;
+        final Boolean offHandLocked = compoundOff.has("locked")
+            ? compoundOff.get("locked", MojangsonValueTypes.BYTE).getAsBooleanValueOrNull()
+            : null;
 
         if (Objects.equals(mainHandLocked, true) && !event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) {
             event.setCancelled(true);
@@ -326,10 +335,11 @@ public class PlayerEventListener implements Listener {
 
             if (itemStack == null) continue;
 
-            final String tag = ItemStackCustomDataAccess.of(itemStack)
-                .read()
-                .get("custom_item_tag", MojangsonValueTypes.STRING)
-                .getValue();
+            final MojangsonCompound compound = ItemStackCustomDataAccess.of(itemStack).read();
+
+            final String tag = compound.has("custom_item_tag")
+                ? compound.get("custom_item_tag", MojangsonValueTypes.STRING).getValue()
+                : null;
 
             if (Objects.equals(tag, "server_selector")) return;
 
