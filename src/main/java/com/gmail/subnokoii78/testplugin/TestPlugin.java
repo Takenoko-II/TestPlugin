@@ -1,5 +1,6 @@
 package com.gmail.subnokoii78.testplugin;
 
+import com.gmail.subnokoii78.testplugin.commands.ServerSelectorCommand;
 import com.gmail.subnokoii78.testplugin.commands.brigadier.BrigadierCommandNodes;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
@@ -20,6 +21,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -74,11 +77,7 @@ public final class TestPlugin extends JavaPlugin {
             final var registrar = event.registrar();
             for (final BrigadierCommandNodes node : BrigadierCommandNodes.values()) {
                 registrar.register(node.getNode());
-                registrar.register(Commands.literal("debug").executes(ctx -> {
-                    final ItemStack itemStack = ((Player) ctx.getSource().getExecutor()).getEquipment().getItemInMainHand();
-                    System.out.println("debug: " + ItemStackCustomDataAccess.of(itemStack).read());
-                    return Command.SINGLE_SUCCESS;
-                }).build());
+                registrar.register(ServerSelectorCommand.SERVER_SELECTOR_COMMAND.getCommandNode());
             }
         });
 

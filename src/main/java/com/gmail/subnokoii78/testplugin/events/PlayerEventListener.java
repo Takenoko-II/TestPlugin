@@ -237,7 +237,7 @@ public class PlayerEventListener implements Listener {
                 }
                 case "server_selector": {
                     event.cancel();
-                    TPLCore.paperVelocityManager.openServerSelectorInteraction(player);
+                    TPLCore.paperVelocityManager.getServerSelectorInteraction().open(player);
                     break;
                 }
                 case "magic": {

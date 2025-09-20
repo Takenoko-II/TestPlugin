@@ -14,6 +14,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 public enum BrigadierCommandNodes {
@@ -28,10 +29,13 @@ public enum BrigadierCommandNodes {
         }
     },
 
-    RELOAD_CONFIG {
+    CONFIG {
         @Override
         public LiteralCommandNode<CommandSourceStack> getNode() {
             return Commands.literal("config")
+                .requires(stack -> {
+                    return stack.getSender().isOp();
+                })
                 .then(Commands.literal("reload").executes(ctx -> {
                     PluginConfigurationManager.reload();
                     ctx.getSource().getSender().sendPlainMessage(TestPlugin.CONFIG_FILE_PATH + "をリロードしました");
