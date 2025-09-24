@@ -79,7 +79,7 @@ public abstract class Combo {
             final PlayerComboHandler handler = PlayerComboHandler.getHandler(player);
             final OrientedBoundingBox box = new OrientedBoundingBox(4, 0.5, 2);
 
-            new Execute(new CommandSourceStack(SourceOrigin.of(player)))
+            new Execute(new CommandSourceStack(player))
                 .anchored(EntityAnchor.EYES)
                 .positioned.$("^ ^ ^1")
                 .run.callback(stack -> {

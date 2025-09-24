@@ -124,7 +124,7 @@ public class PlayerEventListener implements Listener {
             if (type != null && content != null) {
                 switch (type) {
                     case "run_command":
-                        new Execute(new CommandSourceStack(SourceOrigin.of(player)))
+                        new Execute(new CommandSourceStack(player))
                             .run.command(content);
                         break;
                     case "multiple":
@@ -154,7 +154,7 @@ public class PlayerEventListener implements Listener {
             if (type != null && content != null) {
                 switch (type) {
                     case "run_command":
-                        new Execute(new CommandSourceStack(SourceOrigin.of(player)))
+                        new Execute(new CommandSourceStack(player))
                             .run.command(content);
                         break;
                 }
