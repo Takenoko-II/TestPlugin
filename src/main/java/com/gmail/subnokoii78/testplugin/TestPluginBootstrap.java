@@ -27,11 +27,16 @@ public final class TestPluginBootstrap implements PluginBootstrap {
         }
 
         bootstrapContext.getLifecycleManager().registerEventHandler(LifecycleEvents.DATAPACK_DISCOVERY, event -> {
+            final DiscoveredDatapack datapack;
             try {
-                event.registrar().discoverPack(uri, DATAPACK_ID);
+                datapack = event.registrar().discoverPack(uri, DATAPACK_ID);
             }
             catch (IOException e) {
                 throw new IllegalStateException(e);
+            }
+
+            if (datapack == null) {
+                System.out.println("Load Failure: Could not get discovered datapack: " + DATAPACK_ID + " is null");
             }
         });
     }
@@ -53,5 +58,5 @@ public final class TestPluginBootstrap implements PluginBootstrap {
 
     public static final String DATAPACK_PATH = "/datapack";
 
-    public static final String DATAPACK_ID = "tpl";
+    public static final String DATAPACK_ID = "plugin_api";
 }

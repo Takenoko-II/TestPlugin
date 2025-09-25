@@ -1,4 +1,4 @@
-name: Paper-Test-Plugin
+name: TestPlugin
 version: '${project.version}'
 main: com.gmail.subnokoii78.testplugin.TestPlugin
 description: 'TestPlugin用のPaperプラグイン'

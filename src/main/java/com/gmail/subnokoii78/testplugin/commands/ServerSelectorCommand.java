@@ -8,6 +8,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 public class ServerSelectorCommand extends AbstractCommand {
@@ -23,9 +25,25 @@ public class ServerSelectorCommand extends AbstractCommand {
                     ));
                 }
 
-                TPLCore.paperVelocityManager.getServerSelectorInteraction().open(player);
+                final PlayerInventory inventory = player.getInventory();
+                final ItemStack serverSelector = TPLCore.paperVelocityManager.getServerSelectorItemStack();
+                if (inventory.contains(serverSelector)) {
+                    return failure(ctx.getSource(), new IllegalStateException(
+                        "既にサーバーセレクタを所持しています"
+                    ));
+                }
+                else {
+                    for (final ItemStack itemStack : inventory.getStorageContents()) {
+                        if (itemStack == null) {
+                            player.getInventory().addItem(serverSelector);
+                            return Command.SINGLE_SUCCESS;
+                        }
+                    }
 
-                return Command.SINGLE_SUCCESS;
+                    return failure(ctx.getSource(), new IllegalStateException(
+                        "インベントリがいっぱいです"
+                    ));
+                }
             })
             .build();
     }

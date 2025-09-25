@@ -1,14 +1,13 @@
 package com.gmail.subnokoii78.testplugin;
 
+import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.takenokoii78.json.JSONFile;
 import com.gmail.takenokoii78.json.JSONPath;
 import com.gmail.takenokoii78.json.JSONValue;
 import com.gmail.takenokoii78.json.JSONValueType;
 import com.gmail.takenokoii78.json.values.JSONObject;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public final class PluginConfigurationManager {
     private PluginConfigurationManager() {}
@@ -57,6 +56,8 @@ public final class PluginConfigurationManager {
 
     public static void reload() {
         final JSONFile file = new JSONFile(TestPlugin.CONFIG_FILE_PATH);
+
+        TPLCore.getPlugin().getComponentLogger().info(Component.text(TestPlugin.CONFIG_FILE_PATH + " がリロードされました"));
 
         if (file.exists()) {
             jsonObject = file.readAsObject();

@@ -6,23 +6,15 @@ import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
-import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
-import com.gmail.subnokoii78.tplcore.execute.Execute;
-import com.gmail.subnokoii78.tplcore.execute.SelectorArgument;
-import com.gmail.subnokoii78.tplcore.itemstack.ItemStackCustomDataAccess;
-import com.mojang.brigadier.Command;
-import io.papermc.paper.command.brigadier.Commands;
+import com.gmail.subnokoii78.tplcore.execute.*;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,10 +37,21 @@ public final class TestPlugin extends JavaPlugin {
         TPLCore.initialize(this, bootstrap);
 
         if (bootstrap.getDatapack().isEnabled()) {
-            getComponentLogger().info(Component.text("データパック tpl をロードしました").color(NamedTextColor.GREEN));
+            getComponentLogger().info(Component.text("データパック " + TestPluginBootstrap.DATAPACK_ID + " をロードしました").color(NamedTextColor.GREEN));
         }
         else {
-            getComponentLogger().info(Component.text("データパック tpl のロードに失敗しました").color(NamedTextColor.RED));
+            final String command = "/datapack enable \"" + TPLCore.getDatapackId(bootstrap.getDatapack()) + "\"";
+
+            getComponentLogger().info(
+                Component.text("データパック " + TestPluginBootstrap.DATAPACK_ID + " のロードに失敗しました")
+                    .color(NamedTextColor.RED)
+                    .appendNewline()
+                    .append(
+                        Component.text(command)
+                            .color(NamedTextColor.YELLOW)
+                    )
+                    .append(Component.text(" を実行して手動で有効化してください").color(NamedTextColor.RED))
+            );
         }
 
         // TestPluginPersistentディレクトリを用意
@@ -60,8 +63,6 @@ public final class TestPlugin extends JavaPlugin {
         }
 
         PluginConfigurationManager.reload();
-
-        getLogger().info("TestPluginが起動しました");
 
         // イベントリスナー登録
         PlayerEventListener.init();
@@ -80,19 +81,21 @@ public final class TestPlugin extends JavaPlugin {
                 registrar.register(ServerSelectorCommand.SERVER_SELECTOR_COMMAND.getCommandNode());
             }
         });
+        // TODO: DatapackMessageReceive動かない？それともデータパック側の問題？
 
         TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, CustomEventListener.INSTANCE::onLeftClick);
         TPLCore.events.register(TPLEventTypes.DATAPACK_MESSAGE_RECEIVE, CustomEventListener.INSTANCE::onDatapackMessageReceive);
         TPLCore.events.register(TPLEventTypes.TICK, TickEventListener.INSTANCE::onTick);
 
-        TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, event -> {
-            event.getPlayer().sendMessage(Component.text(event.getClick().toString()));
-        });
+        getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("TestPluginが停止しました");
+        if (bootstrap.getDatapack().isEnabled()) {
+            bootstrap.getDatapack().setEnabled(false);
+            getComponentLogger().info(Component.text("データパック '" + TestPluginBootstrap.DATAPACK_ID + "' が無効化されました"));
+        }
 
         new Execute()
             .as(EntitySelector.E.arg(SelectorArgument.TAG, INTERNAL_ENTITY_TAG))
@@ -100,6 +103,8 @@ public final class TestPlugin extends JavaPlugin {
                 stack.getExecutor().remove();
                 return Execute.SUCCESS;
             });
+
+        getComponentLogger().info(Component.text("TestPluginが停止しました").color(NamedTextColor.BLUE));
     }
 
     public static final String INTERNAL_ENTITY_TAG = "TestPlugin.Internal";
@@ -124,9 +129,3 @@ public final class TestPlugin extends JavaPlugin {
 
     public static final String CONFIG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/config.json";
 }
-
-/* TODO
-* モブを殴ったりする(気のせいかも)と「plugin_api.on_right_clickは存在しないよ」と出る -> TPLCoreのhasObjective()をよく見て、反転忘れてるよ？
-* サーバーセレクターが右クリックで開けない(=TPLCore.eventsを怪しむ) -> またあした
-* 左右どちらもクリックイベントが発火しない？ -> 「キー "custom_item_tag" は存在しないよ」-> DataContainerのころと仕様が違うから。has()してからget()するようにTestPlugin側を書き換える
-*/
