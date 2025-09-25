@@ -199,6 +199,7 @@ public final class CustomEventListener {
         return 1;
     }
 
+    // TODO
     public void onDatapackMessageReceive(DatapackMessageReceiveEvent event) {
         TPLCore.getPlugin().getComponentLogger().info(
             Component.text("TestPlugin API からのメッセージを受信: ")
