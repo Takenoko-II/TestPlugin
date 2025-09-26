@@ -88,6 +88,7 @@ public final class TestPlugin extends JavaPlugin {
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
 
         // TODO: SelectorParser
+        // TODO: データパックはdiscover()だけでいいのか？
     }
 
     @Override
