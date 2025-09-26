@@ -11,4 +11,4 @@
 
     data merge storage plugin_api: {}
 
-    execute if data storage plugin_api: {PluginState: 1} run say TestPlugin API がロードされました
+    say TestPlugin API がロードされました

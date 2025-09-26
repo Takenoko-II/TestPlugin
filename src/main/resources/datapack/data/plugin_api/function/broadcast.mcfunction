@@ -14,34 +14,32 @@
 #
 # @output
 #   storage
-#       plugin_api: broadcast.out
+#       plugin_api: broadcasting.out
 #   returns
 #
 # @api
 
 # 返り値がなかったときのため
-    data modify storage plugin_api: broadcast.out set value {returnValue: 0}
+    data modify storage plugin_api: broadcasting.out set value {return_value: 0}
 
 # プラグインに渡す情報を用意
     tag @s add plugin_api.executor
 
-    summon marker ~ ~ ~ {Tags: ["plugin_api.location_messenger"]}
+    summon marker ~ ~ ~ {Tags: ["plugin_api.messenger"]}
 
-    data remove storage plugin_api: broadcast.in set value {}
+    $data modify storage plugin_api: broadcasting.in set value $(args)
 
-    data modify storage plugin_api: broadcast.in set value $(args)
-
-    data modify storage plugin_api: broadcast.in.id set value "$(id)"
+    $data modify storage plugin_api: broadcasting.in.id set value "$(id)"
 
 # プラグインと通信
-    function plugin_api:__trigger__ {key: "KEY"}
+    teleport @e[type=marker,tag=plugin_api.messenger,limit=1] ~ ~ ~ ~ ~
 
-# 後処理
+# プラグインが正常に動作しなかった場合に対処するための後処理
     tag @s remove plugin_api.executor
 
-    kill @e[type=marker,tag=plugin_api.location_messenger,limit=1]
+    kill @e[type=marker,tag=plugin_api.messenger,limit=1]
 
     tag @e[tag=plugin_api.target] remove plugin_api.target
 
 # 返り値を外部へ返却
-    return run data get storage plugin_api: broadcast.out.returnValue
+    return run data get storage plugin_api: broadcasting.out.return_value

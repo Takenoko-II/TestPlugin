@@ -5,6 +5,7 @@ import com.gmail.subnokoii78.testplugin.system.PlayerComboHandler;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.events.DatapackMessageReceiveEvent;
 import com.gmail.subnokoii78.tplcore.events.PlayerClickEvent;
+import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.execute.EntityAnchor;
 import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
 import com.gmail.subnokoii78.tplcore.execute.Execute;
@@ -21,6 +22,8 @@ import com.gmail.takenokoii78.mojangson.values.MojangsonCompound;
 import com.gmail.takenokoii78.mojangson.values.MojangsonDouble;
 import com.gmail.takenokoii78.mojangson.values.MojangsonFloat;
 import com.gmail.takenokoii78.mojangson.values.TypedMojangsonList;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -194,6 +197,14 @@ public final class CustomEventListener {
     }
 
     public void onDatapackMessageReceive(DatapackMessageReceiveEvent event) {
+        TPLCore.getPlugin().getComponentLogger().info(
+            Component.text(PluginApi.NAMESPACE).color(NamedTextColor.YELLOW)
+                .appendSpace()
+                .append(Component.text("からのメッセージを受信しました:"))
+                .appendSpace()
+                .append(Component.text(event.getInput().toString()).color(NamedTextColor.GRAY))
+        );
+
         final Function<DatapackMessageReceiveEvent, Integer> listener = switch (event.getId()) {
             case "spawn_bounding_box" -> CustomEventListener.INSTANCE::onCallBoundingBox;
             case "knockback_vec2" -> CustomEventListener.INSTANCE::onCallKBVector2;

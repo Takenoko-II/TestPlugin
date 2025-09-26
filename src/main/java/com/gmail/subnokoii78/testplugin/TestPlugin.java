@@ -9,7 +9,6 @@ import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.*;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -87,6 +86,8 @@ public final class TestPlugin extends JavaPlugin {
         TPLCore.events.register(TPLEventTypes.TICK, TickEventListener.INSTANCE::onTick);
 
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
+
+        // TODO: PluginAPIの動作確認, SelectorParser
     }
 
     @Override
