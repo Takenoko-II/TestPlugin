@@ -16,12 +16,11 @@ import com.gmail.subnokoii78.tplcore.vector.DualAxisRotationBuilder;
 import com.gmail.subnokoii78.tplcore.vector.OrientedBoundingBox;
 import com.gmail.subnokoii78.tplcore.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
-import com.gmail.takenokoii78.json.JSONValueTypes;
-import com.gmail.takenokoii78.json.values.JSONNumber;
-import com.gmail.takenokoii78.json.values.JSONObject;
-import com.gmail.takenokoii78.json.values.TypedJSONArray;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import com.gmail.takenokoii78.mojangson.MojangsonValueTypes;
+import com.gmail.takenokoii78.mojangson.values.MojangsonCompound;
+import com.gmail.takenokoii78.mojangson.values.MojangsonDouble;
+import com.gmail.takenokoii78.mojangson.values.MojangsonFloat;
+import com.gmail.takenokoii78.mojangson.values.TypedMojangsonList;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -62,10 +61,10 @@ public final class CustomEventListener {
     }
 
     public int onCallBoundingBox(DatapackMessageReceiveEvent event) {
-        final JSONObject message = event.getMessage();
+        final MojangsonCompound input = event.getInput();
 
-        final TypedJSONArray<JSONNumber> size = message.get("size", JSONValueTypes.ARRAY)
-            .typed(JSONValueTypes.NUMBER);
+        final TypedMojangsonList<MojangsonFloat> size = input.get("size", MojangsonValueTypes.LIST)
+            .typed(MojangsonValueTypes.FLOAT);
 
         final OrientedBoundingBox box = new OrientedBoundingBox(
             size.get(0).doubleValue(),
@@ -73,9 +72,9 @@ public final class CustomEventListener {
             size.get(2).doubleValue()
         );
 
-        final float roll = message.get("roll", JSONValueTypes.NUMBER).floatValue();
+        final float roll = input.get("roll", MojangsonValueTypes.FLOAT).floatValue();
 
-        box.put(event.getLocation());
+        box.put(event.getContext().getLocation());
         box.rotation(box.rotation().roll(roll));
 
         final Set<Entity> entities = box.getCollidingEntities();
@@ -84,7 +83,7 @@ public final class CustomEventListener {
             entity.addScoreboardTag("plugin_api.box_intersection");
         });
 
-        if (event.getMessage().get("show_outline", JSONValueTypes.NUMBER).byteValue() > 0) {
+        if (input.get("show_outline", MojangsonValueTypes.BYTE).getAsBooleanValueOrNull() == Boolean.TRUE) {
             if (entities.isEmpty()) {
                 box.showOutline();
             }
@@ -116,9 +115,9 @@ public final class CustomEventListener {
     }
 
     public int onCallKBVector3(DatapackMessageReceiveEvent event) {
-        final TypedJSONArray<JSONNumber> array = event.getMessage()
-            .get("vector3", JSONValueTypes.ARRAY)
-            .typed(JSONValueTypes.NUMBER);
+        final TypedMojangsonList<MojangsonDouble> array = event.getInput()
+            .get("vector3", MojangsonValueTypes.LIST)
+            .typed(MojangsonValueTypes.DOUBLE);
 
         final Vector3Builder vector3 = new Vector3Builder(
             array.get(0).doubleValue(),
@@ -139,8 +138,8 @@ public final class CustomEventListener {
     }
 
     public int onCallKBVector2(DatapackMessageReceiveEvent event) {
-        final DualAxisRotationBuilder vector2 = DualAxisRotationBuilder.from(event.getLocation());
-        final double strength = event.getMessage().get("strength", JSONValueTypes.NUMBER).doubleValue();
+        final DualAxisRotationBuilder vector2 = event.getContext().getRotation();
+        final double strength = event.getInput().get("strength", MojangsonValueTypes.DOUBLE).doubleValue();
 
         event.getTargets().forEach(entity -> {
             entity.setVelocity(
@@ -155,9 +154,9 @@ public final class CustomEventListener {
     }
 
     public int onCallRotateDisplay(DatapackMessageReceiveEvent event) {
-        final TypedJSONArray<JSONNumber> array = event.getMessage()
-            .get("rotation", JSONValueTypes.ARRAY)
-            .typed(JSONValueTypes.NUMBER);
+        final TypedMojangsonList<MojangsonFloat> array = event.getInput()
+            .get("rotation", MojangsonValueTypes.LIST)
+            .typed(MojangsonValueTypes.FLOAT);
 
         final TripleAxisRotationBuilder rotation = new TripleAxisRotationBuilder(
             array.get(0).floatValue(),
@@ -178,7 +177,7 @@ public final class CustomEventListener {
 
     public int onCallTransfer(DatapackMessageReceiveEvent event) {
         final PaperVelocityManager.BoAServer serverType = PaperVelocityManager.BoAServer.valueOf(
-            event.getMessage().get("server", JSONValueTypes.STRING).getValue()
+            event.getInput().get("server", MojangsonValueTypes.STRING).getValue()
         );
 
         for (final Entity target : event.getTargets()) {
@@ -190,30 +189,17 @@ public final class CustomEventListener {
         return 1;
     }
 
-    public int onCallLogging(DatapackMessageReceiveEvent event) {
-        TPLCore.getPlugin().getLogger().info(event.getMessage().get("message", JSONValueTypes.STRING).getValue());
-        return 1;
-    }
-
     public int onCallIsEnabled(DatapackMessageReceiveEvent event) {
         return 1;
     }
 
-    // TODO
     public void onDatapackMessageReceive(DatapackMessageReceiveEvent event) {
-        TPLCore.getPlugin().getComponentLogger().info(
-            Component.text("TestPlugin API からのメッセージを受信: ")
-                .appendNewline().append(Component.text("    id=" + event.getId() + ", ").color(NamedTextColor.GRAY))
-                .appendNewline().append(Component.text("    message=" + event.getMessage()).color(NamedTextColor.GRAY))
-        );
-
         final Function<DatapackMessageReceiveEvent, Integer> listener = switch (event.getId()) {
             case "spawn_bounding_box" -> CustomEventListener.INSTANCE::onCallBoundingBox;
             case "knockback_vec2" -> CustomEventListener.INSTANCE::onCallKBVector2;
             case "knockback_vec3" -> CustomEventListener.INSTANCE::onCallKBVector3;
             case "rotate_display" -> CustomEventListener.INSTANCE::onCallRotateDisplay;
             case "transfer" -> CustomEventListener.INSTANCE::onCallTransfer;
-            case "logging" -> CustomEventListener.INSTANCE::onCallLogging;
             case "is_enabled" -> CustomEventListener.INSTANCE::onCallIsEnabled;
             default -> $ -> 0;
         };

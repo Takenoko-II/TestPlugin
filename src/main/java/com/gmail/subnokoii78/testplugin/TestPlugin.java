@@ -81,7 +81,6 @@ public final class TestPlugin extends JavaPlugin {
                 registrar.register(ServerSelectorCommand.SERVER_SELECTOR_COMMAND.getCommandNode());
             }
         });
-        // TODO: DatapackMessageReceive動かない？それともデータパック側の問題？
 
         TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, CustomEventListener.INSTANCE::onLeftClick);
         TPLCore.events.register(TPLEventTypes.DATAPACK_MESSAGE_RECEIVE, CustomEventListener.INSTANCE::onDatapackMessageReceive);
