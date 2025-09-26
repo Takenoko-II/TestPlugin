@@ -25,7 +25,15 @@
 # プラグインに渡す情報を用意
     tag @s add plugin_api.executor
 
+    summon marker ~ ~ ~ {Tags: ["non_plugin_api.temporary"]}
+
+    teleport @e[type=marker,tag=non_plugin_api.temporary,limit=1] ~ ~ ~ ~ ~
+
     summon marker ~ ~ ~ {Tags: ["plugin_api.messenger"]}
+
+    data modify entity @e[type=marker,tag=plugin_api.messenger,limit=1] Rotation set from entity @e[type=marker,tag=non_plugin_api.temporary,limit=1] Rotation
+
+    kill @e[type=marker,tag=non_plugin_api.temporary,limit=1]
 
     $data modify storage plugin_api: broadcasting.in set value $(args)
 

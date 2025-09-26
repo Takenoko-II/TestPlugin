@@ -144,14 +144,17 @@ public final class CustomEventListener {
         final DualAxisRotationBuilder vector2 = event.getContext().getRotation();
         final double strength = event.getInput().get("strength", MojangsonValueTypes.DOUBLE).doubleValue();
 
-        event.getTargets().forEach(entity -> {
-            entity.setVelocity(
-                Vector3Builder
-                    .from(entity.getVelocity())
-                    .add(vector2.getDirection3d().length(strength))
-                    .toBukkitVector()
-            );
-        });
+        if (!event.getContext().hasExecutor()) {
+            return 0;
+        }
+
+        final Entity executor = event.getContext().getExecutor();
+        executor.setVelocity(
+            Vector3Builder
+                .from(executor.getVelocity())
+                .add(vector2.getDirection3d().length(strength))
+                .toBukkitVector()
+        );
 
         return 1;
     }

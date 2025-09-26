@@ -5,7 +5,6 @@ import com.gmail.subnokoii78.tplcore.events.PlayerClickEvent;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.CommandSourceStack;
 import com.gmail.subnokoii78.tplcore.execute.Execute;
-import com.gmail.subnokoii78.tplcore.execute.SourceOrigin;
 import com.gmail.subnokoii78.tplcore.itemstack.ItemStackCustomDataAccess;
 import com.gmail.subnokoii78.tplcore.network.PaperVelocityManager;
 import com.gmail.subnokoii78.tplcore.shape.Shape;
@@ -114,10 +113,10 @@ public class PlayerEventListener implements Listener {
 
             final MojangsonCompound compoundL = ItemStackCustomDataAccess.of(itemStack).read();
 
-            final String type = compoundL.has("on_left_click.type")
+            final String type = compoundL.has(MojangsonPath.of("on_left_click.type"))
                 ? compoundL.get(MojangsonPath.of("on_left_click.type"), MojangsonValueTypes.STRING).getValue()
                 : null;
-            final String content = compoundL.has("on_left_click.content")
+            final String content = compoundL.has(MojangsonPath.of("on_left_click.content"))
                 ? compoundL.get(MojangsonPath.of("on_left_click.content"), MojangsonValueTypes.STRING).getValue()
                 : null;
 
@@ -144,10 +143,10 @@ public class PlayerEventListener implements Listener {
 
             final MojangsonCompound compound = ItemStackCustomDataAccess.of(itemStack).read();
 
-            final String type = compound.has("on_right_click.type")
+            final String type = compound.has(MojangsonPath.of("on_right_click.type"))
                 ? compound.get(MojangsonPath.of("on_right_click.type"), MojangsonValueTypes.STRING).getValue()
                 : null;
-            final String content = compound.has("on_right_click.content")
+            final String content = compound.has(MojangsonPath.of("on_right_click.content"))
                 ? compound.get(MojangsonPath.of("on_right_click.content"), MojangsonValueTypes.STRING).getValue()
                 : null;
 

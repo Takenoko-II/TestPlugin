@@ -87,7 +87,7 @@ public final class TestPlugin extends JavaPlugin {
 
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
 
-        // TODO: PluginAPIの動作確認, SelectorParser
+        // TODO: SelectorParser
     }
 
     @Override
