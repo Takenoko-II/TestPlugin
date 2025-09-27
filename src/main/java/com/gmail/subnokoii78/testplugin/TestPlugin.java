@@ -5,6 +5,7 @@ import com.gmail.subnokoii78.testplugin.commands.brigadier.BrigadierCommandNodes
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
 import com.gmail.subnokoii78.tplcore.TPLCore;
+import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.*;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -35,14 +36,14 @@ public final class TestPlugin extends JavaPlugin {
         // ライブラリを準備
         TPLCore.initialize(this, bootstrap);
 
-        if (bootstrap.getDatapack().isEnabled()) {
-            getComponentLogger().info(Component.text("データパック " + TestPluginBootstrap.DATAPACK_ID + " をロードしました").color(NamedTextColor.GREEN));
+        if (TPLCore.pluginApi.getDatapack().isEnabled()) {
+            getComponentLogger().info(Component.text("データパック " + PluginApi.ID + " をロードしました").color(NamedTextColor.GREEN));
         }
         else {
-            final String command = "/datapack enable \"" + TPLCore.getDatapackId(bootstrap.getDatapack()) + "\"";
+            final String command = "/datapack enable \"" + TPLCore.pluginApi.getPackName() + "\"";
 
             getComponentLogger().info(
-                Component.text("データパック " + TestPluginBootstrap.DATAPACK_ID + " のロードに失敗しました")
+                Component.text("データパック " + PluginApi.ID + " のロードに失敗しました")
                     .color(NamedTextColor.RED)
                     .appendNewline()
                     .append(
@@ -86,16 +87,13 @@ public final class TestPlugin extends JavaPlugin {
         TPLCore.events.register(TPLEventTypes.TICK, TickEventListener.INSTANCE::onTick);
 
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
-
-        // TODO: SelectorParser
-        // TODO: データパックはdiscover()だけでいいのか？
     }
 
     @Override
     public void onDisable() {
-        if (bootstrap.getDatapack().isEnabled()) {
-            bootstrap.getDatapack().setEnabled(false);
-            getComponentLogger().info(Component.text("データパック '" + TestPluginBootstrap.DATAPACK_ID + "' が無効化されました"));
+        if (TPLCore.pluginApi.getDatapack().isEnabled()) {
+            TPLCore.pluginApi.getDatapack().setEnabled(false);
+            getComponentLogger().info(Component.text("データパック '" + PluginApi.ID + "' が無効化されました"));
         }
 
         new Execute()

@@ -14,7 +14,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 public enum BrigadierCommandNodes {

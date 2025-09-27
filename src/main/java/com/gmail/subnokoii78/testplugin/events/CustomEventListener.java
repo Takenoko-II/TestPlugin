@@ -200,14 +200,6 @@ public final class CustomEventListener {
     }
 
     public void onDatapackMessageReceive(DatapackMessageReceiveEvent event) {
-        TPLCore.getPlugin().getComponentLogger().info(
-            Component.text(PluginApi.NAMESPACE).color(NamedTextColor.YELLOW)
-                .appendSpace()
-                .append(Component.text("からのメッセージを受信しました:"))
-                .appendSpace()
-                .append(Component.text(event.getInput().toString()).color(NamedTextColor.GRAY))
-        );
-
         final Function<DatapackMessageReceiveEvent, Integer> listener = switch (event.getId()) {
             case "spawn_bounding_box" -> CustomEventListener.INSTANCE::onCallBoundingBox;
             case "knockback_vec2" -> CustomEventListener.INSTANCE::onCallKBVector2;

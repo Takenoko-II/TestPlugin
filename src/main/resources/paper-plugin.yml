@@ -1,7 +1,7 @@
 name: TestPlugin
 version: '${project.version}'
 main: com.gmail.subnokoii78.testplugin.TestPlugin
-description: 'TestPlugin用のPaperプラグイン'
+description: '何故か未だに名前がTestPluginになってるプラグイン'
 api-version: '1.21.8'
 bootstrapper: com.gmail.subnokoii78.testplugin.TestPluginBootstrap
 # loader: com.gmail.subnokoii78.TestPluginLoader
