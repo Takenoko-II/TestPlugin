@@ -35,7 +35,6 @@ public final class TestPlugin extends JavaPlugin {
     public void onEnable() {
         // ライブラリを準備
         TPLCore.initialize(this, bootstrap);
-
         if (TPLCore.pluginApi.getDatapack().isEnabled()) {
             getComponentLogger().info(Component.text("データパック " + PluginApi.ID + " をロードしました").color(NamedTextColor.GREEN));
         }

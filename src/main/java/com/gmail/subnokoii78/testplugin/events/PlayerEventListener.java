@@ -65,7 +65,18 @@ public class PlayerEventListener implements Listener {
             }
 
             final Player player = event.getPlayer();
-            final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
+
+            if (player.getScoreboardTags().contains("plugin_api.disable_left_click")) {
+                event.cancel();
+            }
+
+            TPLCore.getScoreboard()
+                .getOrAddObjective("plugin_api.on_left_click", null, null, null)
+                .addScore(player, 1);
+
+            if (!event.hasItem()) return;
+
+            final ItemStack itemStack = event.getItem();
 
             if (itemStack.getItemMeta() == null) return;
 
@@ -103,14 +114,6 @@ public class PlayerEventListener implements Listener {
                 }
             }
 
-            if (player.getScoreboardTags().contains("plugin_api.disable_left_click")) {
-                event.cancel();
-            }
-
-            TPLCore.getScoreboard()
-                .getOrAddObjective("plugin_api.on_left_click", null, null, null)
-                .addScore(player, 1);
-
             final MojangsonCompound compoundL = ItemStackCustomDataAccess.of(itemStack).read();
 
             final String type = compoundL.has(MojangsonPath.of("on_left_click.type"))
@@ -133,12 +136,16 @@ public class PlayerEventListener implements Listener {
         });
 
         TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, event -> {
+            if (event.getClick() != PlayerClickEvent.Click.RIGHT) return;
+
             final Player player = event.getPlayer();
             TPLCore.getScoreboard()
                 .getOrAddObjective("plugin_api.on_right_click", null, null, null)
                 .addScore(player, 1);
 
-            final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
+            if (!event.hasItem()) return;
+
+            final ItemStack itemStack = event.getItem();
             if (itemStack.getItemMeta() == null) return;
 
             final MojangsonCompound compound = ItemStackCustomDataAccess.of(itemStack).read();
@@ -163,7 +170,9 @@ public class PlayerEventListener implements Listener {
         TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, event -> {
             final Player player = event.getPlayer();
 
-            final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
+            if (!event.hasItem()) return;
+
+            final ItemStack itemStack = event.getItem();
 
             if (itemStack.getItemMeta() == null) return;
 
