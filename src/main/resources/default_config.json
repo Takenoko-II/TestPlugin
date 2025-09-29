@@ -1,0 +1,55 @@
+{
+    "combos": {
+        "knight_slash": {
+            "combos": [
+                {
+                    "frames": [
+                        "normal_combo1/frame1",
+                        "normal_combo1/frame2",
+                        "normal_combo1/frame3",
+                        "normal_combo1/frame4",
+                        "normal_combo1/frame5"
+                    ],
+                    "angle": -60
+                },
+                {
+                    "frames": [
+                        "normal_combo2/frame1",
+                        "normal_combo2/frame2",
+                        "normal_combo2/frame3",
+                        "normal_combo2/frame4",
+                        "normal_combo2/frame5"
+                    ],
+                    "angle": 30
+                },
+                {
+                    "frames": [
+                        "normal_combo3/frame1",
+                        "normal_combo3/frame2",
+                        "normal_combo3/frame3",
+                        "normal_combo3/frame4",
+                        "normal_combo3/frame5"
+                    ],
+                    "angle": 70
+                },
+                {
+                    "frames": [
+                        "normal_combo4/frame1",
+                        "normal_combo4/frame2",
+                        "normal_combo4/frame3",
+                        "normal_combo4/frame4",
+                        "normal_combo4/frame5",
+                        "normal_combo4/frame6",
+                        "normal_combo4/frame7"
+                    ],
+                    "angle": 0
+                }
+            ],
+            "display_scale": [
+                3,
+                6,
+                0.1
+            ]
+        }
+    }
+}

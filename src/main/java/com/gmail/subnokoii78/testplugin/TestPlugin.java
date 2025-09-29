@@ -1,5 +1,6 @@
 package com.gmail.subnokoii78.testplugin;
 
+import com.gmail.subnokoii78.testplugin.commands.CustomItemsCommand;
 import com.gmail.subnokoii78.testplugin.commands.ServerSelectorCommand;
 import com.gmail.subnokoii78.testplugin.commands.brigadier.BrigadierCommandNodes;
 import com.gmail.subnokoii78.testplugin.events.*;
@@ -14,6 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +23,9 @@ import java.nio.file.Path;
 
 public final class TestPlugin extends JavaPlugin {
     private final TestPluginBootstrap bootstrap;
+
+    @Nullable
+    private static PluginConfigLoader pluginConfigLoader;
 
     TestPlugin(@NotNull TestPluginBootstrap bootstrap) {
         this.bootstrap = bootstrap;
@@ -61,6 +66,7 @@ public final class TestPlugin extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
+        pluginConfigLoader = new PluginConfigLoader(TestPlugin.CONFIG_FILE_PATH, TestPlugin.DEFAULT_CONFIG_PATH);
         PluginConfigurationManager.reload();
 
         // イベントリスナー登録
@@ -78,6 +84,7 @@ public final class TestPlugin extends JavaPlugin {
             for (final BrigadierCommandNodes node : BrigadierCommandNodes.values()) {
                 registrar.register(node.getNode());
                 registrar.register(ServerSelectorCommand.SERVER_SELECTOR_COMMAND.getCommandNode());
+                CustomItemsCommand.CUSTOM_ITEMS.register(registrar);
             }
         });
 
@@ -103,6 +110,19 @@ public final class TestPlugin extends JavaPlugin {
             });
 
         getComponentLogger().info(Component.text("TestPluginが停止しました").color(NamedTextColor.BLUE));
+
+        // TODO: PluginConfigLoader Test
+        // TODO: FrameGroup.fromConfig(String id) をつくる
+        // TODO: config.jsonへのサーバーオーナー以外による書き込み手段の提供(set, add, remove 可能な限りすべて)
+        // TODO: そのうえでコンボテスト
+    }
+
+    public static PluginConfigLoader getPluginConfigLoader() throws IllegalStateException {
+        if (pluginConfigLoader == null) {
+            throw new IllegalStateException();
+        }
+
+        return pluginConfigLoader;
     }
 
     public static final String INTERNAL_ENTITY_TAG = "TestPlugin.Internal";
@@ -126,4 +146,6 @@ public final class TestPlugin extends JavaPlugin {
     public static final String DATABASE_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/database.dat";
 
     public static final String CONFIG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/config.json";
+
+    public static final String DEFAULT_CONFIG_PATH = "/default_config.json";
 }

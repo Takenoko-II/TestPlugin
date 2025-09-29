@@ -1,5 +1,6 @@
 package com.gmail.subnokoii78.testplugin.system;
 
+import com.gmail.subnokoii78.testplugin.system.combat.combos.Combo;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 

@@ -9,6 +9,7 @@ import com.gmail.takenokoii78.json.values.JSONObject;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public final class PluginConfigurationManager {
     private PluginConfigurationManager() {}
 
@@ -26,6 +27,7 @@ public final class PluginConfigurationManager {
         return jsonObject == null ? defaultObj : jsonObject;
     }
 
+    @Deprecated
     public static <T extends JSONValue<?>> T getOrWriteDefault(@NotNull JSONPath path, @NotNull JSONValueType<T> type, T defaultValue) {
         if (getRootObject().has(path)) {
             return getRootObject().get(path, type);
@@ -33,6 +35,15 @@ public final class PluginConfigurationManager {
         else {
             write(path, defaultValue, true);
             return defaultValue;
+        }
+    }
+
+    public static <T extends JSONValue<?>> T get(@NotNull JSONPath path, @NotNull JSONValueType<T> type) {
+        if (getRootObject().has(path)) {
+            return getRootObject().get(path, type);
+        }
+        else {
+            throw new IllegalStateException("JSONを読み取れませんでした: " + path);
         }
     }
 

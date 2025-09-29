@@ -1,11 +1,14 @@
 package com.gmail.subnokoii78.testplugin;
 
+import com.gmail.subnokoii78.tplcore.generic.MultiMap;
 import com.gmail.subnokoii78.tplcore.parse.AbstractParser;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.*;
 
 public class Main {
-    static class Parser extends AbstractParser<String[]> {
+    @NullMarked
+    static class Parser extends AbstractParser<MultiMap<String, String>> {
 
         public Parser(String text) {
             super(text);
@@ -22,6 +25,16 @@ public class Main {
         }
 
         @Override
+        protected Set<Character> getInvalidSymbolsInUnquotedString() {
+            final Set<Character> symbols = new HashSet<>(super.getInvalidSymbolsInUnquotedString());
+            symbols.remove(':');
+            symbols.remove('.');
+            symbols.remove('-');
+            symbols.remove('!');
+            return symbols;
+        }
+
+        @Override
         protected String getTrue() {
             return "true";
         }
@@ -32,47 +45,23 @@ public class Main {
         }
 
         @Override
-        protected String[] parse() {
-            ignore();
-            if (isOver()) {
-                return null;
-            }
-
-            final List<String> arguments = new ArrayList<>();
-
-            expect(true, '[');
-
-            do {
-                var s = string(false, '=');
-
-                expect(true, '=');
-
-                final boolean not = next(false, '!') != null;
-
-                if (not) {
-                    arguments.add(String.format("{%s=!%s}", s, number(false)));
-                }
-                else {
-                    System.out.println(peek(false));
-                    arguments.add(String.format("{%s=%s}", s, number(false)));
-                    System.out.println(peek(false));
-                }
-            }
-            while (next(true, ',') != null);
-
-            expect(true, ']');
-
+        protected MultiMap<String, String> parse() {
+            final var m = multiMap(
+                '[', ']',
+                ',', '=',
+                key -> key,
+                value -> value
+            );
             finish();
-
-            return arguments.toArray(String[]::new);
+            return m;
         }
     }
 
     public static void main(String[] args) {
         System.out.println("Hello, world!");
 
-        var p = new Parser("[a=1.7,b=!2,c=3]");
+        var p = new Parser("[type=!minecraft:player,nbt={SelectedItem:{id: 'minecraft:apple'}}]");
 
-        System.out.println(Arrays.toString(p.parse()));
+        System.out.println(p.parse());
     }
 }

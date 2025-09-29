@@ -1,11 +1,10 @@
 package com.gmail.subnokoii78.testplugin.events;
 
-import com.gmail.subnokoii78.testplugin.system.Combo;
-import com.gmail.subnokoii78.testplugin.system.PlayerComboHandler;
+import com.gmail.subnokoii78.testplugin.system.combat.PlayerComboHandle;
+import com.gmail.subnokoii78.testplugin.system.combat.combos.KnightSlash;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.events.DatapackMessageReceiveEvent;
 import com.gmail.subnokoii78.tplcore.events.PlayerClickEvent;
-import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.execute.EntityAnchor;
 import com.gmail.subnokoii78.tplcore.execute.EntitySelector;
 import com.gmail.subnokoii78.tplcore.execute.Execute;
@@ -22,8 +21,6 @@ import com.gmail.takenokoii78.mojangson.values.MojangsonCompound;
 import com.gmail.takenokoii78.mojangson.values.MojangsonDouble;
 import com.gmail.takenokoii78.mojangson.values.MojangsonFloat;
 import com.gmail.takenokoii78.mojangson.values.TypedMojangsonList;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -50,7 +47,7 @@ public final class CustomEventListener {
         // プレイヤーの右手にあるアイテム
         final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
         // プレイヤーのコンボを管理するためのオブジェクト
-        final PlayerComboHandler handler = PlayerComboHandler.getHandler(player);
+        final PlayerComboHandle handler = PlayerComboHandle.getHandle(player);
 
         // 鉄剣じゃなかったらreturn
         if (!itemStack.getType().equals(Material.IRON_SWORD)) return;
@@ -58,7 +55,7 @@ public final class CustomEventListener {
         // 鉄剣持ってたら殴りとかブロック破壊をキャンセル
         event.cancel();
 
-        handler.setCombo(Combo.KNIGHT_NORMAL_SLASH);
+        handler.setCombo(KnightSlash.KNIGHT_SLASH);
 
         handler.nextCombo();
     }
