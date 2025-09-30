@@ -3,8 +3,14 @@ package com.gmail.subnokoii78.testplugin.system.combat.animation;
 import com.gmail.subnokoii78.tplcore.execute.DimensionAccess;
 import com.gmail.subnokoii78.tplcore.vector.TripleAxisRotationBuilder;
 import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
+import com.gmail.takenokoii78.json.JSONValue;
+import com.gmail.takenokoii78.json.JSONValueType;
+import com.gmail.takenokoii78.json.JSONValueTypes;
+import com.gmail.takenokoii78.json.values.JSONObject;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
 
 public class AnimatorDisplayState {
     private World dimension = DimensionAccess.OVERWORLD.getWorld();
@@ -54,5 +60,17 @@ public class AnimatorDisplayState {
         state.rotation(rotation);
         state.scale(scale);
         return state;
+    }
+
+    private <T extends JSONValue<?>> void applyConditional(JSONObject object, String key, JSONValueType<T> type, Consumer<T> consumer) {
+        if (object.has(key) && object.getTypeOf(key) == type) {
+            consumer.accept(object.get(key, type));
+        }
+    }
+
+    public void interpret(JSONObject parameters) {
+        applyConditional(parameters, "angle", JSONValueTypes.NUMBER, v -> {
+            rotation(rotation().roll(v.floatValue()));
+        });
     }
 }

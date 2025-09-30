@@ -28,7 +28,7 @@ public enum BrigadierCommandNodes {
         }
     },
 
-    CONFIG {
+    /*CONFIG {
         @Override
         public LiteralCommandNode<CommandSourceStack> getNode() {
             return Commands.literal("config")
@@ -116,7 +116,7 @@ public enum BrigadierCommandNodes {
                 return Command.SINGLE_SUCCESS;
             };
         }
-    };
+    };*/;
 
     public abstract LiteralCommandNode<CommandSourceStack> getNode();
 }

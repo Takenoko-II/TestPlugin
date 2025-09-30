@@ -1,12 +1,13 @@
 package com.gmail.subnokoii78.testplugin.system.combat.animation;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
+@NullMarked
 public final class FrameGroup {
     private final List<String> paths = new ArrayList<>();
 
@@ -14,20 +15,20 @@ public final class FrameGroup {
 
     private FrameGroup() {}
 
-    public @NotNull List<String> getPaths() {
+    public List<String> getPaths() {
         return paths;
     }
 
-    public @NotNull UnaryOperator<AnimatorDisplayState> stateModifier() {
+    public UnaryOperator<AnimatorDisplayState> stateModifier() {
         return stateModifier;
     }
 
-    public @NotNull FrameGroup stateModifier(@NotNull UnaryOperator<AnimatorDisplayState> animatorStateModifier) {
+    public FrameGroup stateModifier(UnaryOperator<AnimatorDisplayState> animatorStateModifier) {
         this.stateModifier = animatorStateModifier;
         return this;
     }
 
-    public static @NotNull FrameGroup ofPaths(@NotNull String... paths) {
+    public static FrameGroup ofPaths(String... paths) {
         final FrameGroup chain = new FrameGroup();
 
         chain.paths.addAll(Arrays.stream(paths).toList());

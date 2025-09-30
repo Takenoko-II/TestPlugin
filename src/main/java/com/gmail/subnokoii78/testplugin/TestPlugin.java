@@ -1,5 +1,6 @@
 package com.gmail.subnokoii78.testplugin;
 
+import com.gmail.subnokoii78.testplugin.commands.ConfigCommand;
 import com.gmail.subnokoii78.testplugin.commands.CustomItemsCommand;
 import com.gmail.subnokoii78.testplugin.commands.ServerSelectorCommand;
 import com.gmail.subnokoii78.testplugin.commands.brigadier.BrigadierCommandNodes;
@@ -9,13 +10,13 @@ import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.*;
+import com.gmail.takenokoii78.json.JSONSerializer;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,9 +24,6 @@ import java.nio.file.Path;
 
 public final class TestPlugin extends JavaPlugin {
     private final TestPluginBootstrap bootstrap;
-
-    @Nullable
-    private static PluginConfigLoader pluginConfigLoader;
 
     TestPlugin(@NotNull TestPluginBootstrap bootstrap) {
         this.bootstrap = bootstrap;
@@ -38,26 +36,6 @@ public final class TestPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // ライブラリを準備
-        TPLCore.initialize(this, bootstrap);
-        if (TPLCore.pluginApi.getDatapack().isEnabled()) {
-            getComponentLogger().info(Component.text("データパック " + PluginApi.ID + " をロードしました").color(NamedTextColor.GREEN));
-        }
-        else {
-            final String command = "/datapack enable \"" + TPLCore.pluginApi.getPackName() + "\"";
-
-            getComponentLogger().info(
-                Component.text("データパック " + PluginApi.ID + " のロードに失敗しました")
-                    .color(NamedTextColor.RED)
-                    .appendNewline()
-                    .append(
-                        Component.text(command)
-                            .color(NamedTextColor.YELLOW)
-                    )
-                    .append(Component.text(" を実行して手動で有効化してください").color(NamedTextColor.RED))
-            );
-        }
-
         // TestPluginPersistentディレクトリを用意
         try {
             Files.createDirectories(Path.of(TestPlugin.PERSISTENT_DIRECTORY_PATH));
@@ -66,8 +44,21 @@ public final class TestPlugin extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
-        pluginConfigLoader = new PluginConfigLoader(TestPlugin.CONFIG_FILE_PATH, TestPlugin.DEFAULT_CONFIG_PATH);
-        PluginConfigurationManager.reload();
+        // ライブラリを準備
+        TPLCore.initialize(
+            this, bootstrap,
+            TestPlugin.CONFIG_FILE_PATH,
+            TestPlugin.DEFAULT_CONFIG_PATH
+        );
+
+        // System.out.println(JSONSerializer.serialize(TPLCore.getPluginConfigLoader().get()));
+
+        // データパック導入チェック
+        getComponentLogger().info(
+            TPLCore.pluginApi.getDatapack().isEnabled()
+                ? Component.text("データパック " + PluginApi.ID + " をロードしました").color(NamedTextColor.GREEN)
+                : Component.text("データパック " + PluginApi.ID + " のロードに失敗しました").color(NamedTextColor.RED)
+        );
 
         // イベントリスナー登録
         PlayerEventListener.init();
@@ -77,7 +68,6 @@ public final class TestPlugin extends JavaPlugin {
         // TODO: 廃止済みらしいのでbrigadier式に置き換え
         // setCommandManager("lobby", new Lobby());
         // setCommandManager("tools", new Tools());
-        // setCommandManager("test", new Test());
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final var registrar = event.registrar();
@@ -85,6 +75,7 @@ public final class TestPlugin extends JavaPlugin {
                 registrar.register(node.getNode());
                 registrar.register(ServerSelectorCommand.SERVER_SELECTOR_COMMAND.getCommandNode());
                 CustomItemsCommand.CUSTOM_ITEMS.register(registrar);
+                ConfigCommand.CONFIG_COMMAND.register(registrar);
             }
         });
 
@@ -93,6 +84,9 @@ public final class TestPlugin extends JavaPlugin {
         TPLCore.events.register(TPLEventTypes.TICK, TickEventListener.INSTANCE::onTick);
 
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
+
+        // TODO: config.jsonへの書き込み手段の提供(set, add, remove 可能な限りすべて)
+        // TODO: serverselectorからのtp時の音問題の修正ができてるかチェック
     }
 
     @Override
@@ -110,19 +104,6 @@ public final class TestPlugin extends JavaPlugin {
             });
 
         getComponentLogger().info(Component.text("TestPluginが停止しました").color(NamedTextColor.BLUE));
-
-        // TODO: PluginConfigLoader Test
-        // TODO: FrameGroup.fromConfig(String id) をつくる
-        // TODO: config.jsonへのサーバーオーナー以外による書き込み手段の提供(set, add, remove 可能な限りすべて)
-        // TODO: そのうえでコンボテスト
-    }
-
-    public static PluginConfigLoader getPluginConfigLoader() throws IllegalStateException {
-        if (pluginConfigLoader == null) {
-            throw new IllegalStateException();
-        }
-
-        return pluginConfigLoader;
     }
 
     public static final String INTERNAL_ENTITY_TAG = "TestPlugin.Internal";
@@ -138,12 +119,6 @@ public final class TestPlugin extends JavaPlugin {
     }
 
     public static final String PERSISTENT_DIRECTORY_PATH = "plugins/TestPluginPersistent";
-
-    @Deprecated
-    public static final String LOG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/plugin.log";
-
-    @Deprecated
-    public static final String DATABASE_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/database.dat";
 
     public static final String CONFIG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/config.json";
 

@@ -1,5 +1,11 @@
 {
-    "combos": {
+    "privileges": {
+        "server_owner": "b41fc1ab-3eaf-4ec9-aa1e-9eab016de261",
+        "plugin_developers": [
+            "90732c94-ff58-4b4f-884c-d255f0a482ae"
+        ]
+    },
+    "animations": {
         "knight_slash": {
             "combos": [
                 {
@@ -10,7 +16,9 @@
                         "normal_combo1/frame4",
                         "normal_combo1/frame5"
                     ],
-                    "angle": -60
+                    "parameters": {
+                        "angle": -60
+                    }
                 },
                 {
                     "frames": [
@@ -20,7 +28,9 @@
                         "normal_combo2/frame4",
                         "normal_combo2/frame5"
                     ],
-                    "angle": 30
+                    "parameters": {
+                        "angle": 30
+                    }
                 },
                 {
                     "frames": [
@@ -30,7 +40,9 @@
                         "normal_combo3/frame4",
                         "normal_combo3/frame5"
                     ],
-                    "angle": 70
+                    "parameters": {
+                        "angle": 70
+                    }
                 },
                 {
                     "frames": [
@@ -42,14 +54,19 @@
                         "normal_combo4/frame6",
                         "normal_combo4/frame7"
                     ],
-                    "angle": 0
+                    "parameters": {
+                        "angle": 0
+                    }
                 }
             ],
-            "display_scale": [
-                3,
-                6,
-                0.1
-            ]
+            "frame_time": 2,
+            "default_state": {
+                "scale": [
+                    3,
+                    6,
+                    0.1
+                ]
+            }
         }
     }
 }
