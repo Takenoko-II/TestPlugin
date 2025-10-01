@@ -11,7 +11,8 @@ import java.util.Set;
 
 public class TestPluginLoader implements PluginLoader {
     public static final Set<String> LIBRARIES = Set.of(
-        "org.codehaus.groovy:groovy:3.0.21"
+        "org.codehaus.groovy:groovy:3.0.21",
+        "org.xerial:sqlite-jdbc:3.46.0.0"
     );
 
     @Override

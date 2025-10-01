@@ -1,11 +1,8 @@
 package com.gmail.subnokoii78.testplugin;
 
-import com.gmail.subnokoii78.testplugin.commands.ConfigCommand;
-import com.gmail.subnokoii78.testplugin.commands.CustomItemsCommand;
-import com.gmail.subnokoii78.testplugin.commands.LobbyCommand;
-import com.gmail.subnokoii78.testplugin.commands.ServerSelectorCommand;
+import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.events.*;
-import com.gmail.subnokoii78.testplugin.events.TickEventListener;
+import com.gmail.subnokoii78.testplugin.system.field.GameFieldRestorer;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
@@ -13,14 +10,18 @@ import com.gmail.subnokoii78.tplcore.execute.*;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class TestPlugin extends JavaPlugin {
+    @Nullable
+    private static GameFieldRestorer gameFieldRestorer;
+
     private final TestPluginBootstrap bootstrap;
 
-    TestPlugin(@NotNull TestPluginBootstrap bootstrap) {
+    TestPlugin(TestPluginBootstrap bootstrap) {
         this.bootstrap = bootstrap;
     }
 
@@ -50,7 +51,8 @@ public final class TestPlugin extends JavaPlugin {
             TestPlugin.DEFAULT_CONFIG_RESOURCE_PATH
         );
 
-        // System.out.println(JSONSerializer.serialize(TPLCore.getPluginConfigLoader().get()));
+        gameFieldRestorer = new GameFieldRestorer(getDatabaseFilePath());
+        getGameFieldRestorer().open();
 
         // データパック導入チェック
         getComponentLogger().info(
@@ -84,6 +86,8 @@ public final class TestPlugin extends JavaPlugin {
 
         // TODO: config.jsonへの書き込み手段の提供(set, add, remove 可能な限りすべて)
         // TODO: serverselectorからのtp時の音問題の修正ができてるかチェック
+        // TODO: dbのテスト
+        // TODO: イベントハンドラ書く
     }
 
     @Override
@@ -100,23 +104,26 @@ public final class TestPlugin extends JavaPlugin {
                 return Execute.SUCCESS;
             });
 
+        getGameFieldRestorer().close();
+
         getComponentLogger().info(Component.text("TestPluginが停止しました").color(NamedTextColor.BLUE));
+    }
+
+    public static GameFieldRestorer getGameFieldRestorer() {
+        if (gameFieldRestorer == null) {
+            throw new IllegalStateException("gamefieldrestorer is null");
+        }
+        return gameFieldRestorer;
     }
 
     public static final String INTERNAL_ENTITY_TAG = "TestPlugin.Internal";
 
-    @Deprecated
-    private <T extends CommandExecutor & TabCompleter> void setCommandManager(String name, T manager) {
-        final PluginCommand command = getCommand(name);
-
-        if (command == null) return;
-
-        command.setExecutor(manager);
-        command.setTabCompleter(manager);
-    }
-
     public String getConfigFilePath() {
         return getDataPath() + "/config.json";
+    }
+
+    public String getDatabaseFilePath() {
+        return getDataPath() + "/database.db";
     }
 
     public static final String DEFAULT_CONFIG_RESOURCE_PATH = "/default_config.json";

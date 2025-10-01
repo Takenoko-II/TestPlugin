@@ -19,6 +19,7 @@ com\gmail\subnokoii78\testplugin\system\combat\combos\Combo.class
 com\gmail\subnokoii78\testplugin\commands\ConfigCommand.class
 com\gmail\subnokoii78\testplugin\system\combat\animation\FrameGroup.class
 com\gmail\subnokoii78\testplugin\system\field\GameFieldRestorer.class
+com\gmail\subnokoii78\testplugin\system\field\GameFieldRestorer$BlockModificationRecord.class
 com\gmail\subnokoii78\testplugin\commands\CustomItemsCommand$CustomItem$1.class
 com\gmail\subnokoii78\testplugin\events\EntityEventListener.class
 com\gmail\subnokoii78\testplugin\system\Job.class
