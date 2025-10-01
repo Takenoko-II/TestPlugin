@@ -2,25 +2,20 @@ package com.gmail.subnokoii78.testplugin;
 
 import com.gmail.subnokoii78.testplugin.commands.ConfigCommand;
 import com.gmail.subnokoii78.testplugin.commands.CustomItemsCommand;
+import com.gmail.subnokoii78.testplugin.commands.LobbyCommand;
 import com.gmail.subnokoii78.testplugin.commands.ServerSelectorCommand;
-import com.gmail.subnokoii78.testplugin.commands.brigadier.BrigadierCommandNodes;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.events.TickEventListener;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.*;
-import com.gmail.takenokoii78.json.JSONSerializer;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public final class TestPlugin extends JavaPlugin {
     private final TestPluginBootstrap bootstrap;
@@ -37,18 +32,22 @@ public final class TestPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // TestPluginPersistentディレクトリを用意
-        try {
-            Files.createDirectories(Path.of(TestPlugin.PERSISTENT_DIRECTORY_PATH));
+        if (getDataFolder().exists()) {
+            getComponentLogger().info(Component.text("データフォルダが既に存在するため、作成をスキップしました"));
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        else {
+            final boolean created = getDataFolder().mkdir();
+
+            if (!created) {
+                throw new IllegalStateException("データフォルダの作成に失敗しました; 致命的な例外のためプラグインは停止されます");
+            }
         }
 
         // ライブラリを準備
         TPLCore.initialize(
             this, bootstrap,
-            TestPlugin.CONFIG_FILE_PATH,
-            TestPlugin.DEFAULT_CONFIG_PATH
+            getConfigFilePath(),
+            TestPlugin.DEFAULT_CONFIG_RESOURCE_PATH
         );
 
         // System.out.println(JSONSerializer.serialize(TPLCore.getPluginConfigLoader().get()));
@@ -71,12 +70,10 @@ public final class TestPlugin extends JavaPlugin {
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final var registrar = event.registrar();
-            for (final BrigadierCommandNodes node : BrigadierCommandNodes.values()) {
-                registrar.register(node.getNode());
-                registrar.register(ServerSelectorCommand.SERVER_SELECTOR_COMMAND.getCommandNode());
-                CustomItemsCommand.CUSTOM_ITEMS.register(registrar);
-                ConfigCommand.CONFIG_COMMAND.register(registrar);
-            }
+            ServerSelectorCommand.SERVER_SELECTOR_COMMAND.register(registrar);
+            CustomItemsCommand.CUSTOM_ITEMS.register(registrar);
+            ConfigCommand.CONFIG_COMMAND.register(registrar);
+            LobbyCommand.LOBBY_COMMAND.register(registrar);
         });
 
         TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, CustomEventListener.INSTANCE::onLeftClick);
@@ -118,9 +115,9 @@ public final class TestPlugin extends JavaPlugin {
         command.setTabCompleter(manager);
     }
 
-    public static final String PERSISTENT_DIRECTORY_PATH = "plugins/TestPluginPersistent";
+    public String getConfigFilePath() {
+        return getDataPath() + "/config.json";
+    }
 
-    public static final String CONFIG_FILE_PATH = PERSISTENT_DIRECTORY_PATH + "/config.json";
-
-    public static final String DEFAULT_CONFIG_PATH = "/default_config.json";
+    public static final String DEFAULT_CONFIG_RESOURCE_PATH = "/default_config.json";
 }
