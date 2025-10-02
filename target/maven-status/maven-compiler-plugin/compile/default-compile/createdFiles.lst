@@ -2,6 +2,7 @@ com\gmail\subnokoii78\testplugin\commands\LobbyCommand.class
 com\gmail\subnokoii78\testplugin\events\TickEventListener.class
 com\gmail\subnokoii78\testplugin\TestPlugin.class
 com\gmail\subnokoii78\testplugin\TestPluginBootstrap.class
+com\gmail\subnokoii78\testplugin\commands\DatabaseCommand.class
 com\gmail\subnokoii78\testplugin\commands\FooCommand.class
 com\gmail\subnokoii78\testplugin\events\PlayerEventListener.class
 com\gmail\subnokoii78\testplugin\commands\CustomItemsCommand$CustomItem.class
@@ -23,8 +24,10 @@ com\gmail\subnokoii78\testplugin\system\field\GameFieldRestorer$BlockModificatio
 com\gmail\subnokoii78\testplugin\commands\CustomItemsCommand$CustomItem$1.class
 com\gmail\subnokoii78\testplugin\events\EntityEventListener.class
 com\gmail\subnokoii78\testplugin\system\Job.class
+com\gmail\subnokoii78\testplugin\system\field\GameFieldChangeObserver.class
 com\gmail\subnokoii78\testplugin\commands\Test.class
 com\gmail\subnokoii78\testplugin\system\combat\animation\AnimatorDisplayState.class
+com\gmail\subnokoii78\testplugin\commands\GameFieldCommand.class
 com\gmail\subnokoii78\testplugin\system\combat\PlayerComboHandle.class
 com\gmail\subnokoii78\testplugin\util\Converter.class
 com\gmail\subnokoii78\testplugin\commands\CustomItemsCommand$CustomItem$2.class

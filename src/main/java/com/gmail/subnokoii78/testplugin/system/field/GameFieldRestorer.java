@@ -5,23 +5,19 @@ import com.gmail.subnokoii78.tplcore.database.SqliteDatabase;
 import com.gmail.subnokoii78.tplcore.vector.BlockPositionBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+@NullMarked
 public class GameFieldRestorer extends SqliteDatabase {
-    private static final String TABLE_NAME = "blocks";
-
-    private static final String WORLD_KEY = "world_key";
-
     private static final String X = "x";
 
     private static final String Y = "y";
@@ -30,12 +26,35 @@ public class GameFieldRestorer extends SqliteDatabase {
 
     private static final String BLOCK_DATA = "block_data";
 
-    private record BlockModificationRecord(World world, BlockPositionBuilder position, BlockData blockData) {}
+    private record BlockModificationRecord(BlockPositionBuilder position, BlockData blockData) {}
+
+    private static final Map<World, GameFieldRestorer> caches = new HashMap<>();
+
+    private final World world;
 
     private final List<BlockModificationRecord> batches = new ArrayList<>();
 
-    public GameFieldRestorer(String path) {
-        super(path);
+    public GameFieldRestorer(World world) {
+        super(TPLCore.getPlugin().getDataPath() + "/GameFieldRestorer_" + world.getName() + ".db");
+        this.world = world;
+        caches.put(world, this);
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameFieldRestorer that = (GameFieldRestorer) o;
+        return Objects.equals(world, that.world);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(world);
     }
 
     public void open() {
@@ -63,13 +82,19 @@ public class GameFieldRestorer extends SqliteDatabase {
 
     public void close() {
         flush();
-        load();
-        clear();
+        restore();
         disconnect();
     }
 
-    public void batch(World world, BlockPositionBuilder position, BlockData blockData) {
-        batches.add(new BlockModificationRecord(world, position, blockData));
+    public void restore() {
+        load();
+        clear();
+    }
+
+    public void batch(BlockPositionBuilder position, BlockData blockData) {
+        System.out.println(position.toString());
+        System.out.println(blockData.getAsString());
+        batches.add(new BlockModificationRecord(position, blockData));
     }
 
     public void flush() {
@@ -81,16 +106,14 @@ public class GameFieldRestorer extends SqliteDatabase {
         final String sql = String.format(
             """
             CREATE TABLE IF NOT EXISTS %s (
-                %s TEXT NOT NULL,
                 %s int NOT NULL,
                 %s int NOT NULL,
                 %s int NOT NULL,
                 %s TEXT NOT NULL,
-                PRIMARY KEY (world, x, y, z)
+                PRIMARY KEY (x, y, z)
             );
             """,
-            TABLE_NAME,
-            WORLD_KEY,
+            world.getName(),
             X, Y, Z,
             BLOCK_DATA
         );
@@ -103,22 +126,20 @@ public class GameFieldRestorer extends SqliteDatabase {
         }
     }
 
-    private boolean exists(World world, BlockPositionBuilder position) {
+    private boolean exists(BlockPositionBuilder position) {
         final String sql = String.format(
             """
             SELECT 1 FROM %s
-            WHERE %s=? AND %s=? AND %s=? AND %s=?
+            WHERE %s=? AND %s=? AND %s=?
             """,
-            TABLE_NAME,
-            WORLD_KEY,
+            world.getName(),
             X, Y, Z
         );
 
         try (final PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
-            preparedStatement.setString(1, world.getName());
-            preparedStatement.setInt(2, position.x());
-            preparedStatement.setInt(3, position.y());
-            preparedStatement.setInt(4, position.z());
+            preparedStatement.setInt(1, position.x());
+            preparedStatement.setInt(2, position.y());
+            preparedStatement.setInt(3, position.z());
 
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 return resultSet.next();
@@ -132,62 +153,63 @@ public class GameFieldRestorer extends SqliteDatabase {
     private void save(List<BlockModificationRecord> records) {
         final String sql = String.format(
             """
-            INSERT OR IGNORE INTO %s(%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO %s(%s, %s, %s, %s) VALUES (?, ?, ?, ?)
             """,
-            TABLE_NAME,
-            WORLD_KEY, X, Y, Z, BLOCK_DATA
+            world.getName(),
+            X, Y, Z, BLOCK_DATA
         );
 
-        try (final PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
-            for (final BlockModificationRecord record : records) {
-                preparedStatement.setString(1, record.world.getKey().asString());
-                preparedStatement.setInt(2, record.position.x());
-                preparedStatement.setInt(3, record.position.y());
-                preparedStatement.setInt(4, record.position.z());
-                preparedStatement.setString(5, record.blockData.getAsString());
-                preparedStatement.addBatch();
-            }
+        Bukkit.getScheduler().runTaskAsynchronously(TPLCore.getPlugin(), () -> {
+            System.out.println("start save");
 
-            preparedStatement.executeBatch();
-        }
-        catch (SQLException e) {
-            throw new IllegalStateException("データベースのアクセスに問題が発生しました", e);
-        }
+            try (final PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
+                getConnection().setAutoCommit(false);
+
+                for (final BlockModificationRecord record : records) {
+                    preparedStatement.setInt(1, record.position.x());
+                    preparedStatement.setInt(2, record.position.y());
+                    preparedStatement.setInt(3, record.position.z());
+                    preparedStatement.setString(4, record.blockData.getAsString());
+                    preparedStatement.addBatch();
+                }
+
+                System.out.println("end of adding batches");
+
+                preparedStatement.executeBatch();
+
+                System.out.println("end execute batch");
+
+                getConnection().commit();
+
+                System.out.println("end commit, finish save");
+            }
+            catch (SQLException e) {
+                throw new IllegalStateException("データベースのアクセスに問題が発生しました", e);
+            }
+        });
     }
 
     private void load() {
         final String sql = String.format(
             """
-            SELECT %s, %s, %s, %s, %s FROM %s
+            SELECT %s, %s, %s, %s FROM %s
             """,
-            WORLD_KEY, X, Y, Z, BLOCK_DATA,
-            TABLE_NAME
+            X, Y, Z, BLOCK_DATA,
+            world.getName()
         );
 
         try (final Statement statement = getConnection().createStatement(); final ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
-                final String worldKeyStr = resultSet.getString(WORLD_KEY);
-                final int x = resultSet.getInt(X);
-                final int y = resultSet.getInt(Y);
-                final int z = resultSet.getInt(Z);
-                final String blockDataStr = resultSet.getString(BLOCK_DATA);
+                final BlockPositionBuilder position = new BlockPositionBuilder(
+                    resultSet.getInt(X),
+                    resultSet.getInt(Y),
+                    resultSet.getInt(Z)
+                );
+                final BlockData blockData = Bukkit.createBlockData(resultSet.getString(BLOCK_DATA));
 
-                final NamespacedKey key = NamespacedKey.fromString(worldKeyStr);
-
-                if (key == null) {
-                    throw new IllegalStateException("ワールドのキーを解決できませんでした: " + worldKeyStr);
-                }
-
-                final World world = Bukkit.getWorld(key);
-
-                if (world == null) {
-                    throw new IllegalStateException("ワールド '" + key + "' は存在しません");
-                }
-
-                final BlockPositionBuilder position = new BlockPositionBuilder(x, y, z);
-                final BlockData blockData = Bukkit.createBlockData(blockDataStr);
                 position.toBlock(world).setBlockData(blockData);
             }
+            System.out.println("end load");
         }
         catch (SQLException e) {
             throw new IllegalStateException("データベースのアクセスに問題が発生しました", e);
@@ -199,7 +221,7 @@ public class GameFieldRestorer extends SqliteDatabase {
             """
             DELETE FROM %s
             """,
-            TABLE_NAME
+            world.getName()
         );
 
         try (final Statement statement = getConnection().createStatement()) {
@@ -208,5 +230,34 @@ public class GameFieldRestorer extends SqliteDatabase {
         catch (SQLException e) {
             throw new IllegalStateException("データベースのアクセスに問題が発生しました", e);
         }
+    }
+
+    public Map<BlockPositionBuilder, String> get() {
+        final String sql = String.format(
+            """
+            SELECT %s, %s, %s, %s FROM %s
+            """,
+            X, Y, Z, BLOCK_DATA,
+            world.getName()
+        );
+
+        final Map<BlockPositionBuilder, String> data = new HashMap<>();
+
+        try (final Statement statement = getConnection().createStatement(); final ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                final BlockPositionBuilder position = new BlockPositionBuilder(
+                    resultSet.getInt(X),
+                    resultSet.getInt(Y),
+                    resultSet.getInt(Z)
+                );
+                final String serializedBlockData = resultSet.getString(BLOCK_DATA);
+                data.put(position, serializedBlockData);
+            }
+        }
+        catch (SQLException e) {
+            throw new IllegalStateException("データベースのアクセスに問題が発生しました", e);
+        }
+
+        return data;
     }
 }

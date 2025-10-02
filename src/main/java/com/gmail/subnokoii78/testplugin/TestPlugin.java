@@ -2,6 +2,7 @@ package com.gmail.subnokoii78.testplugin;
 
 import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.events.*;
+import com.gmail.subnokoii78.testplugin.system.field.GameFieldChangeObserver;
 import com.gmail.subnokoii78.testplugin.system.field.GameFieldRestorer;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.events.PluginApi;
@@ -51,7 +52,7 @@ public final class TestPlugin extends JavaPlugin {
             TestPlugin.DEFAULT_CONFIG_RESOURCE_PATH
         );
 
-        gameFieldRestorer = new GameFieldRestorer(getDatabaseFilePath());
+        gameFieldRestorer = new GameFieldRestorer(DimensionAccess.of(GAME_FIELD_DIMENSION_ID).getWorld());
         getGameFieldRestorer().open();
 
         // データパック導入チェック
@@ -64,6 +65,7 @@ public final class TestPlugin extends JavaPlugin {
         // イベントリスナー登録
         PlayerEventListener.init();
         EntityEventListener.init();
+        getServer().getPluginManager().registerEvents(GameFieldChangeObserver.INSTANCE, this);
 
         // コマンド登録
         // TODO: 廃止済みらしいのでbrigadier式に置き換え
@@ -76,6 +78,8 @@ public final class TestPlugin extends JavaPlugin {
             CustomItemsCommand.CUSTOM_ITEMS.register(registrar);
             ConfigCommand.CONFIG_COMMAND.register(registrar);
             LobbyCommand.LOBBY_COMMAND.register(registrar);
+            DatabaseCommand.DATABASE_COMMAND.register(registrar);
+            GameFieldCommand.GAME_FIELD_COMMAND.register(registrar);
         });
 
         TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, CustomEventListener.INSTANCE::onLeftClick);
@@ -127,4 +131,6 @@ public final class TestPlugin extends JavaPlugin {
     }
 
     public static final String DEFAULT_CONFIG_RESOURCE_PATH = "/default_config.json";
+
+    public static final String GAME_FIELD_DIMENSION_ID = "plugin_api:game_field";
 }
