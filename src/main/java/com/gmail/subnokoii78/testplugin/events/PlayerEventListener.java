@@ -1,5 +1,6 @@
 package com.gmail.subnokoii78.testplugin.events;
 
+import com.gmail.subnokoii78.testplugin.system.transfer.PlayerTransferManager;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.events.PlayerClickEvent;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
@@ -245,7 +246,7 @@ public class PlayerEventListener implements Listener {
                 }
                 case "server_selector": {
                     event.cancel();
-                    TPLCore.paperVelocityManager.getServerSelectorInteraction().open(player);
+                    PlayerTransferManager.interaction().open(player);
                     break;
                 }
                 case "magic": {

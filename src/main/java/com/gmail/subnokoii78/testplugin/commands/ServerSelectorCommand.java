@@ -1,5 +1,6 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
+import com.gmail.subnokoii78.testplugin.system.transfer.PlayerTransferManager;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.commands.AbstractCommand;
 import com.mojang.brigadier.Command;
@@ -32,7 +33,7 @@ public class ServerSelectorCommand extends AbstractCommand {
                 }
 
                 final PlayerInventory inventory = player.getInventory();
-                final ItemStack serverSelector = TPLCore.paperVelocityManager.getServerSelectorItemStack();
+                final ItemStack serverSelector = PlayerTransferManager.itemStack();
                 if (inventory.contains(serverSelector)) {
                     return failure(ctx.getSource(), new IllegalStateException(
                         "既にサーバーセレクタを所持しています"

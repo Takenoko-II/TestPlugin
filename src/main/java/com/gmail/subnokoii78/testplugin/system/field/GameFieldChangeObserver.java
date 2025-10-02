@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 
 public class GameFieldChangeObserver implements Listener {
     public boolean isEnabled = false;
@@ -28,8 +29,6 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        System.out.println("blockplace");
-
         TestPlugin.getGameFieldRestorer().batch(
             Vector3Builder.from(event.getBlockPlaced().getLocation()).toIntVector(true),
             event.getBlockReplacedState().getBlockData()
@@ -42,8 +41,6 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        System.out.println("blockbreak");
-
         TestPlugin.getGameFieldRestorer().batch(
             Vector3Builder.from(event.getBlock().getLocation()).toIntVector(true),
             event.getBlock().getBlockData()
@@ -55,8 +52,6 @@ public class GameFieldChangeObserver implements Listener {
         if (!isValid(event.getBlock().getWorld())) {
             return;
         }
-
-        System.out.println("blockexplode");
 
         for (final Block block : event.blockList()) {
             TestPlugin.getGameFieldRestorer().batch(
@@ -72,8 +67,6 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        System.out.println("entityexplode");
-
         for (final Block block : event.blockList()) {
             TestPlugin.getGameFieldRestorer().batch(
                 Vector3Builder.from(block).toIntVector(true),
@@ -87,8 +80,6 @@ public class GameFieldChangeObserver implements Listener {
         if (!isValid(event.getBlock().getWorld())) {
             return;
         }
-
-        System.out.println("blockburn");
 
         TestPlugin.getGameFieldRestorer().batch(
             Vector3Builder.from(event.getBlock().getLocation()).toIntVector(true),
@@ -116,10 +107,20 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        System.out.println("blockform");
-
         TestPlugin.getGameFieldRestorer().batch(
             Vector3Builder.from(event.getBlock().getLocation()).toIntVector(true),
+            event.getBlock().getBlockData()
+        );
+    }
+
+    @EventHandler
+    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        if (!isValid(event.getBlock().getWorld())) {
+            return;
+        }
+
+        TestPlugin.getGameFieldRestorer().batch(
+            Vector3Builder.from(event.getBlock()).toIntVector(true),
             event.getBlock().getBlockData()
         );
     }
@@ -129,8 +130,6 @@ public class GameFieldChangeObserver implements Listener {
         if (!isValid(event.getBlock().getWorld())) {
             return;
         }
-
-        System.out.println("blockfromto");
 
         TestPlugin.getGameFieldRestorer().batch(
             Vector3Builder.from(event.getToBlock()).toIntVector(true),
@@ -144,8 +143,6 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        System.out.println("onblockdispense");
-
         TestPlugin.getGameFieldRestorer().batch(
             Vector3Builder.from(event.getBlock()).toIntVector(true),
             event.getBlock().getBlockData()
@@ -158,8 +155,6 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        System.out.println("blockbreakblock");
-
         TestPlugin.getGameFieldRestorer().batch(
             Vector3Builder.from(event.getBlock()).toIntVector(true),
             event.getBlock().getBlockData()
@@ -171,8 +166,6 @@ public class GameFieldChangeObserver implements Listener {
         if (!isValid(event.getBlock().getWorld())) {
             return;
         }
-
-        System.out.println("grow");
 
         TestPlugin.getGameFieldRestorer().batch(
             Vector3Builder.from(event.getBlock()).toIntVector(true),

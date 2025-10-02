@@ -1,7 +1,10 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
+import com.gmail.subnokoii78.testplugin.TestPlugin;
+import com.gmail.subnokoii78.testplugin.system.transfer.PlayerTransferManager;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.commands.AbstractCommand;
+import com.gmail.subnokoii78.tplcore.execute.DimensionAccess;
 import com.gmail.subnokoii78.tplcore.network.PaperVelocityManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -49,7 +52,7 @@ public class LobbyCommand extends AbstractCommand {
         }
 
         for (final Player player : players) {
-            TPLCore.paperVelocityManager.transfer(player, PaperVelocityManager.BoAServer.LOBBY);
+            PlayerTransferManager.transfer(player, DimensionAccess.OVERWORLD);
         }
 
         context.getSource().getSender().sendMessage(Component.text(
@@ -68,7 +71,7 @@ public class LobbyCommand extends AbstractCommand {
             ));
         }
 
-        TPLCore.paperVelocityManager.transfer(player, PaperVelocityManager.BoAServer.LOBBY);
+        PlayerTransferManager.transfer(player, DimensionAccess.OVERWORLD);
 
         context.getSource().getSender().sendMessage(Component.text(
             player.getName() + " のロビーへの転送を試行します"

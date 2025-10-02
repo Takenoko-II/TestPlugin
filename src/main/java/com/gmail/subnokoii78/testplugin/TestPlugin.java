@@ -2,23 +2,18 @@ package com.gmail.subnokoii78.testplugin;
 
 import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.events.*;
+import com.gmail.subnokoii78.testplugin.system.combat.PlayerComboHandle;
 import com.gmail.subnokoii78.testplugin.system.field.GameFieldChangeObserver;
 import com.gmail.subnokoii78.testplugin.system.field.GameFieldRestorer;
 import com.gmail.subnokoii78.tplcore.TPLCore;
+import com.gmail.subnokoii78.tplcore.commands.ScriptCommand;
+import com.gmail.subnokoii78.tplcore.eval.groovy.GroovyContext;
 import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.*;
-import com.gmail.subnokoii78.tplcore.network.PaperVelocityManager;
-import com.gmail.subnokoii78.tplcore.ui.container.ContainerInteraction;
-import com.gmail.subnokoii78.tplcore.ui.container.ItemButton;
-import com.gmail.subnokoii78.tplcore.ui.container.ItemButtonClickSound;
-import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -80,8 +75,20 @@ public final class TestPlugin extends JavaPlugin {
         // setCommandManager("lobby", new Lobby());
         // setCommandManager("tools", new Tools());
 
+        TPLCore.events.register(TPLEventTypes.SCRIPT_API_CONTEXT_INITIALIZE, event -> {
+            if (event.getClazz() != GroovyContext.class) return;
+
+            final GroovyContext context = event.getContext(GroovyContext.class);
+
+            context.putClasses(TestPlugin.class, TPLCore.class);
+            context.putClasses(PlayerComboHandle.class);
+
+            System.out.println("script initialization");
+        });
+
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final var registrar = event.registrar();
+            ScriptCommand.SCRIPT_COMMAND.register(registrar);
             ServerSelectorCommand.SERVER_SELECTOR_COMMAND.register(registrar);
             CustomItemsCommand.CUSTOM_ITEMS.register(registrar);
             ConfigCommand.CONFIG_COMMAND.register(registrar);
@@ -97,8 +104,10 @@ public final class TestPlugin extends JavaPlugin {
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
 
         // TODO: config.jsonへの書き込み手段の提供(set, add, remove 可能な限りすべて)
-        // TODO: serverselectorからのtp時の音問題の修正ができてるかチェック
-        // TODO: serverselectorを別ディメンションへのテレポートにする
+        // TODO:ApiContextをなんとか...
+        // TODO: ゲームサイクル(投票システムとかね)
+        // TODO: Execute.run::onCatch
+        // TODO: 鯖閉じ時にフラッシュロードしてくれるか？
     }
 
     @Override
@@ -141,54 +150,5 @@ public final class TestPlugin extends JavaPlugin {
 
     public static final String GAME_FIELD_DIMENSION_ID = "plugin_api:game_field";
 
-//    private static final ContainerInteraction SERVER_SELECTOR = new ContainerInteraction(Component.text("Battle of Apostolos"), 1)
-//        .set(1, ItemButton.item(Material.NETHER_STAR)
-//            .clickSound(ItemButtonClickSound.BASIC)
-//            .name(Component.text("Game").color(NamedTextColor.AQUA))
-//            .lore(Component.text("ゲームサーバーに接続する").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
-//            .onClick(event -> {
-//                event.close();
-//                event.getPlayer().teleport(Location)
-//                // transfer(event.getPlayer(), PaperVelocityManager.BoAServer.GAME);
-//            })
-//        )
-//        .set(3, ItemButton.item(Material.PAPER)
-//            .clickSound(ItemButtonClickSound.BASIC)
-//            .name(Component.text("Lobby").color(NamedTextColor.GOLD))
-//            .lore(Component.text("ロビーサーバーに接続する").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
-//            .glint(true)
-//            .onClick(event -> {
-//                event.close();
-//                transfer(event.getPlayer(), PaperVelocityManager.BoAServer.LOBBY);
-//            })
-//        )
-//        .set(5, ItemButton.item(Material.COMMAND_BLOCK)
-//            .clickSound(ItemButtonClickSound.BASIC)
-//            .name(Component.text("Development").color(NamedTextColor.GOLD))
-//            .lore(Component.text("開発サーバーに接続する").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
-//            .glint(true)
-//            .onClick(event -> {
-//                event.close();
-//                if (event.getPlayer().isOp()) {
-//                    transfer(event.getPlayer(), PaperVelocityManager.BoAServer.DEVELOPMENT);
-//                }
-//                else {
-//                    event.getPlayer().sendMessage(Component.text("このサーバーへの接続はオペレーター権限が必要です").color(NamedTextColor.RED));
-//                }
-//            })
-//        )
-//        .set(7, ItemButton.item(Material.RED_BED)
-//            .clickSound(ItemButtonClickSound.BASIC)
-//            .name(Component.text("Spawn").color(NamedTextColor.RED))
-//            .lore(Component.text("スポーン地点に戻る").color(NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false))
-//            .onClick(event -> {
-//                final Location spawnPoint = event.getPlayer().getRespawnLocation();
-//                event.close();
-//                event.getPlayer().teleport(
-//                    spawnPoint == null
-//                        ? event.getPlayer().getWorld().getSpawnLocation().add(new Vector3Builder(0.5, 0.5, 0.5).toBukkitVector())
-//                        : spawnPoint.add(new Vector3Builder(0.5, 0.5, 0.5).toBukkitVector())
-//                );
-//            })
-//        );
+    public static final String DEVELOPMENT_DIMENSION_ID = "plugin_api:development";
 }
