@@ -8,6 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.Component;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -43,17 +44,24 @@ public class GameFieldCommand extends AbstractCommand {
         }
         else {
             GameFieldChangeObserver.INSTANCE.isEnabled = true;
+            context.getSource().getSender().sendMessage(Component.text(
+                "ゲームフィールドの監視を開始しました"
+            ));
             return Command.SINGLE_SUCCESS;
         }
     }
 
     private int flush(CommandContext<CommandSourceStack> context) {
+        final int sum;
         try {
-            TestPlugin.getGameFieldRestorer().flush();
+            sum = TestPlugin.getGameFieldRestorer().flush();
         }
         catch (IllegalStateException e) {
             return failure(context.getSource(), e);
         }
+        context.getSource().getSender().sendMessage(Component.text(
+            sum+ "件のバッチをデータベース書きだしました"
+        ));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -69,6 +77,9 @@ public class GameFieldCommand extends AbstractCommand {
             return failure(context.getSource(), e);
         }
         GameFieldChangeObserver.INSTANCE.isEnabled = false;
+        context.getSource().getSender().sendMessage(Component.text(
+            "ゲームフィールドを修復し、監視を終了しました"
+        ));
         return Command.SINGLE_SUCCESS;
     }
 

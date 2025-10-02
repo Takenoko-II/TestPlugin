@@ -6,12 +6,16 @@
             "biome": "minecraft:plains",
             "layers": [
                 {
-                    "block": "minecraft:grass_block",
+                    "block": "minecraft:bedrock",
                     "height": 1
                 },
                 {
                     "block": "minecraft:stone",
-                    "height": 63
+                    "height": 62
+                },
+                {
+                    "block": "minecraft:grass_block",
+                    "height": 1
                 }
             ],
             "structure_overrides": []

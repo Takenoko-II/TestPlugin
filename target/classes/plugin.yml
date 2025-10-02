@@ -1,5 +1,0 @@
-name: TestPlugin
-description: '何故か未だに名前がTestPluginになってるプラグイン'
-version: '1.0-SNAPSHOT'
-main: com.gmail.subnokoii78.testplugin.TestPlugin
-api-version: '1.21'

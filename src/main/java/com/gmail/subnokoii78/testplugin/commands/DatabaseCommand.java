@@ -44,11 +44,15 @@ public class DatabaseCommand extends AbstractCommand {
             final Map<BlockPositionBuilder, String> data = TestPlugin.getGameFieldRestorer().get();
             final TextComponent.Builder builder = Component.text();
 
+            builder.append(Component.text(
+                data.keySet().size() + "件のデータが見つかりました: "
+            ));
+
             data.forEach((k, v) -> {
+                builder.appendNewline();
                 builder.append(Component.text(
                     k + ": " + v
                 ));
-                builder.appendNewline();
             });
 
             context.getSource().getSender().sendMessage(builder);

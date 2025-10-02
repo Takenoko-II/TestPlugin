@@ -36,6 +36,11 @@ public class GameFieldRestorer extends SqliteDatabase {
 
     public GameFieldRestorer(World world) {
         super(TPLCore.getPlugin().getDataPath() + "/GameFieldRestorer_" + world.getName() + ".db");
+
+        if (caches.containsKey(world)) {
+            throw new IllegalStateException();
+        }
+
         this.world = world;
         caches.put(world, this);
     }
@@ -92,14 +97,13 @@ public class GameFieldRestorer extends SqliteDatabase {
     }
 
     public void batch(BlockPositionBuilder position, BlockData blockData) {
-        System.out.println(position.toString());
-        System.out.println(blockData.getAsString());
         batches.add(new BlockModificationRecord(position, blockData));
     }
 
-    public void flush() {
-        save(batches);
+    public int flush() {
+        final int c = save(batches);
         batches.clear();
+        return c;
     }
 
     private void create() {
@@ -150,7 +154,7 @@ public class GameFieldRestorer extends SqliteDatabase {
         }
     }
 
-    private void save(List<BlockModificationRecord> records) {
+    private int save(List<BlockModificationRecord> records) {
         final String sql = String.format(
             """
             INSERT OR IGNORE INTO %s(%s, %s, %s, %s) VALUES (?, ?, ?, ?)
@@ -159,34 +163,29 @@ public class GameFieldRestorer extends SqliteDatabase {
             X, Y, Z, BLOCK_DATA
         );
 
-        Bukkit.getScheduler().runTaskAsynchronously(TPLCore.getPlugin(), () -> {
-            System.out.println("start save");
+        final int[] result;
 
-            try (final PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
-                getConnection().setAutoCommit(false);
+        try (final PreparedStatement preparedStatement = getConnection().prepareStatement(sql)) {
+            getConnection().setAutoCommit(false);
 
-                for (final BlockModificationRecord record : records) {
-                    preparedStatement.setInt(1, record.position.x());
-                    preparedStatement.setInt(2, record.position.y());
-                    preparedStatement.setInt(3, record.position.z());
-                    preparedStatement.setString(4, record.blockData.getAsString());
-                    preparedStatement.addBatch();
-                }
-
-                System.out.println("end of adding batches");
-
-                preparedStatement.executeBatch();
-
-                System.out.println("end execute batch");
-
-                getConnection().commit();
-
-                System.out.println("end commit, finish save");
+            for (final BlockModificationRecord record : records) {
+                preparedStatement.setInt(1, record.position.x());
+                preparedStatement.setInt(2, record.position.y());
+                preparedStatement.setInt(3, record.position.z());
+                preparedStatement.setString(4, record.blockData.getAsString());
+                preparedStatement.addBatch();
             }
-            catch (SQLException e) {
-                throw new IllegalStateException("データベースのアクセスに問題が発生しました", e);
-            }
-        });
+
+            result = preparedStatement.executeBatch();
+
+            getConnection().commit();
+            getConnection().setAutoCommit(true);
+        }
+        catch (SQLException e) {
+            throw new IllegalStateException("データベースのアクセスに問題が発生しました", e);
+        }
+
+        return Arrays.stream(result).sum();
     }
 
     private void load() {
@@ -209,7 +208,6 @@ public class GameFieldRestorer extends SqliteDatabase {
 
                 position.toBlock(world).setBlockData(blockData);
             }
-            System.out.println("end load");
         }
         catch (SQLException e) {
             throw new IllegalStateException("データベースのアクセスに問題が発生しました", e);
