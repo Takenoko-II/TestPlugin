@@ -90,8 +90,9 @@ public final class TestPlugin extends JavaPlugin {
 
         // TODO: config.jsonへの書き込み手段の提供(set, add, remove 可能な限りすべて)
         // TODO: serverselectorからのtp時の音問題の修正ができてるかチェック
-        // TODO: dbのテスト
-        // TODO: イベントハンドラ書く
+        // TODO: 何故か書き込まれたり書き込まれなかったりする
+        // TODO: 何故かロードできてない
+        // TODO: org.bukkit.plugin.IllegalPluginAccessException: Plugin attempted to register task while disabledが終了時に出る
     }
 
     @Override
