@@ -7,6 +7,13 @@
     },
     "animations": {
         "knight_slash": {
+            "default_state": {
+                "scale": [
+                    4,
+                    6,
+                    0.6
+                ]
+            },
             "combos": [
                 {
                     "frames": [
@@ -17,7 +24,7 @@
                         "normal_combo1/frame5"
                     ],
                     "parameters": {
-                        "angle": -60
+                        "angle": -40
                     }
                 },
                 {
@@ -29,7 +36,7 @@
                         "normal_combo2/frame5"
                     ],
                     "parameters": {
-                        "angle": 30
+                        "angle": 50
                     }
                 },
                 {
@@ -41,7 +48,7 @@
                         "normal_combo3/frame5"
                     ],
                     "parameters": {
-                        "angle": 70
+                        "angle": 80
                     }
                 },
                 {
@@ -59,14 +66,7 @@
                     }
                 }
             ],
-            "frame_time": 2,
-            "default_state": {
-                "scale": [
-                    3,
-                    6,
-                    0.1
-                ]
-            }
+            "frame_time": 2
         }
     }
 }

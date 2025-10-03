@@ -1,11 +1,8 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
-import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.testplugin.system.transfer.PlayerTransferManager;
-import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.commands.AbstractCommand;
 import com.gmail.subnokoii78.tplcore.execute.DimensionAccess;
-import com.gmail.subnokoii78.tplcore.network.PaperVelocityManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

@@ -6,10 +6,15 @@ import com.gmail.subnokoii78.testplugin.system.combat.animation.ItemDisplayAnima
 import com.gmail.subnokoii78.tplcore.execute.CommandSourceStack;
 import com.gmail.subnokoii78.tplcore.execute.EntityAnchor;
 import com.gmail.subnokoii78.tplcore.execute.Execute;
+import com.gmail.subnokoii78.tplcore.shape.DustSpawner;
+import com.gmail.subnokoii78.tplcore.shape.ParticleSpawner;
 import com.gmail.subnokoii78.tplcore.vector.OrientedBoundingBox;
+import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
@@ -29,7 +34,7 @@ public class KnightSlash extends Combo {
     @Override
     public void onComboProgress(Player player, int currentComboCount) {
         final PlayerComboHandle handler = PlayerComboHandle.getHandle(player);
-        final OrientedBoundingBox box = new OrientedBoundingBox(4, 0.5, 2);
+        final OrientedBoundingBox box = new OrientedBoundingBox(6 * 0.8, 0.5, 4 * 0.8);
 
         new Execute(new CommandSourceStack(player))
             .anchored(EntityAnchor.EYES)
@@ -44,7 +49,20 @@ public class KnightSlash extends Combo {
 
                 box.put(stack.getLocation());
                 box.rotation(state.rotation());
-                box.showOutline(Color.BLUE);
+                // box.showOutline(Color.BLUE);
+
+                new DustSpawner(new Particle.DustOptions(Color.AQUA, 1.5f))
+                    .delta(box.size())
+                    .place(stack.getDimension(), stack.getPosition())
+                    .count(10)
+                    .speed(1)
+                    .spawn();
+                new ParticleSpawner<>(Particle.CRIT)
+                    .delta(box.size())
+                    .place(stack.getDimension(), stack.getPosition())
+                    .count(15)
+                    .speed(0.5)
+                    .spawn();
 
                 final Set<Entity> entities = new HashSet<>(box.getCollidingEntities())
                     .stream().filter(entity -> {
@@ -62,13 +80,37 @@ public class KnightSlash extends Combo {
                 else {
                     entities.forEach(entity -> {
                         if (entity instanceof Damageable damageable) {
-                            damageable.damage(2, player);
+                            if (currentComboCount == getMaxCombo()) {
+                                damageable.damage(5, player);
+                                player.getWorld().playSound(
+                                    player.getLocation(),
+                                    Sound.ITEM_TRIDENT_RIPTIDE_1,
+                                    2.0f,
+                                    1.1f
+                                );
+                                new ParticleSpawner<>(Particle.SONIC_BOOM)
+                                    .delta(box.size())
+                                    .place(stack.getDimension(), stack.getPosition())
+                                    .count(15)
+                                    .speed(0.2)
+                                    .spawn();
+                            }
+                            else {
+                                damageable.damage(3, player);
+                            }
                         }
                     });
 
                     return Execute.SUCCESS;
                 }
             });
+
+        player.getWorld().playSound(
+            player.getLocation(),
+            Sound.ITEM_TRIDENT_THROW,
+            2.0f,
+            1.5f
+        );
 
         player.sendMessage(Component.text("コンボ数: " + currentComboCount));
     }
@@ -89,6 +131,10 @@ public class KnightSlash extends Combo {
     }
 
     public ItemDisplayAnimator animator = ItemDisplayAnimator.fromConfig(getId());
+
+    public void updateAnimator() {
+        animator = ItemDisplayAnimator.fromConfig(getId());
+    }
 
     public static final KnightSlash KNIGHT_SLASH = new KnightSlash();
 }

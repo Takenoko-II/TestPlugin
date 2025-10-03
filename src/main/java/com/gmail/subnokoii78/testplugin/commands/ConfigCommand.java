@@ -1,6 +1,7 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
+import com.gmail.subnokoii78.testplugin.system.combat.combos.KnightSlash;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.commands.AbstractCommand;
 import com.gmail.takenokoii78.json.JSONPath;
@@ -80,9 +81,6 @@ public class ConfigCommand extends AbstractCommand {
 
     private int reload(CommandContext<CommandSourceStack> context) {
         if (TPLCore.getPluginConfigLoader().reload()) {
-            // コマンドの実行権限更新
-            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
-
             context.getSource().getSender().sendMessage("再読み込みに成功しました");
             return Command.SINGLE_SUCCESS;
         }

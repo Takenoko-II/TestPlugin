@@ -3,17 +3,21 @@ package com.gmail.subnokoii78.testplugin;
 import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.events.*;
 import com.gmail.subnokoii78.testplugin.system.combat.PlayerComboHandle;
+import com.gmail.subnokoii78.testplugin.system.combat.combos.KnightSlash;
 import com.gmail.subnokoii78.testplugin.system.field.GameFieldChangeObserver;
 import com.gmail.subnokoii78.testplugin.system.field.GameFieldRestorer;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.commands.ScriptCommand;
 import com.gmail.subnokoii78.tplcore.eval.groovy.GroovyContext;
+import com.gmail.subnokoii78.tplcore.events.BukkitEventObserver;
 import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.*;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -100,6 +104,14 @@ public final class TestPlugin extends JavaPlugin {
         TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, CustomEventListener.INSTANCE::onLeftClick);
         TPLCore.events.register(TPLEventTypes.DATAPACK_MESSAGE_RECEIVE, CustomEventListener.INSTANCE::onDatapackMessageReceive);
         TPLCore.events.register(TPLEventTypes.TICK, TickEventListener.INSTANCE::onTick);
+        TPLCore.events.register(TPLEventTypes.PLUGIN_CONFIG_UPDATE, event -> {
+            if (event.getLoader() == TPLCore.getPluginConfigLoader()) {
+                // コマンドの実行権限更新
+                Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+
+                KnightSlash.KNIGHT_SLASH.updateAnimator();
+            }
+        });
 
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
 
@@ -107,7 +119,7 @@ public final class TestPlugin extends JavaPlugin {
         // TODO:ApiContextをなんとか...
         // TODO: ゲームサイクル(投票システムとかね)
         // TODO: Execute.run::onCatch
-        // TODO: 鯖閉じ時にフラッシュロードしてくれるか？
+        // TODO: Auto Flush
     }
 
     @Override
