@@ -87,19 +87,17 @@ public class GameFieldChangeObserver implements Listener {
         );
     }
 
-    /*@EventHandler
+    @EventHandler
     public void onBlockFade(BlockFadeEvent event) {
         if (!isValid(event.getBlock().getWorld())) {
             return;
         }
 
-        System.out.println("blockfade");
-
         TestPlugin.getGameFieldRestorer().batch(
             Vector3Builder.from(event.getBlock().getLocation()).toIntVector(true),
             event.getBlock().getBlockData()
         );
-    }*/
+    }
 
     @EventHandler
     public void onBlockForm(BlockFormEvent event) {

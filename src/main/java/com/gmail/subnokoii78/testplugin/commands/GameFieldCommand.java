@@ -23,9 +23,6 @@ public class GameFieldCommand extends AbstractCommand {
                 Commands.literal("observe").executes(this::observe)
             )
             .then(
-                Commands.literal("flush").executes(this::flush)
-            )
-            .then(
                 Commands.literal("restore").executes(this::restore)
             )
             .build();
@@ -51,7 +48,11 @@ public class GameFieldCommand extends AbstractCommand {
         }
     }
 
-    private int flush(CommandContext<CommandSourceStack> context) {
+    private int restore(CommandContext<CommandSourceStack> context) {
+        if (!GameFieldChangeObserver.INSTANCE.isEnabled) return failure(context.getSource(), new IllegalStateException(
+            "監視が有効化されていません"
+        ));
+
         final int sum;
         try {
             sum = TestPlugin.getGameFieldRestorer().flush();
@@ -61,13 +62,6 @@ public class GameFieldCommand extends AbstractCommand {
         }
         context.getSource().getSender().sendMessage(Component.text(
             sum+ "件のバッチをデータベース書きだしました"
-        ));
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private int restore(CommandContext<CommandSourceStack> context) {
-        if (!GameFieldChangeObserver.INSTANCE.isEnabled) return failure(context.getSource(), new IllegalStateException(
-            "監視が有効化されていません"
         ));
 
         try {

@@ -7,12 +7,13 @@ import com.gmail.subnokoii78.testplugin.system.combat.combos.KnightSlash;
 import com.gmail.subnokoii78.testplugin.system.field.GameFieldChangeObserver;
 import com.gmail.subnokoii78.testplugin.system.field.GameFieldRestorer;
 import com.gmail.subnokoii78.tplcore.TPLCore;
-import com.gmail.subnokoii78.tplcore.commands.ScriptCommand;
+import com.gmail.subnokoii78.tplcore.eval.ScriptLanguage;
 import com.gmail.subnokoii78.tplcore.eval.groovy.GroovyContext;
-import com.gmail.subnokoii78.tplcore.events.BukkitEventObserver;
 import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.*;
+import com.gmail.subnokoii78.tplcore.files.PluginConfigLoader;
+import com.gmail.subnokoii78.tplcore.schedule.GameTickScheduler;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -76,23 +77,21 @@ public final class TestPlugin extends JavaPlugin {
 
         // コマンド登録
         // TODO: 廃止済みらしいのでbrigadier式に置き換え
-        // setCommandManager("lobby", new Lobby());
         // setCommandManager("tools", new Tools());
 
-        TPLCore.events.register(TPLEventTypes.SCRIPT_API_CONTEXT_INITIALIZE, event -> {
-            if (event.getClazz() != GroovyContext.class) return;
-
-            final GroovyContext context = event.getContext(GroovyContext.class);
-
-            context.putClasses(TestPlugin.class, TPLCore.class);
-            context.putClasses(PlayerComboHandle.class);
-
-            System.out.println("script initialization");
-        });
+        ScriptLanguage.GROOVY.registerContext(
+            "testplugin", GroovyContext.standardApi()
+                .putClasses(
+                    TestPlugin.class,
+                    TPLCore.class,
+                    PlayerComboHandle.class,
+                    PluginConfigLoader.class
+                )
+                .putVariable("plugin", TPLCore.getPlugin())
+        );
 
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final var registrar = event.registrar();
-            ScriptCommand.SCRIPT_COMMAND.register(registrar);
             ServerSelectorCommand.SERVER_SELECTOR_COMMAND.register(registrar);
             CustomItemsCommand.CUSTOM_ITEMS.register(registrar);
             ConfigCommand.CONFIG_COMMAND.register(registrar);
@@ -116,10 +115,11 @@ public final class TestPlugin extends JavaPlugin {
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
 
         // TODO: config.jsonへの書き込み手段の提供(set, add, remove 可能な限りすべて)
-        // TODO:ApiContextをなんとか...
         // TODO: ゲームサイクル(投票システムとかね)
         // TODO: Execute.run::onCatch
         // TODO: Auto Flush
+        // TODO: README.md
+        // TODO: GameFieldRestorerを範囲ごとに分けるかも
     }
 
     @Override

@@ -26,6 +26,8 @@ public class GameFieldRestorer extends SqliteDatabase {
 
     private static final String BLOCK_DATA = "block_data";
 
+    private static final int AUTO_FLUSH_BATCHES_COUNT = 30;
+
     private record BlockModificationRecord(BlockPositionBuilder position, BlockData blockData) {}
 
     private static final Map<World, GameFieldRestorer> caches = new HashMap<>();
@@ -98,6 +100,13 @@ public class GameFieldRestorer extends SqliteDatabase {
 
     public void batch(BlockPositionBuilder position, BlockData blockData) {
         batches.add(new BlockModificationRecord(position, blockData));
+
+        if (batches.size() >= AUTO_FLUSH_BATCHES_COUNT) {
+            TPLCore.getPlugin().getComponentLogger().info(Component.text(
+                batches.size() + "件のバッチを確認したためオートフラッシュを実行しました"
+            ));
+            flush();
+        }
     }
 
     public int flush() {
