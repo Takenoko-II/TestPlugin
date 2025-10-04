@@ -82,9 +82,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <!-->
-
-            <-->
             <groupId>com.gmail.subnokoii78</groupId>
             <artifactId>TPLCore</artifactId>
             <version>1.0-SNAPSHOT</version>

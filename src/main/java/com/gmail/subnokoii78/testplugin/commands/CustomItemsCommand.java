@@ -82,7 +82,7 @@ public class CustomItemsCommand extends AbstractCommand {
             @Override
             protected ItemStack getItem() {
                 return new ItemStackBuilder(Material.BOW)
-                    .customName(Component.text("Instant Shoot Bow").color(NamedTextColor.GOLD))
+                    .itemName(Component.text("Instant Shoot Bow").color(NamedTextColor.GOLD))
                     .customData(MojangsonPath.of("custom_item_tag"), "instant_shoot_bow")
                     .build();
             }

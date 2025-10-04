@@ -9,10 +9,13 @@ import com.gmail.subnokoii78.testplugin.system.field.GameFieldRestorer;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.eval.ScriptLanguage;
 import com.gmail.subnokoii78.tplcore.eval.groovy.GroovyContext;
+import com.gmail.subnokoii78.tplcore.events.PlayerClickEvent;
 import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
+import com.gmail.subnokoii78.tplcore.events.TPLEvents;
 import com.gmail.subnokoii78.tplcore.execute.*;
 import com.gmail.subnokoii78.tplcore.files.PluginConfigLoader;
+import com.gmail.subnokoii78.tplcore.ui.container.ContainerInteraction;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -80,7 +83,8 @@ public final class TestPlugin extends JavaPlugin {
                     TestPlugin.class,
                     TPLCore.class,
                     PlayerComboHandle.class,
-                    PluginConfigLoader.class
+                    PluginConfigLoader.class,
+                    ContainerInteraction.class
                 )
                 .putVariable("plugin", TPLCore.getPlugin())
         );
@@ -109,11 +113,10 @@ public final class TestPlugin extends JavaPlugin {
 
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
 
-        // TODO: config.jsonへの書き込み手段の提供(set, add, remove 可能な限りすべて)
-        // TODO: ゲームサイクル(投票システムとかね)
         // TODO: Execute.run::onCatch
-        // TODO: README.md
+        // TODO: config.jsonへの書き込み手段の提供(set, add, remove 可能な限りすべて)
         // TODO: GameFieldRestorerを範囲ごとに分けるかも
+        // TODO: ゲームサイクル(投票システムとかね)
     }
 
     @Override

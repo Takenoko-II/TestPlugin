@@ -1,4 +1,0 @@
-↓はmavenのローカルリポジトリにTPLCoreのプロジェクトディレクトリ下にあるjarファイルを登録するコマンド
-TPLCoreのプロジェクトディレクトリ下にあるjarファイルを更新したら実行してね
-
-mvn install:install-file -U -Dfile="C:\Users\wakab\IdeaProjects\TPLCore\build\libs\TPLCore-1.0-SNAPSHOT.jar" -DgroupId="com.gmail.subnokoii78" -DartifactId=TPLCore -Dversion="1.0-SNAPSHOT" -Dpackaging=jar
