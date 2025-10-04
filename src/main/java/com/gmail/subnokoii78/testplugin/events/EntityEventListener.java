@@ -43,13 +43,11 @@ public class EntityEventListener extends BukkitRunnable implements Listener {
 
     @Override
     public void run() {
-        final World world = Bukkit.getServer().getWorld("world");
-
-        if (world == null) return;
-
-        for (final Entity entity : world.getEntities()) {
-            if (entity instanceof FishHook && entity.getVelocity().isZero()) {
-                onHookHit((FishHook) entity);
+        for (final World world : Bukkit.getWorlds()) {
+            for (final FishHook entity : world.getEntitiesByClass(FishHook.class)) {
+                if (entity.getVelocity().isZero()) {
+                    onHookHit(entity);
+                }
             }
         }
     }

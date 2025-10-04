@@ -9,8 +9,8 @@
         "knight_slash": {
             "default_state": {
                 "scale": [
-                    4,
-                    6,
+                    4.5,
+                    4.5,
                     0.6
                 ]
             },

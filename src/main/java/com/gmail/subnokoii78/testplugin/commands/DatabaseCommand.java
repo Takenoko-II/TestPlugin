@@ -1,6 +1,7 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
 import com.gmail.subnokoii78.testplugin.TestPlugin;
+import com.gmail.subnokoii78.testplugin.system.field.GameFieldRestorer;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.commands.AbstractCommand;
 import com.gmail.subnokoii78.tplcore.vector.BlockPositionBuilder;
@@ -27,7 +28,7 @@ public class DatabaseCommand extends AbstractCommand {
             .then(
                 Commands.literal("game_field_restorer")
                     .then(
-                        Commands.literal("get")
+                        Commands.literal("get_context_dimension")
                             .executes(this::getDataOfGameFieldRestorer)
                     )
             )
@@ -40,8 +41,14 @@ public class DatabaseCommand extends AbstractCommand {
     }
 
     private int getDataOfGameFieldRestorer(CommandContext<CommandSourceStack> context) {
+        if (!GameFieldRestorer.hasRestorer(context.getSource().getLocation().getWorld())) {
+            return failure(context.getSource(), new IllegalStateException(
+                "指定のディメンションにはGameFieldRestorerが存在しません"
+            ));
+        }
+
         Bukkit.getScheduler().runTaskAsynchronously(TPLCore.getPlugin(), () -> {
-            final Map<BlockPositionBuilder, String> data = TestPlugin.getGameFieldRestorer().get();
+            final Map<BlockPositionBuilder, String> data = GameFieldRestorer.getRestorer(context.getSource().getLocation().getWorld()).get();
             final TextComponent.Builder builder = Component.text();
 
             builder.append(Component.text(

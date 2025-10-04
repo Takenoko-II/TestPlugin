@@ -5,10 +5,13 @@ import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.events.TickEvent;
 import com.gmail.subnokoii78.tplcore.itemstack.ItemStackCustomDataAccess;
 import com.gmail.takenokoii78.mojangson.MojangsonValueTypes;
+import com.gmail.takenokoii78.mojangson.values.MojangsonCompound;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
@@ -21,20 +24,20 @@ public class TickEventListener {
     private TickEventListener() {}
 
     public void onTick(@NotNull TickEvent event) {
-        if (!event.isTicking()) return;
+        if (event.isFrozen()) return;
 
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            final ItemStack itemStackInMainHand = player.getEquipment().getItemInMainHand();
-            final ItemStack itemStackInOffHand = player.getEquipment().getItemInOffHand();
+        for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
+            final EntityEquipment equipment = player.getEquipment();
+            if (equipment == null) continue;
+            final MojangsonCompound mainHand = ItemStackCustomDataAccess.of(equipment.getItemInMainHand()).read();
+            final MojangsonCompound offHand = ItemStackCustomDataAccess.of(equipment.getItemInOffHand()).read();
 
-            final String tagInMainHand = ItemStackCustomDataAccess.of(itemStackInMainHand)
-                .read()
-                .get("custom_item_tag", MojangsonValueTypes.STRING)
-                .getValue();
-            final String tagInOffHand = ItemStackCustomDataAccess.of(itemStackInOffHand)
-                .read()
-                .get("custom_item_tag", MojangsonValueTypes.STRING)
-                .getValue();
+            final String tagInMainHand = mainHand.has("custom_item_tag")
+                ? mainHand.get("custom_item_tag", MojangsonValueTypes.STRING).getValue()
+                : null;
+            final String tagInOffHand = offHand.has("custom_item_tag")
+                ? offHand.get("custom_item_tag", MojangsonValueTypes.STRING).getValue()
+                : null;
 
             if (Objects.equals(tagInMainHand, "data_getter") || Objects.equals(tagInOffHand, "data_getter")) {
                 final Entity entity = player.getTargetEntity(16);

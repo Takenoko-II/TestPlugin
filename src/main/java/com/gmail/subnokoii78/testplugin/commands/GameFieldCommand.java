@@ -1,7 +1,6 @@
 package com.gmail.subnokoii78.testplugin.commands;
 
-import com.gmail.subnokoii78.testplugin.TestPlugin;
-import com.gmail.subnokoii78.testplugin.system.field.GameFieldChangeObserver;
+import com.gmail.subnokoii78.testplugin.system.field.GameFieldRestorer;
 import com.gmail.subnokoii78.tplcore.commands.AbstractCommand;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -34,13 +33,15 @@ public class GameFieldCommand extends AbstractCommand {
     }
 
     private int observe(CommandContext<CommandSourceStack> context) {
-        if (GameFieldChangeObserver.INSTANCE.isEnabled) {
+        final GameFieldRestorer restorer = GameFieldRestorer.getOrCreateRestorer(context.getSource().getLocation().getWorld(), true);
+
+        if (restorer.isEnabled()) {
             return failure(context.getSource(), new IllegalStateException(
                 "既に有効化されています"
             ));
         }
         else {
-            GameFieldChangeObserver.INSTANCE.isEnabled = true;
+            restorer.setEnabled(true);
             context.getSource().getSender().sendMessage(Component.text(
                 "ゲームフィールドの監視を開始しました"
             ));
@@ -49,13 +50,21 @@ public class GameFieldCommand extends AbstractCommand {
     }
 
     private int restore(CommandContext<CommandSourceStack> context) {
-        if (!GameFieldChangeObserver.INSTANCE.isEnabled) return failure(context.getSource(), new IllegalStateException(
+        if (!GameFieldRestorer.hasRestorer(context.getSource().getLocation().getWorld())) {
+            return failure(context.getSource(), new IllegalStateException(
+                "指定のディメンションにはGameFieldRestorerが存在しません"
+            ));
+        }
+
+        final GameFieldRestorer restorer = GameFieldRestorer.getRestorer(context.getSource().getLocation().getWorld());
+
+        if (!restorer.isEnabled()) return failure(context.getSource(), new IllegalStateException(
             "監視が有効化されていません"
         ));
 
         final int sum;
         try {
-            sum = TestPlugin.getGameFieldRestorer().flush();
+            sum = restorer.flush();
         }
         catch (IllegalStateException e) {
             return failure(context.getSource(), e);
@@ -65,12 +74,12 @@ public class GameFieldCommand extends AbstractCommand {
         ));
 
         try {
-            TestPlugin.getGameFieldRestorer().restore();
+            restorer.restore();
         }
         catch (IllegalStateException e) {
             return failure(context.getSource(), e);
         }
-        GameFieldChangeObserver.INSTANCE.isEnabled = false;
+        restorer.setEnabled(false);
         context.getSource().getSender().sendMessage(Component.text(
             "ゲームフィールドを修復し、監視を終了しました"
         ));

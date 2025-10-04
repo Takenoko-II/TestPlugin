@@ -34,7 +34,7 @@ public class KnightSlash extends Combo {
     @Override
     public void onComboProgress(Player player, int currentComboCount) {
         final PlayerComboHandle handler = PlayerComboHandle.getHandle(player);
-        final OrientedBoundingBox box = new OrientedBoundingBox(6 * 0.8, 0.5, 4 * 0.8);
+        final OrientedBoundingBox box = new OrientedBoundingBox(4.5, 0.5, 4.5);
 
         new Execute(new CommandSourceStack(player))
             .anchored(EntityAnchor.EYES)
@@ -52,16 +52,16 @@ public class KnightSlash extends Combo {
                 // box.showOutline(Color.BLUE);
 
                 new DustSpawner(new Particle.DustOptions(Color.AQUA, 1.5f))
-                    .delta(box.size())
+                    .delta(box.size().scale(1/2d))
                     .place(stack.getDimension(), stack.getPosition())
                     .count(10)
                     .speed(1)
                     .spawn();
                 new ParticleSpawner<>(Particle.CRIT)
-                    .delta(box.size())
+                    .delta(box.size().scale(1/2d))
                     .place(stack.getDimension(), stack.getPosition())
                     .count(15)
-                    .speed(0.5)
+                    .speed(0.0)
                     .spawn();
 
                 final Set<Entity> entities = new HashSet<>(box.getCollidingEntities())
@@ -88,12 +88,6 @@ public class KnightSlash extends Combo {
                                     2.0f,
                                     1.1f
                                 );
-                                new ParticleSpawner<>(Particle.SONIC_BOOM)
-                                    .delta(box.size())
-                                    .place(stack.getDimension(), stack.getPosition())
-                                    .count(15)
-                                    .speed(0.2)
-                                    .spawn();
                             }
                             else {
                                 damageable.damage(3, player);

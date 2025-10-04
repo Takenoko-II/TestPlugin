@@ -26,15 +26,17 @@ public class GameFieldRestorer extends SqliteDatabase {
 
     private static final String BLOCK_DATA = "block_data";
 
-    private static final int AUTO_FLUSH_BATCHES_COUNT = 30;
-
     private record BlockModificationRecord(BlockPositionBuilder position, BlockData blockData) {}
 
     private static final Map<World, GameFieldRestorer> caches = new HashMap<>();
 
     private final World world;
 
+    private boolean isEnabled = false;
+
     private final List<BlockModificationRecord> batches = new ArrayList<>();
+
+    private final AutoFlusher autoFlusher = new AutoFlusher(this);
 
     public GameFieldRestorer(World world) {
         super(TPLCore.getPlugin().getDataPath() + "/GameFieldRestorer_" + world.getName() + ".db");
@@ -49,6 +51,18 @@ public class GameFieldRestorer extends SqliteDatabase {
 
     public World getWorld() {
         return world;
+    }
+
+    public int getBatchCount() {
+        return batches.size();
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean f) {
+        isEnabled = f;
     }
 
     @Override
@@ -90,6 +104,7 @@ public class GameFieldRestorer extends SqliteDatabase {
     public void close() {
         flush();
         restore();
+        autoFlusher.disable();
         disconnect();
     }
 
@@ -100,18 +115,19 @@ public class GameFieldRestorer extends SqliteDatabase {
 
     public void batch(BlockPositionBuilder position, BlockData blockData) {
         batches.add(new BlockModificationRecord(position, blockData));
-
-        if (batches.size() >= AUTO_FLUSH_BATCHES_COUNT) {
-            TPLCore.getPlugin().getComponentLogger().info(Component.text(
-                batches.size() + "件のバッチを確認したためオートフラッシュを実行しました"
-            ));
-            flush();
-        }
+        autoFlusher.update();
     }
 
     public int flush() {
         final int c = save(batches);
         batches.clear();
+        return c;
+    }
+
+    public int flush(int limit) {
+        final List<BlockModificationRecord> view = batches.subList(0, Math.min(limit, batches.size()));
+        final int c = save(view);
+        view.clear();
         return c;
     }
 
@@ -266,5 +282,27 @@ public class GameFieldRestorer extends SqliteDatabase {
         }
 
         return data;
+    }
+
+    public static boolean hasRestorer(World world) {
+        return caches.containsKey(world);
+    }
+
+    public static GameFieldRestorer getRestorer(World world) {
+        if (!caches.containsKey(world)) throw new IllegalStateException();
+        else return caches.get(world);
+    }
+
+    public static GameFieldRestorer getOrCreateRestorer(World world, boolean open) {
+        if (hasRestorer(world)) return getRestorer(world);
+        else {
+            var g = new GameFieldRestorer(world);
+            if (open) g.open();
+            return g;
+        }
+    }
+
+    public static Set<GameFieldRestorer> getAllRestorers() {
+        return Set.copyOf(caches.values());
     }
 }

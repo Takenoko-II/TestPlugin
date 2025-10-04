@@ -1,9 +1,7 @@
 package com.gmail.subnokoii78.testplugin.system.field;
 
-import com.gmail.subnokoii78.testplugin.TestPlugin;
 import com.gmail.subnokoii78.tplcore.vector.Vector3Builder;
 import io.papermc.paper.event.block.BlockBreakBlockEvent;
-import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -13,12 +11,10 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 
 public class GameFieldChangeObserver implements Listener {
-    public boolean isEnabled = false;
-
     private GameFieldChangeObserver() {}
 
     private boolean isValid(World world) {
-        return isEnabled && world.equals(TestPlugin.getGameFieldRestorer().getWorld());
+        return GameFieldRestorer.hasRestorer(world) && GameFieldRestorer.getRestorer(world).isEnabled();
     }
 
     @EventHandler
@@ -29,7 +25,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getBlockPlaced().getLocation()).toIntVector(true),
             event.getBlockReplacedState().getBlockData()
         );
@@ -41,7 +37,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getBlock().getLocation()).toIntVector(true),
             event.getBlock().getBlockData()
         );
@@ -54,7 +50,7 @@ public class GameFieldChangeObserver implements Listener {
         }
 
         for (final Block block : event.blockList()) {
-            TestPlugin.getGameFieldRestorer().batch(
+            GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
                 Vector3Builder.from(block).toIntVector(true),
                 block.getBlockData()
             );
@@ -68,7 +64,7 @@ public class GameFieldChangeObserver implements Listener {
         }
 
         for (final Block block : event.blockList()) {
-            TestPlugin.getGameFieldRestorer().batch(
+            GameFieldRestorer.getRestorer(event.getLocation().getWorld()).batch(
                 Vector3Builder.from(block).toIntVector(true),
                 block.getBlockData()
             );
@@ -81,7 +77,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getBlock().getLocation()).toIntVector(true),
             event.getBlock().getBlockData()
         );
@@ -93,7 +89,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getBlock().getLocation()).toIntVector(true),
             event.getBlock().getBlockData()
         );
@@ -105,7 +101,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getBlock().getLocation()).toIntVector(true),
             event.getBlock().getBlockData()
         );
@@ -117,7 +113,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getBlock()).toIntVector(true),
             event.getBlock().getBlockData()
         );
@@ -129,7 +125,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getToBlock()).toIntVector(true),
             event.getToBlock().getBlockData()
         );
@@ -141,7 +137,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getBlock()).toIntVector(true),
             event.getBlock().getBlockData()
         );
@@ -153,7 +149,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getBlock()).toIntVector(true),
             event.getBlock().getBlockData()
         );
@@ -165,7 +161,7 @@ public class GameFieldChangeObserver implements Listener {
             return;
         }
 
-        TestPlugin.getGameFieldRestorer().batch(
+        GameFieldRestorer.getRestorer(event.getBlock().getWorld()).batch(
             Vector3Builder.from(event.getBlock()).toIntVector(true),
             event.getBlock().getBlockData()
         );

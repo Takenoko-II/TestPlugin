@@ -13,7 +13,6 @@ import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
 import com.gmail.subnokoii78.tplcore.execute.*;
 import com.gmail.subnokoii78.tplcore.files.PluginConfigLoader;
-import com.gmail.subnokoii78.tplcore.schedule.GameTickScheduler;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,13 +20,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public final class TestPlugin extends JavaPlugin {
-    @Nullable
-    private static GameFieldRestorer gameFieldRestorer;
-
     private final TestPluginBootstrap bootstrap;
 
     TestPlugin(TestPluginBootstrap bootstrap) {
@@ -60,8 +55,8 @@ public final class TestPlugin extends JavaPlugin {
             TestPlugin.DEFAULT_CONFIG_RESOURCE_PATH
         );
 
-        gameFieldRestorer = new GameFieldRestorer(DimensionAccess.of(GAME_FIELD_DIMENSION_ID).getWorld());
-        getGameFieldRestorer().open();
+        // ゲームフィールドディメンションのリストアラーは早期に作っておく
+        new GameFieldRestorer(DimensionAccess.of(GAME_FIELD_DIMENSION_ID).getWorld()).open();
 
         // データパック導入チェック
         getComponentLogger().info(
@@ -117,7 +112,6 @@ public final class TestPlugin extends JavaPlugin {
         // TODO: config.jsonへの書き込み手段の提供(set, add, remove 可能な限りすべて)
         // TODO: ゲームサイクル(投票システムとかね)
         // TODO: Execute.run::onCatch
-        // TODO: Auto Flush
         // TODO: README.md
         // TODO: GameFieldRestorerを範囲ごとに分けるかも
     }
@@ -136,26 +130,15 @@ public final class TestPlugin extends JavaPlugin {
                 return Execute.SUCCESS;
             });
 
-        getGameFieldRestorer().close();
+        GameFieldRestorer.getAllRestorers().forEach(GameFieldRestorer::close);
 
         getComponentLogger().info(Component.text("TestPluginが停止しました").color(NamedTextColor.BLUE));
-    }
-
-    public static GameFieldRestorer getGameFieldRestorer() {
-        if (gameFieldRestorer == null) {
-            throw new IllegalStateException("gamefieldrestorer is null");
-        }
-        return gameFieldRestorer;
     }
 
     public static final String INTERNAL_ENTITY_TAG = "TestPlugin.Internal";
 
     public String getConfigFilePath() {
         return getDataPath() + "/config.json";
-    }
-
-    public String getDatabaseFilePath() {
-        return getDataPath() + "/database.db";
     }
 
     public static final String DEFAULT_CONFIG_RESOURCE_PATH = "/default_config.json";
