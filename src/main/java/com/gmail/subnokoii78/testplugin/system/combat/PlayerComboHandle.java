@@ -1,10 +1,11 @@
 package com.gmail.subnokoii78.testplugin.system.combat;
 
 import com.gmail.subnokoii78.testplugin.system.combat.combos.Combo;
-import com.gmail.subnokoii78.testplugin.system.combat.combos.KnightSlash;
 import com.gmail.subnokoii78.tplcore.schedule.GameTickScheduler;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -20,11 +21,14 @@ public class PlayerComboHandle {
 
     private int comboCount = 0;
 
-    private Combo combo = KnightSlash.KNIGHT_SLASH;
+    @Nullable
+    private Combo combo = null;
 
     private boolean isAwaitingNextCombo = false;
 
     private boolean isInCoolTime = false;
+
+    private long lastComboTick = 0L;
 
     private final GameTickScheduler scheduler = new GameTickScheduler(scheduler -> {
         if (isAwaitingNextCombo) {
@@ -34,8 +38,12 @@ public class PlayerComboHandle {
     });
 
     public boolean nextCombo() {
+        return nextCombo(null);
+    }
+
+    public boolean nextCombo(@Nullable Object data) {
         if (isInCoolTime) {
-            combo.onComboIsInCT(player);
+            getCombo().onComboIsInCT(player);
             return false;
         }
 
@@ -43,12 +51,12 @@ public class PlayerComboHandle {
         isInCoolTime = true;
 
         // リログ時に新しくServerPlayerオブジェクトが作られることを願って()
-        new GameTickScheduler(() -> isInCoolTime = false).runTimeout(combo.getCoolTime());
+        new GameTickScheduler(() -> isInCoolTime = false).runTimeout(getCombo().getCoolTime());
 
         final int nextComboCount = comboCount;
 
         boolean comboCompleted = false;
-        if (comboCount >= combo.getMaxCombo()) {
+        if (comboCount >= getCombo().getMaxCombo()) {
             // コンボ完成
             comboCompleted = true;
             comboCount = 0;
@@ -56,27 +64,37 @@ public class PlayerComboHandle {
         else {
             // コンボ未完成
             scheduler.clear();
-            scheduler.runTimeout(combo.getTimeToReset());
+            scheduler.runTimeout(getCombo().getTimeToReset());
             isAwaitingNextCombo = true;
         }
 
-        combo.onComboProgress(player, nextComboCount);
+        getCombo().onComboProgress(player, nextComboCount, data);
 
         if (comboCompleted) {
-            combo.onComboComplete(player);
+            getCombo().onComboComplete(player, data);
         }
 
+        lastComboTick = Bukkit.getServer().getCurrentTick();
+
         return nextComboCount > 0;
+    }
+
+    public long getLastComboTick() {
+        return lastComboTick;
     }
 
     public void stopCombo() {
         if (comboCount > 0) {
             comboCount = 0;
-            combo.onComboStop(player);
+            getCombo().onComboStop(player);
         }
     }
 
     public Combo getCombo() {
+        if (combo == null) {
+            throw new IllegalStateException("プレイヤー '" + player.getName() + "' は職業を持っていません");
+        }
+
         return combo;
     }
 

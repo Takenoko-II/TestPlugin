@@ -39,27 +39,6 @@ public final class CustomEventListener {
 
     private CustomEventListener() {}
 
-    public void onLeftClick(PlayerClickEvent event) {
-        if (!event.getClick().equals(PlayerClickEvent.Click.LEFT)) return;
-
-        // 左クリックしたプレイヤー
-        final Player player = event.getPlayer();
-        // プレイヤーの右手にあるアイテム
-        final ItemStack itemStack = player.getEquipment().getItem(EquipmentSlot.HAND);
-        // プレイヤーのコンボを管理するためのオブジェクト
-        final PlayerComboHandle handler = PlayerComboHandle.getHandle(player);
-
-        // 鉄剣じゃなかったらreturn
-        if (!itemStack.getType().equals(Material.IRON_SWORD)) return;
-
-        // 鉄剣持ってたら殴りとかブロック破壊をキャンセル
-        event.cancel();
-
-        handler.setCombo(KnightSlash.KNIGHT_SLASH);
-
-        handler.nextCombo();
-    }
-
     public int onCallBoundingBox(DatapackMessageReceiveEvent event) {
         final MojangsonCompound input = event.getInput();
 

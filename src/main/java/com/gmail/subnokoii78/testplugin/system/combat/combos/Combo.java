@@ -2,6 +2,7 @@ package com.gmail.subnokoii78.testplugin.system.combat.combos;
 
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public abstract class Combo {
@@ -36,7 +37,7 @@ public abstract class Combo {
         return coolTime;
     }
 
-    public void onComboProgress(Player player, int currentComboCount) {
+    public void onComboProgress(Player player, int currentComboCount, @Nullable Object data) {
 
     }
 
@@ -44,7 +45,7 @@ public abstract class Combo {
 
     }
 
-    public void onComboComplete(Player player) {
+    public void onComboComplete(Player player, @Nullable Object data) {
 
     }
 

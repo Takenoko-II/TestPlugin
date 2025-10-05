@@ -20,6 +20,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,7 +33,7 @@ public class KnightSlash extends Combo {
     }
 
     @Override
-    public void onComboProgress(Player player, int currentComboCount) {
+    public void onComboProgress(Player player, int currentComboCount, @Nullable Object data) {
         final PlayerComboHandle handler = PlayerComboHandle.getHandle(player);
         final OrientedBoundingBox box = new OrientedBoundingBox(4.5, 0.5, 4.5);
 
@@ -115,7 +116,7 @@ public class KnightSlash extends Combo {
     }
 
     @Override
-    public void onComboComplete(Player player) {
+    public void onComboComplete(Player player, @Nullable Object data) {
         player.sendMessage(Component.text("コンボ完成").color(NamedTextColor.GREEN));
     }
 

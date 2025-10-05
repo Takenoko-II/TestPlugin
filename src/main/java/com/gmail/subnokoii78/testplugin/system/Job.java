@@ -1,28 +1,68 @@
 package com.gmail.subnokoii78.testplugin.system;
 
+import com.gmail.subnokoii78.testplugin.system.combat.PlayerComboHandle;
+import com.gmail.subnokoii78.testplugin.system.combat.combos.ArcherShoot;
 import com.gmail.subnokoii78.testplugin.system.combat.combos.Combo;
+import com.gmail.subnokoii78.testplugin.system.combat.combos.KnightSlash;
+import com.gmail.subnokoii78.testplugin.system.items.JobItem;
+import com.gmail.subnokoii78.tplcore.commands.arguments.CommandArgumentableEnumeration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class Job {
-    private static int nextId = 1;
+import java.util.HashMap;
+import java.util.Map;
 
-    private final int id;
+public enum Job implements CommandArgumentableEnumeration {
+    KNIGHT("knight", KnightSlash.KNIGHT_SLASH, JobItem.KNIGHT_BLADE),
 
-    protected Job() {
-        this.id = nextId++;
+    ARCHER("archer", ArcherShoot.ARCHER_SHOOT, JobItem.ARCHER_BOW);
+
+    final String id;
+
+    final Combo normalCombo;
+
+    final JobItem jobItem;
+
+    private static final Map<Player, Job> map = new HashMap<>();
+
+    Job(String id, Combo normalCombo, JobItem jobItem) {
+        this.id = id;
+        this.normalCombo = normalCombo;
+        this.jobItem = jobItem;
     }
 
-    public final int getId() {
+    public String getId() {
         return id;
     }
 
-    public abstract void attack(@NotNull Player attacker, @NotNull Combo combo);
+    public Combo getNormalCombo() {
+        return normalCombo;
+    }
 
-    public static final Job KNIGHT = new Job() {
-        @Override
-        public void attack(@NotNull Player attacker, @NotNull Combo combo) {
+    public static boolean hasJob(Player player) {
+        return map.containsKey(player);
+    }
 
+    public static Job getJob(Player player) {
+        if (map.containsKey(player)) {
+            return map.get(player);
         }
-    };
+        else {
+            throw new IllegalStateException("プレイヤー '" + player.getName() + "' は職業を持っていません");
+        }
+    }
+
+    public static void setJob(Player player, Job job) {
+        takeJob(player);
+        map.put(player, job);
+        PlayerComboHandle.getHandle(player).setCombo(job.normalCombo);
+        player.getInventory().addItem(job.jobItem.get());
+    }
+
+    public static void takeJob(Player player) {
+        map.remove(player);
+        for (JobItem value : JobItem.values()) {
+            player.getInventory().remove(value.get());
+        }
+    }
 }

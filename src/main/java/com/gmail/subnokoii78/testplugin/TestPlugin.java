@@ -2,6 +2,8 @@ package com.gmail.subnokoii78.testplugin;
 
 import com.gmail.subnokoii78.testplugin.commands.*;
 import com.gmail.subnokoii78.testplugin.events.*;
+import com.gmail.subnokoii78.testplugin.system.Job;
+import com.gmail.subnokoii78.testplugin.system.combat.CombatSystemTriggerObserver;
 import com.gmail.subnokoii78.testplugin.system.combat.PlayerComboHandle;
 import com.gmail.subnokoii78.testplugin.system.combat.combos.KnightSlash;
 import com.gmail.subnokoii78.testplugin.system.field.GameFieldChangeObserver;
@@ -9,10 +11,8 @@ import com.gmail.subnokoii78.testplugin.system.field.GameFieldRestorer;
 import com.gmail.subnokoii78.tplcore.TPLCore;
 import com.gmail.subnokoii78.tplcore.eval.ScriptLanguage;
 import com.gmail.subnokoii78.tplcore.eval.groovy.GroovyContext;
-import com.gmail.subnokoii78.tplcore.events.PlayerClickEvent;
 import com.gmail.subnokoii78.tplcore.events.PluginApi;
 import com.gmail.subnokoii78.tplcore.events.TPLEventTypes;
-import com.gmail.subnokoii78.tplcore.events.TPLEvents;
 import com.gmail.subnokoii78.tplcore.execute.*;
 import com.gmail.subnokoii78.tplcore.files.PluginConfigLoader;
 import com.gmail.subnokoii78.tplcore.ui.container.ContainerInteraction;
@@ -97,9 +97,9 @@ public final class TestPlugin extends JavaPlugin {
             LobbyCommand.LOBBY_COMMAND.register(registrar);
             DatabaseCommand.DATABASE_COMMAND.register(registrar);
             GameFieldCommand.GAME_FIELD_COMMAND.register(registrar);
+            JobCommand.JOB_COMMAND.register(registrar);
         });
 
-        TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, CustomEventListener.INSTANCE::onLeftClick);
         TPLCore.events.register(TPLEventTypes.DATAPACK_MESSAGE_RECEIVE, CustomEventListener.INSTANCE::onDatapackMessageReceive);
         TPLCore.events.register(TPLEventTypes.TICK, TickEventListener.INSTANCE::onTick);
         TPLCore.events.register(TPLEventTypes.PLUGIN_CONFIG_UPDATE, event -> {
@@ -110,6 +110,11 @@ public final class TestPlugin extends JavaPlugin {
                 KnightSlash.KNIGHT_SLASH.updateAnimator();
             }
         });
+
+        getServer().getPluginManager().registerEvents(CombatSystemTriggerObserver.INSTANCE, this);
+        TPLCore.events.register(TPLEventTypes.PLAYER_CLICK, CombatSystemTriggerObserver.INSTANCE::onPlayerClick);
+        TPLCore.events.register(TPLEventTypes.PLAYER_BOW_SHOOT, CombatSystemTriggerObserver.INSTANCE::onPlayerBowShoot);
+        TPLCore.events.register(TPLEventTypes.PLAYER_USING_ITEM, CombatSystemTriggerObserver.INSTANCE::onPlayerUsingItem);
 
         getComponentLogger().info(Component.text("TestPluginが起動しました").color(NamedTextColor.GREEN));
 
@@ -132,6 +137,8 @@ public final class TestPlugin extends JavaPlugin {
                 stack.getExecutor().remove();
                 return Execute.SUCCESS;
             });
+
+        Bukkit.getOnlinePlayers().forEach(Job::takeJob);
 
         GameFieldRestorer.getAllRestorers().forEach(GameFieldRestorer::close);
 
